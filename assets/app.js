@@ -426,3 +426,155 @@ window.addEventListener("DOMContentLoaded", async ()=>{
     document.querySelector(".bg-orbs")?.style.setProperty("animation","none");
   }
 });
+/* ==== EVRT Demo 2.0 script ============================================ */
+(function(){
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  const preview = $("#preview");
+  const meters = { reach: $("#m-reach"), ctr: $("#m-ctr"), conf: $("#m-conf") };
+
+  // Chip toggles
+  $$("#chips-platforms .chip").forEach(chip=>{
+    chip.addEventListener("click", ()=>{
+      chip.classList.toggle("is-on");
+      paint(); // platforms influence pattern
+    });
+  });
+  $$("#chips-tone .chip").forEach(chip=>{
+    chip.addEventListener("click", ()=>{
+      $$("#chips-tone .chip").forEach(c=>c.classList.remove("is-on"));
+      chip.classList.add("is-on");
+      paint();
+    });
+  });
+
+  // Text + sliders
+  const pt = $("#post-text");
+  ["input","change"].forEach(ev=> pt.addEventListener(ev, ()=> {
+    preview.textContent = pt.value || "Your post preview will appear here…";
+  }));
+  ["#s-clarity","#s-energy","#s-depth"].forEach(sel=>{
+    $(sel).addEventListener("input", ()=> paint());
+  });
+
+  // Buttons
+  $("#btn-variant").addEventListener("click", ()=>{
+    // ultra-simplified “variant”
+    const base = pt.value.trim() || "Announcing EVRT Social AI — create, predict, and scale content.";
+    const tones = { pro:["Here’s the plan:","Key takeaways:","In short:"],
+                    playful:["Fun fact:","Hot take:","BTW:"],
+                    bold:["Heads up:","Look —","Real talk:"] };
+    const tone = document.querySelector("#chips-tone .chip.is-on")?.dataset.tone || "pro";
+    pt.value = `${tones[tone][Math.floor(Math.random()*3)]} ${base}`;
+    pt.dispatchEvent(new Event("input"));
+  });
+
+  $("#btn-predict").addEventListener("click", ()=>{
+    // fake metrics tied to sliders + platforms
+    const clarity = +$("#s-clarity").value;
+    const energy  = +$("#s-energy").value;
+    const depth   = +$("#s-depth").value;
+    const plats = $$("#chips-platforms .chip.is-on").length || 1;
+
+    const reach = Math.round( (clarity*0.6 + energy*0.4 + depth*0.2) * plats * 3 );
+    const ctr = ( (energy*0.015 + clarity*0.01) / 10 + 1.2 ).toFixed(1);
+    const conf = Math.min(99, Math.round( 40 + depth*0.4 + plats*6 ));
+
+    meters.reach.textContent = Intl.NumberFormat().format(reach);
+    meters.ctr.textContent   = `${ctr}%`;
+    meters.conf.textContent  = `${conf}%`;
+
+    pulse(meters.reach.parentElement);
+    pulse(meters.ctr.parentElement);
+    pulse(meters.conf.parentElement);
+
+    paint();
+  });
+
+  $("#btn-schedule").addEventListener("click", ()=>{
+    flash(".stage-toolbar");
+  });
+  $("#btn-clear").addEventListener("click", ()=>{
+    meters.reach.textContent = meters.ctr.textContent = meters.conf.textContent = "—";
+    paint(true);
+  });
+
+  // Canvas heatmap
+  const cvs = document.getElementById("heatmap");
+  const ctx = cvs.getContext("2d");
+
+  function sizeCanvas(){
+    const r = cvs.getBoundingClientRect();
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    cvs.width = Math.floor(r.width * dpr);
+    cvs.height = Math.floor(Math.max(r.height, 360) * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener("resize", sizeCanvas, { passive:true });
+
+  function paint(clear=false){
+    sizeCanvas();
+    const w = cvs.width / (window.devicePixelRatio||1);
+    const h = cvs.height / (window.devicePixelRatio||1);
+    ctx.clearRect(0,0,w,h);
+
+    // grid 7 days x 24 hours (condensed)
+    const cols = 24, rows = 7;
+    const cellW = w/cols, cellH = h/rows;
+
+    // parameters from UI
+    const clarity = +$("#s-clarity").value;
+    const energy  = +$("#s-energy").value;
+    const depth   = +$("#s-depth").value;
+    const toneKey = document.querySelector("#chips-tone .chip.is-on")?.dataset.tone || "pro";
+    const plats = $$("#chips-platforms .chip.is-on").map(c=>c.dataset.pl);
+
+    // seed pattern
+    const seed = (clarity*3 + energy*5 + depth*7 + toneKey.length*11 + plats.join("").length*13) % 997;
+    function rnd(i,j){ // cheap deterministic-ish noise
+      const x = Math.sin((i*37 + j*57 + seed)*0.01)*43758.5453;
+      return x - Math.floor(x);
+    }
+
+    for(let r=0;r<rows;r++){
+      for(let c=0;c<cols;c++){
+        const base = rnd(r,c);
+        // weight hours: evenings hotter
+        const hourBias = Math.sin((c/24)*Math.PI) * 0.6 + 0.2;
+        // platforms add spikes
+        const platBoost = plats.length>0 ? 0.1*plats.length : 0.05;
+        const val = clear ? 0.08 : Math.min(1, base*0.35 + hourBias + platBoost + energy*0.003);
+
+        const hueA = 275, hueB = 195;
+        const hue = hueA + (hueB-hueA)*val;
+        const alpha = 0.12 + val*0.38;
+
+        ctx.fillStyle = `hsla(${hue} 90% 55% / ${alpha})`;
+        const pad = 2;
+        ctx.fillRect(c*cellW+pad, r*cellH+pad, cellW-2*pad, cellH-2*pad);
+      }
+    }
+
+    // overlay axes
+    ctx.strokeStyle = "rgba(255,255,255,0.06)";
+    for(let c=1;c<cols;c++){ ctx.beginPath(); ctx.moveTo(c*cellW,0); ctx.lineTo(c*cellW,h); ctx.stroke(); }
+    for(let r=1;r<rows;r++){ ctx.beginPath(); ctx.moveTo(0,r*cellH); ctx.lineTo(w,r*cellH); ctx.stroke(); }
+  }
+
+  function pulse(el){
+    el.animate([{transform:"scale(1)"},{transform:"scale(1.03)"},{transform:"scale(1)"}],
+               {duration:400, easing:"ease-out"});
+  }
+  function flash(sel){
+    const el = document.querySelector(sel);
+    if(!el) return;
+    el.animate([{boxShadow:"0 0 0 rgba(0,0,0,0)"},
+                {boxShadow:"0 0 0 6px rgba(80,160,255,.25)"},
+                {boxShadow:"0 0 0 rgba(0,0,0,0)"}],
+                {duration:700, easing:"ease-out"});
+  }
+
+  // init
+  sizeCanvas(); paint();
+})();
+
