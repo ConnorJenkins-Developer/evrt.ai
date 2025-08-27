@@ -7,6 +7,7 @@
 [data-theme="light"]{--bg:#f7f8fb;--surface:#fff;--text:#0b0d14;--muted:#475066;--line:#e5e8f0}
 *,*::before,*::after{box-sizing:border-box}
 html,body{height:100%}
+html,body{overscroll-behavior-y:none}
 body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;
   color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
@@ -77,13 +78,36 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-s
 [data-reveal]{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease}
 [data-reveal].in{opacity:1;transform:translateY(0)}
 
+/* ============ MOBILE SCROLL LOCK ============ */
+body.modal-open{
+  position:fixed; /* locks the page behind on iOS too */
+  width:100%;
+  overflow:hidden;
+}
+
 /* =======================
    LIVE DEMO PORTAL
 ======================= */
-#demoPortal{position:fixed;inset:0;background:color-mix(in oklab,var(--bg) 85%, transparent);
-backdrop-filter:blur(12px);display:none;z-index:60}
+#demoPortal{
+  position:fixed; inset:0;
+  background:color-mix(in oklab,var(--bg) 85%, transparent);
+  backdrop-filter:blur(12px);
+  display:none; z-index:60;
+
+  /* capture scrolling inside the overlay */
+  overflow:auto; 
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+}
 #demoPortal.open{display:block}
-.portal-shell{position:absolute;inset:0;display:flex;flex-direction:column;padding:16px}
+.portal-shell{
+  position:relative;
+  display:flex; flex-direction:column;
+  padding:16px;
+  min-height:100vh;       /* fallback */
+  min-height:100dvh;      /* modern mobile toolbars */
+}
 .portal-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .portal-badge{padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#0d111a;opacity:.95}
 .portal-spacer{flex:1}
@@ -92,9 +116,19 @@ backdrop-filter:blur(12px);display:none;z-index:60}
 .tab.active{background:linear-gradient(90deg,hsl(var(--accent)/.3),hsl(var(--accent-2)/.3));border-color:transparent;color:#fff}
 .btn.close{padding:.6rem .8rem}
 
-.portal-grid{display:grid;grid-template-columns:320px 1fr 360px;gap:14px;min-height:0;flex:1}
-.panel{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
-padding:14px;min-height:0}
+.portal-grid{
+  display:grid; grid-template-columns:320px 1fr 360px; gap:14px;
+  /* Let the grid grow but also allow children to scroll */
+  min-height:0; flex:1;
+}
+.panel{
+  border:1px solid var(--line);border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+  padding:14px; min-height:0;
+
+  /* vertical layout + internal scroll if needed */
+  display:flex; flex-direction:column; overflow:auto;
+}
 .panel h3,.panel h4{margin:.25rem 0 .5rem}
 .panel .row{display:flex;gap:10px;flex-wrap:wrap}
 .left textarea{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#0d111a;color:var(--text)}
@@ -144,7 +178,8 @@ display:grid;place-items:center;color:#fff;font-weight:700}
 
 /* Responsive portal */
 @media(max-width:1320px){.portal-grid{grid-template-columns:280px 1fr 320px}}
-@media(max-width:1080px){.portal-grid{grid-template-columns:1fr; grid-auto-rows:min-content}
+@media(max-width:1080px){
+  .portal-grid{grid-template-columns:1fr; grid-auto-rows:min-content}
   .right{order:3}
   .center{order:2}
   .left{order:1}
