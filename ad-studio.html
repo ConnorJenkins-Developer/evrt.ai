@@ -3,85 +3,83 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>EVRT – Ad Preview Studio</title>
-  <meta name="description" content="Live, high-fidelity previews for Facebook, Instagram, and TikTok ads."/>
+  <title>EVRT — Ad Preview Studio</title>
+  <meta name="description" content="Design ad mockups for Facebook, Instagram, and TikTok. Upload an image, tune copy, generate variants, preview instantly, and export as PNG."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="assets/style.css"/>
 
+  <!-- Page-scoped styles -->
   <style>
-    /* ======= Page-specific styles (namespaced with .studio-) ======= */
-    .container.wide{max-width:1440px}
-    .studio-wrap{
-      position:relative; display:grid; gap:24px;
-      grid-template-columns:minmax(300px,420px) 1fr;
-      border:1px solid var(--line); border-radius:16px; padding:16px;
-      background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
-      box-shadow:var(--shadow-lg);
-    }
-    .studio-controls{
-      display:flex; flex-direction:column; gap:14px;
-      border:1px solid var(--line); border-radius:14px; padding:14px;
-      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));
-    }
-    .studio-controls .kv{display:grid; grid-template-columns:1fr; gap:8px}
-    .studio-controls label{font-size:.9rem; color:var(--muted); font-weight:600}
-    .studio-controls input[type="text"],
-    .studio-controls input[type="url"],
-    .studio-controls textarea,
-    .studio-controls select{
-      padding:12px; border:1px solid var(--line); border-radius:10px;
-      background:#0e121b; color:var(--text);
-    }
-    .studio-controls textarea{min-height:110px; resize:vertical}
-    .studio-row{display:flex; gap:10px; flex-wrap:wrap}
-    .chip{padding:.42rem .7rem; border:1px solid var(--line); border-radius:999px; background:#0f1320; font-weight:600}
-    .chip.is-on{background:linear-gradient(90deg,hsl(var(--accent)/.25),hsl(var(--accent-2)/.25)); border-color:hsl(var(--accent)/.6)}
-    .help{color:var(--muted); font-size:.9rem}
-
-    .studio-previews{
-      border:1px solid var(--line); border-radius:14px; padding:14px;
-      background:linear-gradient(135deg,#080b12,#0b0810);
-      min-height:520px;
-      display:grid; gap:16px;
-      grid-template-rows:auto 1fr;
-    }
-    .studio-toolbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
-    .studio-grid{display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-    /* Cards look native-ish (not exact brand UIs) */
-    .card-ui{border:1px solid var(--line); border-radius:14px; background:#0b0f19; overflow:hidden}
-    .card-ui .head{display:flex; align-items:center; gap:10px; padding:12px}
-    .avatar{width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,hsl(var(--accent)),hsl(var(--accent-2)));}
-    .brand{font-weight:800}
-    .subtle{color:var(--muted); font-size:.9rem}
-    .media{position:relative; background:#0e1422; min-height:200px}
-    .media img{width:100%; height:100%; object-fit:cover; display:block}
-    .body{padding:12px}
-    .cta-row{display:flex; align-items:center; gap:12px; justify-content:space-between; padding:12px; border-top:1px solid var(--line)}
-    .btn-cta{padding:.55rem .9rem; border-radius:10px; font-weight:800; background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2))); color:#fff; border:none}
-
-    /* Platform skins */
-    .fb .head{border-bottom:1px solid var(--line)}
-    .ig .media{aspect-ratio: 4/5}
-    .ig .icons{display:flex; gap:12px; padding:10px 12px; border-top:1px solid var(--line)}
-    .tt .media{aspect-ratio:9/16}
-    .tt .overlay{
-      position:absolute; inset:0; background:linear-gradient(180deg,transparent, rgba(0,0,0,.45) 70%);
-      display:flex; align-items:flex-end; padding:12px; color:#fff
-    }
-    .tt .rightbar{
-      position:absolute; right:8px; bottom:8px; display:grid; gap:10px; text-align:center; color:#fff
-    }
-    .tt .rightbar .icon{width:42px; height:42px; border-radius:50%; background:rgba(255,255,255,.1); display:grid; place-items:center}
-
-    /* Phone frame preview (optional toggle) */
-    .phone-frame{
-      border:1px solid var(--line); border-radius:24px; padding:10px; background:#02040a;
-      box-shadow:0 30px 70px rgba(0,0,0,.45), inset 0 0 0 8px #0a0f18;
+    /* layout */
+    .studio-wrap { padding: 14px 0 28px; }
+    .studio-grid { display:grid; gap:20px; }
+    @media (min-width: 980px){
+      .studio-grid { grid-template-columns: 360px 1fr; align-items:start; }
     }
 
-    @media (max-width:1100px){ .studio-wrap{grid-template-columns:1fr} }
+    /* cards / sections */
+    .tool { border:1px solid var(--line); background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02)); border-radius:16px; padding:16px; }
+    .tool h3 { margin:.1rem 0 .6rem; }
+    .muted { color: var(--muted); }
+
+    .seg { display:inline-flex; gap:6px; border:1px solid var(--line); background:#0e121b; padding:4px; border-radius:999px; }
+    .seg button { border:0; background:transparent; color:var(--text); padding:.45rem .8rem; border-radius:999px; font-weight:700; cursor:pointer; }
+    .seg button.active { background:linear-gradient(90deg,hsl(var(--accent)/.35),hsl(var(--accent-2)/.35)); }
+
+    .row { display:grid; gap:10px; }
+    .row.two { grid-template-columns: 1fr 1fr; }
+    .row.three { grid-template-columns: 1fr 1fr 1fr; }
+    @media (max-width:740px){ .row.two, .row.three { grid-template-columns:1fr; } }
+
+    .fld { display:flex; flex-direction:column; gap:6px; }
+    .fld label { font-weight:700; font-size:.95rem; }
+    .fld input[type="text"], .fld input[type="url"], .fld textarea {
+      padding:12px; border-radius:12px; border:1px solid var(--line); background:#0f141d; color:var(--text);
+    }
+    .hint { font-size:.9rem; color:var(--muted); display:flex; justify-content:space-between; gap:8px; }
+    .hint .count { font-variant-numeric: tabular-nums; }
+
+    .btnbar { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn.primary { background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2))); border-color:transparent; color:#fff; }
+    .chip { display:inline-flex; align-items:center; gap:.45rem; padding:.35rem .6rem; border-radius:999px; border:1px solid var(--line); background:#0e121b; }
+    .metric { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:10px; margin-top:10px; }
+    .metric .m { border:1px dashed var(--line); border-radius:12px; padding:10px; text-align:center; }
+    .metric .m .v { font-size:1.2rem; font-weight:800; }
+
+    /* previews area */
+    .preview-rail { display:grid; gap:16px; }
+    @media (min-width: 1100px){ .preview-rail { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+    .ad-shell { border:1px solid var(--line); background:#0c111a; border-radius:16px; padding:14px; box-shadow:var(--shadow-lg); }
+    .ad-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .ad-brand { display:flex; align-items:center; gap:10px; font-weight:800; }
+    .ad-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,hsl(var(--accent)),hsl(var(--accent-2))); }
+    .ad-copy { margin:.5rem 0 0; white-space:pre-wrap; }
+    .ad-media { height:220px; border-radius:12px; margin-top:10px;
+      background: radial-gradient(100% 120% at 10% 10%, hsl(var(--accent)/.45), transparent),
+                  radial-gradient(120% 120% at 90% 20%, hsl(var(--accent-2)/.35), transparent),
+                  radial-gradient(120% 120% at 40% 80%, hsl(320 90% 55%/.30), transparent);
+      background-size:cover; background-position:center; overflow:hidden; display:block;
+    }
+    .ad-footer { display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
+    .ad-cta { padding:.5rem .8rem; border-radius:999px; border:1px solid var(--line);
+      background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2))); color:#fff; font-weight:800; }
+    .ad-url { color: var(--muted); }
+    .clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .clamp-4 { display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+
+    /* platform aspect tweaks */
+    .shell[data-p="facebook"] .ad-media { height: 220px; }
+    .shell[data-p="instagram"] .ad-media { height: 300px; border-radius:16px; }
+    .shell[data-p="tiktok"] .ad-media { height: 420px; border-radius:12px; }
+
+    /* drop area */
+    .drop {
+      border:1px dashed var(--line); border-radius:12px; padding:14px; text-align:center;
+      background:#0d121b;
+    }
+    .drop.drag { outline: 2px solid hsl(var(--accent)); outline-offset:2px; }
   </style>
 </head>
 <body>
@@ -89,286 +87,481 @@
   <div data-include="partials/header.html"></div>
 
   <section class="container hero">
-    <span class="eyebrow">Interactive</span>
+    <span class="eyebrow">Studio</span>
     <h1 class="gradient-text">Ad Preview Studio</h1>
-    <p class="sub">Craft once → see how it lands in Facebook, Instagram, and TikTok feeds—in real time.</p>
+    <p class="sub">Design FB/IG/TikTok mockups. Update fields → previews refresh instantly. Export PNG, share a link, or jump into Social&nbsp;AI.</p>
+    <div class="hero-cta">
+      <a class="btn primary" href="index.html#demo">Open live Social&nbsp;AI demo</a>
+      <a class="btn" href="pricing.html">Try Pro</a>
+    </div>
   </section>
 
-  <section class="container wide section">
-    <div class="studio-wrap">
-      <!-- ========== Controls ========== -->
-      <aside class="studio-controls">
-        <div class="studio-head kv">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="badge-pill">★</div>
-            <div>
-              <div style="font-weight:800">Creative controls</div>
-              <div class="help">Update fields → previews refresh instantly.</div>
+  <section class="container studio-wrap">
+    <div class="studio-grid">
+      <!-- Controls -->
+      <aside class="tool" id="controls">
+        <div class="seg" role="tablist" aria-label="Platform">
+          <button class="active" data-p="facebook" role="tab" aria-selected="true">Facebook</button>
+          <button data-p="instagram" role="tab" aria-selected="false">Instagram</button>
+          <button data-p="tiktok" role="tab" aria-selected="false">TikTok</button>
+        </div>
+
+        <h3 style="margin:12px 0 6px">Creative controls</h3>
+        <p class="muted" style="margin-top:0">Brand, handle, copy, CTA, and media.</p>
+
+        <div class="row two">
+          <div class="fld"><label for="brand">Brand name</label>
+            <input id="brand" type="text" data-field="brand" placeholder="EVRT" maxlength="24">
+            <div class="hint"><span>Shown as page/account</span><span class="count" data-count="brand"></span></div>
+          </div>
+          <div class="fld"><label for="handle">Handle</label>
+            <input id="handle" type="text" data-field="handle" placeholder="@evrt.ai" maxlength="32">
+            <div class="hint"><span>Optional (IG/TikTok)</span><span class="count" data-count="handle"></span></div>
+          </div>
+        </div>
+
+        <div class="fld"><label for="headline">Headline</label>
+          <input id="headline" type="text" data-field="headline" placeholder="Draft once → schedule everywhere with predictive timing" maxlength="110">
+          <div class="hint"><span>Keep it scannable</span><span class="count" data-count="headline"></span></div>
+        </div>
+
+        <div class="fld"><label for="body">Body / caption</label>
+          <textarea id="body" rows="5" data-field="body" placeholder="Create on-brand posts, predict the best minute per platform, and measure lift with closed-loop analytics." maxlength="400"></textarea>
+          <div class="hint"><span>Longer copy for FB; concise for TikTok</span><span class="count" data-count="body"></span></div>
+        </div>
+
+        <div class="row two">
+          <div class="fld"><label for="cta">CTA</label>
+            <input id="cta" type="text" data-field="cta" placeholder="Start trial" maxlength="18">
+            <div class="hint"><span></span><span class="count" data-count="cta"></span></div>
+          </div>
+          <div class="fld"><label for="url">Link</label>
+            <input id="url" type="url" data-field="url" placeholder="https://evrt.ai" maxlength="120">
+            <div class="hint"><span>Shown as display URL</span><span class="count" data-count="url"></span></div>
+          </div>
+        </div>
+
+        <div class="fld">
+          <label>Image / video poster</label>
+          <div class="drop" id="drop">
+            <input id="file" type="file" accept="image/*,video/*" style="display:none">
+            <p class="muted" style="margin:0 0 8px">Drop an image here or <a href="#" id="filePick">choose a file</a>.</p>
+            <div class="btnbar">
+              <button class="btn" id="clearMedia">Remove</button>
+              <button class="btn" id="exportPng">Export PNG</button>
+              <button class="btn" id="shareLink">Share setup</button>
             </div>
           </div>
-          <div></div>
         </div>
 
-        <div class="kv">
-          <label>Platforms</label>
-          <div class="studio-row">
-            <button class="chip is-on" data-platform="fb">Facebook</button>
-            <button class="chip is-on" data-platform="ig">Instagram</button>
-            <button class="chip is-on" data-platform="tt">TikTok</button>
+        <h3 style="margin:14px 0 6px">Signal sliders</h3>
+        <div class="row three">
+          <div class="fld"><label>Clarity</label>
+            <input type="range" min="0" max="100" value="70" step="1" data-field="clarity">
+          </div>
+          <div class="fld"><label>Energy</label>
+            <input type="range" min="0" max="100" value="65" step="1" data-field="energy">
+          </div>
+          <div class="fld"><label>Depth</label>
+            <input type="range" min="0" max="100" value="55" step="1" data-field="depth">
           </div>
         </div>
-
-        <div class="kv">
-          <label>Brand name</label>
-          <input id="brand" type="text" value="EVRT"/>
+        <div class="metric">
+          <div class="m"><div class="v" id="mReach">—</div><div class="muted">Expected reach</div></div>
+          <div class="m"><div class="v" id="mCTR">—</div><div class="muted">CTR</div></div>
+          <div class="m"><div class="v" id="mConf">—</div><div class="muted">Confidence</div></div>
         </div>
 
-        <div class="kv">
-          <label>Handle</label>
-          <input id="handle" type="text" value="@evrt.ai"/>
+        <h3 style="margin:14px 0 6px">Idea helpers</h3>
+        <div class="btnbar">
+          <button class="btn" id="genVariants">Generate headline variants</button>
+          <button class="btn" id="bestMinute">Predict best minute</button>
         </div>
-
-        <div class="kv">
-          <label>Headline</label>
-          <input id="headline" type="text" value="Draft once → schedule everywhere with predictive timing"/>
-        </div>
-
-        <div class="kv">
-          <label>Body / caption</label>
-          <textarea id="body">Create on-brand posts, predict the best minute per platform, and measure lift with closed-loop analytics.</textarea>
-        </div>
-
-        <div class="kv">
-          <label>CTA</label>
-          <div class="studio-row">
-            <input id="cta" type="text" value="Start trial" style="flex:1"/>
-            <input id="url" type="url" value="https://evrt.ai" placeholder="https://…"/>
-          </div>
-        </div>
-
-        <div class="kv">
-          <label>Image / video poster</label>
-          <input id="image" type="file" accept="image/*"/>
-          <div class="studio-row">
-            <button class="btn" id="useGradient">Use gradient</button>
-            <button class="btn" id="clearImage">Clear</button>
-          </div>
-          <div class="help">We’ll auto-fit to the right aspect ratio per platform.</div>
-        </div>
-
-        <div class="kv">
-          <label>Appearance</label>
-          <div class="studio-row">
-            <button class="btn ghost" id="themeBtn">🌓 Toggle theme</button>
-            <button class="btn" id="togglePhone">Phone frame: <span id="pfState">Off</span></button>
-          </div>
-        </div>
-
-        <button class="btn primary block" id="genVariants">Generate 3 variants</button>
-        <div class="help">Variants tweak headline rhythm, punctuation, and CTA strength.</div>
+        <div id="variantBox" class="row" style="margin-top:10px"></div>
+        <div id="minuteBox" class="row" style="margin-top:10px"></div>
       </aside>
 
-      <!-- ========== Previews ========== -->
-      <main class="studio-previews">
-        <div class="studio-toolbar">
-          <span class="pill">Live previews</span>
-          <span class="pill" id="variantTag" style="display:none">Variant: A</span>
-          <div class="spacer"></div>
-          <a class="btn" href="social-ai.html">See full product</a>
+      <!-- Live previews -->
+      <main class="preview-rail">
+        <div class="ad-shell shell tool" data-p="facebook">
+          <div class="chip">Facebook preview</div>
+          <article class="ad ad-shell__inner ad-shell--fb ad-shell tool" aria-label="Facebook ad">
+            <div class="ad-head">
+              <div class="ad-brand">
+                <span class="ad-avatar" aria-hidden="true"></span>
+                <div><div id="pBrandFB">EVRT</div><div class="muted" id="pTagFB">Sponsored · 1h</div></div>
+              </div>
+              <span class="chip" id="pCtaFB">Start trial</span>
+            </div>
+            <p class="ad-copy clamp-4" id="pCopyFB">Draft once → schedule everywhere with predictive timing.</p>
+            <div class="ad-media" id="pMediaFB"></div>
+            <div class="ad-footer"><span class="ad-url" id="pUrlFB">evrt.ai</span><span class="ad-cta">Learn more</span></div>
+          </article>
         </div>
 
-        <div class="studio-grid" id="previewGrid">
-          <!-- Facebook -->
-          <div class="card-ui fb" data-platform="fb">
-            <div class="head">
-              <div class="avatar" id="fbAvatar"></div>
-              <div>
-                <div class="brand" id="fbBrand">EVRT</div>
-                <div class="subtle">Sponsored · 1h · 🌐</div>
+        <div class="ad-shell shell tool" data-p="instagram">
+          <div class="chip">Instagram preview</div>
+          <article class="ad-shell__inner ad-shell--ig ad-shell tool" aria-label="Instagram ad">
+            <div class="ad-head">
+              <div class="ad-brand">
+                <span class="ad-avatar" aria-hidden="true"></span>
+                <div><div id="pBrandIG">EVRT</div><div class="muted" id="pTagIG">@evrt.ai</div></div>
               </div>
+              <span class="chip" id="pCtaIG">Shop now</span>
             </div>
-            <div class="body">
-              <div id="fbText">Draft once → schedule everywhere with predictive timing</div>
-            </div>
-            <div class="media"><img id="fbImg" alt=""/></div>
-            <div class="cta-row">
-              <div class="subtle" id="fbDomain">evrt.ai</div>
-              <button class="btn-cta" id="fbCTA">Start trial</button>
-            </div>
-          </div>
+            <p class="ad-copy clamp-2" id="pCopyIG">Create on-brand posts, publish at the best minute, measure lift.</p>
+            <div class="ad-media" id="pMediaIG"></div>
+            <div class="ad-footer"><span class="ad-url" id="pUrlIG">evrt.ai</span><span class="ad-cta">Learn more</span></div>
+          </article>
+        </div>
 
-          <!-- Instagram -->
-          <div class="card-ui ig" data-platform="ig">
-            <div class="head">
-              <div class="avatar"></div>
-              <div>
-                <div class="brand" id="igBrand">EVRT</div>
-                <div class="subtle" id="igHandle">@evrt.ai</div>
+        <div class="ad-shell shell tool" data-p="tiktok">
+          <div class="chip">TikTok preview</div>
+          <article class="ad-shell__inner ad-shell--tt ad-shell tool" aria-label="TikTok ad">
+            <div class="ad-head">
+              <div class="ad-brand">
+                <span class="ad-avatar" aria-hidden="true"></span>
+                <div><div id="pBrandTT">EVRT · Official</div><div class="muted" id="pTagTT">Promoted</div></div>
               </div>
+              <span class="chip" id="pCtaTT">Learn more</span>
             </div>
-            <div class="media"><img id="igImg" alt=""/></div>
-            <div class="icons">
-              <span>♡</span><span>💬</span><span>↗</span>
-            </div>
-            <div class="body">
-              <strong id="igHeadline">Draft once → schedule everywhere with predictive timing</strong>
-              <p class="subtle" id="igBody">Create on-brand posts, predict the best minute per platform, and measure lift with closed-loop analytics.</p>
-            </div>
-          </div>
-
-          <!-- TikTok -->
-          <div class="card-ui tt" data-platform="tt">
-            <div class="media">
-              <img id="ttImg" alt=""/>
-              <div class="overlay"><div>
-                <div class="brand" id="ttBrand">EVRT</div>
-                <div class="subtle" id="ttHandle">@evrt.ai</div>
-              </div></div>
-              <div class="rightbar">
-                <div class="icon">♡</div>
-                <div class="icon">💬</div>
-                <div class="icon">↗</div>
-              </div>
-            </div>
-            <div class="body">
-              <strong id="ttHeadline">Draft once → schedule everywhere with predictive timing</strong>
-              <p class="subtle" id="ttBody">Create on-brand posts, predict the best minute per platform, and measure lift with closed-loop analytics.</p>
-              <div class="cta-row">
-                <button class="btn-cta" id="ttCTA">Start trial</button>
-                <span class="subtle" id="ttDomain">evrt.ai</span>
-              </div>
-            </div>
-          </div>
+            <p class="ad-copy clamp-2" id="pCopyTT">On-brand content + best-minute timing. Close the loop on lift.</p>
+            <div class="ad-media" id="pMediaTT"></div>
+            <div class="ad-footer"><span class="ad-url" id="pUrlTT">@evrt.ai</span><span class="ad-cta">Learn more</span></div>
+          </article>
         </div>
       </main>
     </div>
   </section>
 
   <div data-include="partials/footer.html"></div>
-  <script defer src="assets/app.js"></script>
+
+  <!-- Hidden canvas for PNG export -->
+  <canvas id="exportCanvas" width="1200" height="628" style="display:none"></canvas>
+
   <script>
-    // ======= Ad Studio logic (no external libs) =======
+    // ---------- helpers
     const $ = sel => document.querySelector(sel);
-    const $$ = sel => Array.from(document.querySelectorAll(sel));
+    const $$ = sel => [...document.querySelectorAll(sel)];
+    const SKEY = 'evrt_ad_studio_v1';
 
-    const brand = $('#brand');
-    const handle = $('#handle');
-    const headline = $('#headline');
-    const body = $('#body');
-    const cta = $('#cta');
-    const url = $('#url');
-    const file = $('#image');
+    function safe(str=''){ return (str || '').toString(); }
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+    function hostFromUrl(u) {
+      try { return new URL(u).host.replace(/^www\./,''); } catch { return safe(u).replace(/^https?:\/\//,''); }
+    }
 
-    const imgEls = { fb:$('#fbImg'), ig:$('#igImg'), tt:$('#ttImg') };
-    const defaultGradient = () => {
-      // Generate a dynamic gradient data URL (no external asset)
-      const c = document.createElement('canvas');
-      c.width = 1200; c.height = 1600;
-      const g = c.getContext('2d');
-      const grad = g.createLinearGradient(0,0,c.width,c.height);
-      grad.addColorStop(0,'#1a1150');
-      grad.addColorStop(.5,'#0a4fb3');
-      grad.addColorStop(1,'#1b0b23');
-      g.fillStyle = grad; g.fillRect(0,0,c.width,c.height);
-      g.globalAlpha = .35;
-      for (let i=0;i<6;i++){
-        const rx = Math.random()*c.width, ry=Math.random()*c.height;
-        const r = 200+Math.random()*400;
-        const g2 = g.createRadialGradient(rx,ry,0,rx,ry,r);
-        g2.addColorStop(0,`hsla(${Math.random()*360},90%,60%,.9)`);
-        g2.addColorStop(1,'transparent');
-        g.fillStyle = g2; g.beginPath(); g.arc(rx,ry,r,0,Math.PI*2); g.fill();
-      }
-      return c.toDataURL('image/png');
+    // ---------- state
+    const state = {
+      platform: 'facebook',
+      brand: 'EVRT',
+      handle: '@evrt.ai',
+      headline: 'Draft once → schedule everywhere with predictive timing',
+      body: 'Create on-brand posts, predict the best minute per platform, and measure lift with closed-loop analytics.',
+      cta: 'Start trial',
+      url: 'https://evrt.ai',
+      media: '', // dataURL
+      clarity: 70, energy: 65, depth: 55
     };
 
-    // Initialize gradient poster
-    const gradientURL = defaultGradient();
-    Object.values(imgEls).forEach(el => el.src = gradientURL);
+    // load from localStorage or hash
+    (function hydrate(){
+      try{
+        const hash = location.hash.startsWith('#s=') ? location.hash.slice(3) : '';
+        if (hash){
+          const decoded = JSON.parse(atob(decodeURIComponent(hash)));
+          Object.assign(state, decoded || {});
+        } else {
+          const saved = localStorage.getItem(SKEY);
+          if (saved) Object.assign(state, JSON.parse(saved));
+        }
+      }catch(e){}
+    })();
 
-    function domainFromUrl(u){
-      try{ return new URL(u).hostname.replace(/^www\./,''); }
-      catch { return 'evrt.ai' }
+    // save
+    function persist(){
+      try{ localStorage.setItem(SKEY, JSON.stringify(state)); }catch(e){}
     }
-    function updateText(){
-      // Brand & handle
-      $('#fbBrand').textContent = brand.value || 'EVRT';
-      $('#igBrand').textContent = brand.value || 'EVRT';
-      $('#ttBrand').textContent = brand.value || 'EVRT';
 
-      $('#igHandle').textContent = handle.value || '@evrt.ai';
-      $('#ttHandle').textContent = handle.value || '@evrt.ai';
-
-      // Headline + body
-      const h = headline.value || 'Draft once → schedule everywhere with predictive timing';
-      $('#fbText').textContent = h;
-      $('#igHeadline').textContent = h;
-      $('#ttHeadline').textContent = h;
-
-      const b = body.value || '';
-      $('#igBody').textContent = b;
-      $('#ttBody').textContent = b;
-
-      // CTA + domain
-      const c = (cta.value || 'Learn more').trim();
-      $('#fbCTA').textContent = c;
-      $('#ttCTA').textContent = c;
-      const d = domainFromUrl(url.value);
-      $('#fbDomain').textContent = d;
-      $('#ttDomain').textContent = d;
+    // ---------- controls binding
+    function bindField(id, key){
+      const el = document.getElementById(id);
+      const counter = document.querySelector(`[data-count="${key}"]`);
+      const max = el.maxLength > 0 ? el.maxLength : null;
+      el.value = safe(state[key]);
+      if (counter) counter.textContent = max ? `${el.value.length}/${max}` : `${el.value.length}`;
+      el.addEventListener('input', ()=>{
+        state[key] = el.value;
+        if (counter) counter.textContent = max ? `${el.value.length}/${max}` : `${el.value.length}`;
+        render();
+        persist();
+      });
     }
-    [brand, handle, headline, body, cta, url].forEach(el => el.addEventListener('input', updateText));
-    updateText();
 
-    // Image upload
-    file.addEventListener('change', e=>{
-      const f = e.target.files?.[0]; if (!f) return;
-      const rd = new FileReader();
-      rd.onload = () => { Object.values(imgEls).forEach(el => el.src = rd.result); };
-      rd.readAsDataURL(f);
+    ['brand','handle','headline','body','cta','url'].forEach(k=> bindField(k, k));
+    $$('input[type="range"][data-field]').forEach(r=>{
+      const k = r.dataset.field; r.value = state[k];
+      r.addEventListener('input', ()=>{ state[k] = +r.value; renderMetrics(); persist(); });
     });
-    $('#useGradient').addEventListener('click', ()=>{ Object.values(imgEls).forEach(el => el.src = gradientURL); });
-    $('#clearImage').addEventListener('click', ()=>{ Object.values(imgEls).forEach(el => el.src = ''); });
 
-    // Platform toggles
-    $$('.chip[data-platform]').forEach(chip=>{
-      chip.addEventListener('click', ()=>{
-        const p = chip.getAttribute('data-platform');
-        const card = document.querySelector(`.card-ui.${p}`);
-        const on = !chip.classList.contains('is-on');
-        chip.classList.toggle('is-on', on);
-        card.style.display = on ? '' : 'none';
+    // platform tabs
+    $$('.seg [data-p]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        $$('.seg [data-p]').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        state.platform = btn.dataset.p;
+        render();
+        persist();
+        if (window.innerWidth < 980){
+          const panel = document.querySelector(`.shell[data-p="${state.platform}"]`);
+          panel?.scrollIntoView({behavior:'smooth', block:'center'});
+        }
       });
+      if (btn.dataset.p === state.platform) btn.classList.add('active');
     });
 
-    // Theme toggle reuses global handler from assets/app.js (sets data-theme)
-    // Phone frame toggle (wrap cards visually)
-    const pfState = $('#pfState');
-    let phoneOn = false;
-    $('#togglePhone').addEventListener('click', ()=>{
-      phoneOn = !phoneOn;
-      pfState.textContent = phoneOn ? 'On' : 'Off';
-      $$('.card-ui').forEach(c=>{
-        c.parentElement.classList.toggle('phone-frame', phoneOn);
-      });
-    });
+    // media upload
+    const file = $('#file'), pick = $('#filePick'), drop = $('#drop'), clear = $('#clearMedia');
+    pick.addEventListener('click', e => { e.preventDefault(); file.click(); });
+    file.addEventListener('change', handleFiles);
 
-    // Variant generator (simple client-side copy tweaks)
-    const variants = [
-      (h)=>h.replace('→','⟶'),
-      (h)=>h.replace(/ with .*$/i,'').replace(/.$/,'…'),
-      (h)=>'Predict the best minute. Publish on autopilot.'
-    ];
-    let vIndex = -1;
+    ;['dragenter','dragover'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('drag'); }));
+    ;['dragleave','drop'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('drag'); }));
+    drop.addEventListener('drop', e=> { const f = e.dataTransfer.files?.[0]; if (f) loadFile(f); });
+
+    function handleFiles(){ const f = file.files?.[0]; if (f) loadFile(f); }
+    function loadFile(f){
+      const reader = new FileReader();
+      if (f.type.startsWith('image/')){
+        reader.onload = ()=>{ state.media = reader.result; render(); persist(); };
+        reader.readAsDataURL(f);
+      } else {
+        state.media = '';
+        render(); persist();
+      }
+    }
+    clear.addEventListener('click', ()=>{ state.media = ''; file.value=''; render(); persist(); });
+
+    // variants generator
+    const POWER = ['predictive timing','closed-loop analytics','creative scoring','best-minute windows','on-brand automation'];
+    function headlineVariants(h){
+      const base = safe(h).replace(/\s+/g,' ').trim();
+      const short = base.length > 72 ? base.slice(0,69)+'…' : base;
+      const verb = 'Unlock';
+      return [
+        short,
+        `Draft once → publish where it wins (${POWER[Math.floor(Math.random()*POWER.length)]})`,
+        `${verb} lift with ${POWER[Math.floor(Math.random()*POWER.length)]}`,
+        `From draft to results — ${POWER[Math.floor(Math.random()*POWER.length)]}`
+      ];
+    }
     $('#genVariants').addEventListener('click', ()=>{
-      vIndex = (vIndex+1)%variants.length;
-      const next = variants[vIndex](headline.value || '');
-      headline.value = next || 'Predict the best minute. Publish on autopilot.';
-      updateText();
-      const tag = $('#variantTag'); tag.style.display = ''; tag.textContent = `Variant: ${String.fromCharCode(65+vIndex)}`;
+      const box = $('#variantBox'); box.innerHTML='';
+      headlineVariants(state.headline).forEach(v=>{
+        const b = document.createElement('button'); b.className='btn'; b.textContent=v;
+        b.addEventListener('click', ()=>{ state.headline = v; $('#headline').value=v; render(); persist(); });
+        box.appendChild(b);
+      });
     });
 
-    // Active link highlight is handled in assets/app.js after partials load
+    // best minute (toy)
+    $('#bestMinute').addEventListener('click', ()=>{
+      const now = new Date();
+      const opts = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const hour = 7 + Math.floor(Math.random()*12);
+      const min  = [0,5,10,15,20,25,30,35,40,45,50,55][Math.floor(Math.random()*12)];
+      const ampm = hour >= 12 ? 'PM':'AM';
+      const m = document.createElement('div'); m.className='card';
+      m.innerHTML = `<strong>Recommended window</strong>
+        <p class="muted" style="margin:.35rem 0 0">${opts[now.getDay()]} ${hour}:${String(min).padStart(2,'0')} ${ampm} · ${state.platform} · CTR +${(6+Math.floor(Math.random()*8))}%</p>`;
+      const box = $('#minuteBox'); box.innerHTML=''; box.appendChild(m);
+    });
+
+    // share link
+    $('#shareLink').addEventListener('click', async ()=>{
+      const payload = encodeURIComponent(btoa(JSON.stringify(state)));
+      const url = `${location.origin}${location.pathname}#s=${payload}`;
+      try { await navigator.clipboard.writeText(url); alert('Shareable link copied!'); }
+      catch { prompt('Copy your share link:', url); }
+    });
+
+    // export PNG
+    $('#exportPng').addEventListener('click', ()=>{
+      makePNG(state.platform);
+    });
+
+    function aspect(platform){
+      if (platform==='instagram') return [1080,1350];
+      if (platform==='tiktok') return [1080,1920];
+      return [1200,628]; // facebook
+    }
+
+    function makePNG(platform){
+      const [W,H] = aspect(platform);
+      const c = document.getElementById('exportCanvas');
+      c.width=W; c.height=H;
+      const ctx = c.getContext('2d');
+
+      // bg gradient
+      const g = ctx.createLinearGradient(0,0,W,H);
+      g.addColorStop(0,'#0b0f16'); g.addColorStop(1,'#0f1220');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+      // media rect
+      const mediaH = platform==='facebook' ? H*0.58 : platform==='instagram' ? H*0.62 : H*0.68;
+      if (state.media){
+        const img = new Image();
+        img.onload = ()=>{ drawAfterMedia(); };
+        img.src = state.media;
+      } else {
+        // decorative
+        const g2 = ctx.createRadialGradient(W*0.2,H*0.2,80, W*0.7,H*0.3, W*0.8);
+        g2.addColorStop(0,'rgba(86,156,255,.55)'); g2.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=g2; ctx.fillRect(32,140,W-64, mediaH-48);
+        drawAfterMedia();
+      }
+
+      function drawAfterMedia(){
+        // draw media (cover)
+        if (state.media){
+          const img = new Image();
+          img.onload = ()=>{
+            const rect = {x:32, y:140, w:W-64, h:mediaH-48};
+            const ir = img.width/img.height, rr = rect.w/rect.h;
+            let sw, sh, sx, sy;
+            if (ir>rr){ sh=img.height; sw=sh*rr; sx=(img.width-sw)/2; sy=0; }
+            else { sw=img.width; sh=sw/rr; sx=0; sy=(img.height-sh)/2; }
+            ctx.save(); roundRect(ctx, rect.x, rect.y, rect.w, rect.h, 20); ctx.clip();
+            ctx.drawImage(img, sx, sy, sw, sh, rect.x, rect.y, rect.w, rect.h);
+            ctx.restore();
+            drawUI();
+          };
+          img.src = state.media;
+        } else {
+          drawUI();
+        }
+      }
+
+      function drawUI(){
+        // brand row
+        ctx.fillStyle='#fff'; ctx.font='700 42px Inter, system-ui, -apple-system';
+        ctx.fillText(safe(state.brand).slice(0,20), 32, 72);
+        ctx.fillStyle='rgba(255,255,255,.7)'; ctx.font='400 22px Inter, system-ui, -apple-system';
+        const tag = platform==='facebook' ? 'Sponsored · 1h' : (platform==='instagram' ? safe(state.handle) : 'Promoted');
+        ctx.fillText(tag, 32, 102);
+
+        // copy
+        ctx.fillStyle='#dfe5ff'; ctx.font='700 38px Inter, system-ui, -apple-system';
+        wrapText(ctx, safe(state.headline), 32, 120, W-64, 44);
+
+        // CTA chip
+        const chip = safe(state.cta).slice(0,18);
+        const cw = ctx.measureText(chip).width + 34;
+        roundedChip(ctx, W-32-cw, 40, cw, 44, chip);
+
+        // URL
+        ctx.fillStyle='rgba(255,255,255,.75)'; ctx.font='500 22px Inter, system-ui, -apple-system';
+        const disp = platform==='tiktok' ? safe(state.handle) : hostFromUrl(state.url) || 'evrt.ai';
+        ctx.fillText(disp, 32, H-28);
+
+        // save
+        const a = document.createElement('a');
+        a.download = `evrt-${platform}.png`;
+        a.href = c.toDataURL('image/png');
+        a.click();
+      }
+    }
+
+    // drawing helpers
+    function roundRect(ctx, x, y, w, h, r=12){
+      const rr = Math.min(r, w/2, h/2);
+      ctx.beginPath();
+      ctx.moveTo(x+rr, y);
+      ctx.arcTo(x+w, y,   x+w, y+h, rr);
+      ctx.arcTo(x+w, y+h, x,   y+h, rr);
+      ctx.arcTo(x,   y+h, x,   y,   rr);
+      ctx.arcTo(x,   y,   x+w, y,   rr);
+      ctx.closePath();
+    }
+    function roundedChip(ctx, x, y, w, h, text){
+      const g = ctx.createLinearGradient(x, y, x+w, y+h);
+      g.addColorStop(0,'hsl(252 86% 62%)'); g.addColorStop(1,'hsl(190 95% 50%)');
+      ctx.fillStyle=g;
+      roundRect(ctx, x, y, w, h, h/2);
+      ctx.fill();
+      if (text){
+        ctx.fillStyle='#fff'; ctx.font='800 20px Inter, system-ui, -apple-system';
+        ctx.fillText(text, x+17, y+h*0.68);
+      }
+    }
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+      const words = safe(text).split(/\s+/);
+      let line = '', cy = y;
+      for (let n=0; n<words.length; n++){
+        const test = line + words[n] + ' ';
+        if (ctx.measureText(test).width > maxWidth && n>0){
+          ctx.fillText(line, x, cy);
+          line = words[n] + ' ';
+          cy += lineHeight;
+        } else {
+          line = test;
+        }
+      }
+      ctx.fillText(line.trim(), x, cy);
+    }
+
+    // ---------- live preview renderers
+    function applyMedia(el){
+      if (state.media) {
+        el.style.backgroundImage = `url(${state.media})`;
+      } else {
+        el.style.backgroundImage = '';
+      }
+    }
+
+    function render(){
+      // Facebook
+      $('#pBrandFB').textContent = safe(state.brand);
+      $('#pTagFB').textContent = 'Sponsored · 1h';
+      $('#pCopyFB').textContent = safe(state.headline);
+      $('#pCtaFB').textContent = safe(state.cta);
+      $('#pUrlFB').textContent = hostFromUrl(state.url) || 'evrt.ai';
+      applyMedia($('#pMediaFB'));
+
+      // Instagram
+      $('#pBrandIG').textContent = safe(state.brand);
+      $('#pTagIG').textContent = safe(state.handle) || '@brand';
+      $('#pCopyIG').textContent = safe(state.body);
+      $('#pCtaIG').textContent = safe(state.cta) || 'Learn more';
+      $('#pUrlIG').textContent = hostFromUrl(state.url) || 'evrt.ai';
+      applyMedia($('#pMediaIG'));
+
+      // TikTok
+      $('#pBrandTT').textContent = safe(state.brand) + ' · Official';
+      $('#pTagTT').textContent = 'Promoted';
+      $('#pCopyTT').textContent = safe(state.headline);
+      $('#pCtaTT').textContent = safe(state.cta) || 'Learn more';
+      $('#pUrlTT').textContent = safe(state.handle) || '@brand';
+      applyMedia($('#pMediaTT'));
+
+      renderMetrics();
+    }
+
+    function renderMetrics(){
+      // lightweight toy model
+      const {clarity, energy, depth} = state;
+      const reach = Math.round( (clarity*0.45 + energy*0.35 + depth*0.20) * 120 );           // scaled
+      const ctr   = ( (clarity*0.018 + energy*0.022 + depth*0.014) / 10 + 0.8 ).toFixed(2); // %
+      const conf  = Math.round( 60 + (depth*0.35 + clarity*0.25 + energy*0.2)/3 );
+
+      $('#mReach').textContent = Intl.NumberFormat().format(reach);
+      $('#mCTR').textContent   = ctr + '%';
+      $('#mConf').textContent  = clamp(conf, 0, 99) + '%';
+    }
+
+    // init
+    render();
   </script>
+  <script defer src="assets/app.js"></script>
 </body>
 </html>
