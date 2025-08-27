@@ -44,14 +44,26 @@ const EVRT = (()=>{
   // DOM refs set on open
   let portal, heat, slots, postInput, phone, postPreview, reachVal, ctrVal, confVal;
   let clarity, energy, depth;
+  let savedScrollY = 0;
 
-  // Simple PRNG (deterministic-ish per text)
+  // Simple PRNG
   function seedFrom(s){ let h=0; for (let i=0;i<s.length;i++) h = Math.imul(31,h) + s.charCodeAt(i) | 0; return h>>>0; }
   function rng(seed){ return ()=> (seed = Math.imul(1664525,seed) + 1013904223) >>> 0 / 2**32; }
 
+  function lockBody(){
+    savedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.body.style.top = `-${savedScrollY}px`;
+    document.body.classList.add('modal-open');
+  }
+  function unlockBody(){
+    document.body.classList.remove('modal-open');
+    document.body.style.top = '';
+    window.scrollTo(0, savedScrollY);
+  }
+
   function openPortal(){
     portal = document.getElementById('demoPortal');
-    document.body.style.overflow='hidden';
+    lockBody();                 // <— critical for iOS & Android
     portal.classList.add('open');
     portal.setAttribute('aria-hidden','false');
 
@@ -74,14 +86,14 @@ const EVRT = (()=>{
     drawChart([6,7,6,8,9,7,10,12,11,13,12,15,14,16]);
   }
   function closePortal(){
-    document.body.style.overflow='';
-    document.getElementById('demoPortal').classList.remove('open');
-    document.getElementById('demoPortal').setAttribute('aria-hidden','true');
+    portal?.classList.remove('open');
+    portal?.setAttribute('aria-hidden','true');
+    unlockBody();
   }
 
   function wireControls(){
-    // close
     document.getElementById('closeDemo').onclick = closePortal;
+
     // tabs (analytics shows canvas)
     document.querySelectorAll('.portal-tabs .tab').forEach(btn=>{
       btn.addEventListener('click', ()=>{
@@ -126,6 +138,10 @@ const EVRT = (()=>{
     document.getElementById('btnSave').onclick = ()=> toast('Draft saved');
     document.getElementById('btnSchedule').onclick = schedule;
     document.getElementById('btnStartTrial').onclick = ()=> toast('Redirecting to sign up… (demo)');
+
+    // prevent wheel/touch from bubbling to page (extra safety on Android)
+    portal.addEventListener('wheel', e=>e.stopPropagation(), {passive:true});
+    portal.addEventListener('touchmove', e=>e.stopPropagation(), {passive:true});
   }
 
   function setPlatform(p){
@@ -135,11 +151,11 @@ const EVRT = (()=>{
 
   function updateMetrics(){
     const text = postInput.value.trim();
-    const seed = seedFrom(text + clarity.value + energy.value + depth.value + document.querySelector('.tonebtn.active')?.dataset?.tone || '');
+    const seed = seedFrom(text + clarity.value + energy.value + depth.value + (document.querySelector('.tonebtn.active')?.dataset?.tone || ''));
     const rand = rng(seed);
-    // Simple “score”
     const base = 400 + Math.round(rand()*600);
-    const toneAdj = document.querySelector('.tonebtn.active')?.dataset.tone === 'playful' ? 1.05 : document.querySelector('.tonebtn.active')?.dataset.tone === 'bold' ? 1.08 : 1;
+    const tone = (document.querySelector('.tonebtn.active')?.dataset.tone||'pro');
+    const toneAdj = tone==='playful'?1.05:tone==='bold'?1.08:1;
     const reach = Math.round(base * toneAdj * (0.7 + clarity.value/200));
     const ctr = (1.2 + (energy.value/100)*1.6 + rand()*0.6).toFixed(1);
     const conf = Math.min(99, Math.round(60 + depth.value/2 + rand()*20));
@@ -150,8 +166,6 @@ const EVRT = (()=>{
 
   function renderHeat(hotCells=[]){
     heat.innerHTML='';
-    // 7 days x 24 hours
-    const now = new Date();
     for (let d=0; d<7; d++){
       for (let h=0; h<24; h++){
         const idx = d*24 + h;
@@ -194,7 +208,7 @@ const EVRT = (()=>{
   function predict(){
     const text = postInput.value.trim();
     const rand = rng(seedFrom(text || 'evrt'));
-    // choose 3 “hot” cells & build recommendations
+    // choose 3 “hot” windows
     const hot = [];
     while (hot.length<6){
       const i = Math.floor(rand()*7*24);
