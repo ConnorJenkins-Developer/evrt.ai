@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>EVRT – Ad Preview Studio</title>
+  <meta name="description" content="Live, high-fidelity previews for Facebook, Instagram, and TikTok ads."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/style.css"/>
+
+  <style>
+    /* ======= Page-specific styles (namespaced with .studio-) ======= */
+    .container.wide{max-width:1440px}
+    .studio-wrap{
+      position:relative; display:grid; gap:24px;
+      grid-template-columns:minmax(300px,420px) 1fr;
+      border:1px solid var(--line); border-radius:16px; padding:16px;
+      background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+      box-shadow:var(--shadow-lg);
+    }
+    .studio-controls{
+      display:flex; flex-direction:column; gap:14px;
+      border:1px solid var(--line); border-radius:14px; padding:14px;
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));
+    }
+    .studio-controls .kv{display:grid; grid-template-columns:1fr; gap:8px}
+    .studio-controls label{font-size:.9rem; color:var(--muted); font-weight:600}
+    .studio-controls input[type="text"],
+    .studio-controls input[type="url"],
+    .studio-controls textarea,
+    .studio-controls select{
+      padding:12px; border:1px solid var(--line); border-radius:10px;
+      background:#0e121b; color:var(--text);
+    }
+    .studio-controls textarea{min-height:110px; resize:vertical}
+    .studio-row{display:flex; gap:10px; flex-wrap:wrap}
+    .chip{padding:.42rem .7rem; border:1px solid var(--line); border-radius:999px; background:#0f1320; font-weight:600}
+    .chip.is-on{background:linear-gradient(90deg,hsl(var(--accent)/.25),hsl(var(--accent-2)/.25)); border-color:hsl(var(--accent)/.6)}
+    .help{color:var(--muted); font-size:.9rem}
+
+    .studio-previews{
+      border:1px solid var(--line); border-radius:14px; padding:14px;
+      background:linear-gradient(135deg,#080b12,#0b0810);
+      min-height:520px;
+      display:grid; gap:16px;
+      grid-template-rows:auto 1fr;
+    }
+    .studio-toolbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+    .studio-grid{display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+    /* Cards look native-ish (not exact brand UIs) */
+    .card-ui{border:1px solid var(--line); border-radius:14px; background:#0b0f19; overflow:hidden}
+    .card-ui .head{display:flex; align-items:center; gap:10px; padding:12px}
+    .avatar{width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,hsl(var(--accent)),hsl(var(--accent-2)));}
+    .brand{font-weight:800}
+    .subtle{color:var(--muted); font-size:.9rem}
+    .media{position:relative; background:#0e1422; min-height:200px}
+    .media img{width:100%; height:100%; object-fit:cover; display:block}
+    .body{padding:12px}
+    .cta-row{display:flex; align-items:center; gap:12px; justify-content:space-between; padding:12px; border-top:1px solid var(--line)}
+    .btn-cta{padding:.55rem .9rem; border-radius:10px; font-weight:800; background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2))); color:#fff; border:none}
+
+    /* Platform skins */
+    .fb .head{border-bottom:1px solid var(--line)}
+    .ig .media{aspect-ratio: 4/5}
+    .ig .icons{display:flex; gap:12px; padding:10px 12px; border-top:1px solid var(--line)}
+    .tt .media{aspect-ratio:9/16}
+    .tt .overlay{
+      position:absolute; inset:0; background:linear-gradient(180deg,transparent, rgba(0,0,0,.45) 70%);
+      display:flex; align-items:flex-end; padding:12px; color:#fff
+    }
+    .tt .rightbar{
+      position:absolute; right:8px; bottom:8px; display:grid; gap:10px; text-align:center; color:#fff
+    }
+    .tt .rightbar .icon{width:42px; height:42px; border-radius:50%; background:rgba(255,255,255,.1); display:grid; place-items:center}
+
+    /* Phone frame preview (optional toggle) */
+    .phone-frame{
+      border:1px solid var(--line); border-radius:24px; padding:10px; background:#02040a;
+      box-shadow:0 30px 70px rgba(0,0,0,.45), inset 0 0 0 8px #0a0f18;
+    }
+
+    @media (max-width:1100px){ .studio-wrap{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true"></div>
+  <div data-include="partials/header.html"></div>
+
+  <section class="container hero">
+    <span class="eyebrow">Interactive</span>
+    <h1 class="gradient-text">Ad Preview Studio</h1>
+    <p class="sub">Craft once → see how it lands in Facebook, Instagram, and TikTok feeds—in real time.</p>
+  </section>
+
+  <section class="container wide section">
+    <div class="studio-wrap">
+      <!-- ========== Controls ========== -->
+      <aside class="studio-controls">
+        <div class="studio-head kv">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="badge-pill">★</div>
+            <div>
+              <div style="font-weight:800">Creative controls</div>
+              <div class="help">Update fields → previews refresh instantly.</div>
+            </div>
+          </div>
+          <div></div>
+        </div>
+
+        <div class="kv">
+          <label>Platforms</label>
+          <div class="studio-row">
+            <button class="chip is-on" data-platform="fb">Facebook</button>
+            <button class="chip is-on" data-platform="ig">Instagram</button>
+            <button class="chip is-on" data-platform="tt">TikTok</button>
+          </div>
+        </div>
+
+        <div class="kv">
+          <label>Brand name</label>
+          <input id="brand" type="text" value="EVRT"/>
+        </div>
+
+        <div class="kv">
+          <label>Handle</label>
+          <input id="handle" type="text" value="@evrt.ai"/>
+        </div>
+
+        <div class="kv">
+          <label>Headline</label>
+          <input id="headline" type="text" value="Draft once → schedule everywhere with predictive timing"/>
+        </div>
+
+        <div class="kv">
+          <label>Body / caption</label>
+          <textarea id="body">Create on-brand posts, predict the best minute per platform, and measure lift with closed-loop analytics.</textarea>
+        </div>
+
+        <div class="kv">
+          <label>CTA</label>
+          <div class="studio-row">
+            <input id="cta" type="text" value="Start trial" style="flex:1"/>
+            <input id="url" type="url" value="https://evrt.ai" placeholder="https://…"/>
+          </div>
+        </div>
+
+        <div class="kv">
+          <label>Image / video poster</label>
+          <input id="image" type="file" accept="image/*"/>
+          <div class="studio-row">
+            <button class="btn" id="useGradient">Use gradient</button>
+            <button class="btn" id="clearImage">Clear</button>
+          </div>
+          <div class="help">We’ll auto-fit to the right aspect ratio per platform.</div>
+        </div>
+
+        <div class="kv">
+          <label>Appearance</label>
+          <div class="studio-row">
+            <button class="btn ghost" id="themeBtn">🌓 Toggle theme</button>
+            <button class="btn" id="togglePhone">Phone frame: <span id="pfState">Off</span></button>
+          </div>
+        </div>
+
+        <button class="btn primary block" id="genVariants">Generate 3 variants</button>
+        <div class="help">Variants tweak headline rhythm, punctuation, and CTA strength.</div>
+      </aside>
+
+      <!-- ========== Previews ========== -->
+      <main class="studio-previews">
+        <div class="studio-toolbar">
+          <span class="pill">Live previews</span>
+          <span class="pill" id="variantTag" style="display:none">Variant: A</span>
+          <div class="spacer"></div>
+          <a class="btn" href="social-ai.html">See full product</a>
+        </div>
+
+        <div class="studio-grid" id="previewGrid">
+          <!-- Facebook -->
+          <div class="card-ui fb" data-platform="fb">
+            <div class="head">
+              <div class="avatar" id="fbAvatar"></div>
+              <div>
+                <div class="brand" id="fbBrand">EVRT</div>
+                <div class="subtle">Sponsored · 1h · 🌐</div>
+              </div>
+            </div>
+            <div class="body">
+              <div id="fbText">Draft once → schedule everywhere with predictive timing</div>
+            </div>
+            <div class="media"><img id="fbImg" alt=""/></div>
+            <div class="cta-row">
+              <div class="subtle" id="fbDomain">evrt.ai</div>
+              <button class="btn-cta" id="fbCTA">Start trial</button>
+            </div>
+          </div>
+
+          <!-- Instagram -->
+          <div class="card-ui ig" data-platform="ig">
+            <div class="head">
+              <div class="avatar"></div>
+              <div>
+                <div class="brand" id="igBrand">EVRT</div>
+                <div class="subtle" id="igHandle">@evrt.ai</div>
+              </div>
+            </div>
+            <div class="media"><img id="igImg" alt=""/></div>
+            <div class="icons">
+              <span>♡</span><span>💬</span><span>↗</span>
+            </div>
+            <div class="body">
+              <strong id="igHeadline">Draft once → schedule everywhere with predictive timing</strong>
+              <p class="subtle" id="igBody">Create on-brand posts, predict the best minute per platform, and measure lift with closed-loop analytics.</p>
+            </div>
+          </div>
+
+          <!-- TikTok -->
+          <div class="card-ui tt" data-platform="tt">
+            <div class="media">
+              <img id="ttImg" alt=""/>
+              <div class="overlay"><div>
+                <div class="brand" id="ttBrand">EVRT</div>
+                <div class="subtle" id="ttHandle">@evrt.ai</div>
+              </div></div>
+              <div class="rightbar">
+                <div class="icon">♡</div>
+                <div class="icon">💬</div>
+                <div class="icon">↗</div>
+              </div>
+            </div>
+            <div class="body">
+              <strong id="ttHeadline">Draft once → schedule everywhere with predictive timing</strong>
+              <p class="subtle" id="ttBody">Create on-brand posts, predict the best minute per platform, and measure lift with closed-loop analytics.</p>
+              <div class="cta-row">
+                <button class="btn-cta" id="ttCTA">Start trial</button>
+                <span class="subtle" id="ttDomain">evrt.ai</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <div data-include="partials/footer.html"></div>
+  <script defer src="assets/app.js"></script>
+  <script>
+    // ======= Ad Studio logic (no external libs) =======
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+    const brand = $('#brand');
+    const handle = $('#handle');
+    const headline = $('#headline');
+    const body = $('#body');
+    const cta = $('#cta');
+    const url = $('#url');
+    const file = $('#image');
+
+    const imgEls = { fb:$('#fbImg'), ig:$('#igImg'), tt:$('#ttImg') };
+    const defaultGradient = () => {
+      // Generate a dynamic gradient data URL (no external asset)
+      const c = document.createElement('canvas');
+      c.width = 1200; c.height = 1600;
+      const g = c.getContext('2d');
+      const grad = g.createLinearGradient(0,0,c.width,c.height);
+      grad.addColorStop(0,'#1a1150');
+      grad.addColorStop(.5,'#0a4fb3');
+      grad.addColorStop(1,'#1b0b23');
+      g.fillStyle = grad; g.fillRect(0,0,c.width,c.height);
+      g.globalAlpha = .35;
+      for (let i=0;i<6;i++){
+        const rx = Math.random()*c.width, ry=Math.random()*c.height;
+        const r = 200+Math.random()*400;
+        const g2 = g.createRadialGradient(rx,ry,0,rx,ry,r);
+        g2.addColorStop(0,`hsla(${Math.random()*360},90%,60%,.9)`);
+        g2.addColorStop(1,'transparent');
+        g.fillStyle = g2; g.beginPath(); g.arc(rx,ry,r,0,Math.PI*2); g.fill();
+      }
+      return c.toDataURL('image/png');
+    };
+
+    // Initialize gradient poster
+    const gradientURL = defaultGradient();
+    Object.values(imgEls).forEach(el => el.src = gradientURL);
+
+    function domainFromUrl(u){
+      try{ return new URL(u).hostname.replace(/^www\./,''); }
+      catch { return 'evrt.ai' }
+    }
+    function updateText(){
+      // Brand & handle
+      $('#fbBrand').textContent = brand.value || 'EVRT';
+      $('#igBrand').textContent = brand.value || 'EVRT';
+      $('#ttBrand').textContent = brand.value || 'EVRT';
+
+      $('#igHandle').textContent = handle.value || '@evrt.ai';
+      $('#ttHandle').textContent = handle.value || '@evrt.ai';
+
+      // Headline + body
+      const h = headline.value || 'Draft once → schedule everywhere with predictive timing';
+      $('#fbText').textContent = h;
+      $('#igHeadline').textContent = h;
+      $('#ttHeadline').textContent = h;
+
+      const b = body.value || '';
+      $('#igBody').textContent = b;
+      $('#ttBody').textContent = b;
+
+      // CTA + domain
+      const c = (cta.value || 'Learn more').trim();
+      $('#fbCTA').textContent = c;
+      $('#ttCTA').textContent = c;
+      const d = domainFromUrl(url.value);
+      $('#fbDomain').textContent = d;
+      $('#ttDomain').textContent = d;
+    }
+    [brand, handle, headline, body, cta, url].forEach(el => el.addEventListener('input', updateText));
+    updateText();
+
+    // Image upload
+    file.addEventListener('change', e=>{
+      const f = e.target.files?.[0]; if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => { Object.values(imgEls).forEach(el => el.src = rd.result); };
+      rd.readAsDataURL(f);
+    });
+    $('#useGradient').addEventListener('click', ()=>{ Object.values(imgEls).forEach(el => el.src = gradientURL); });
+    $('#clearImage').addEventListener('click', ()=>{ Object.values(imgEls).forEach(el => el.src = ''); });
+
+    // Platform toggles
+    $$('.chip[data-platform]').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        const p = chip.getAttribute('data-platform');
+        const card = document.querySelector(`.card-ui.${p}`);
+        const on = !chip.classList.contains('is-on');
+        chip.classList.toggle('is-on', on);
+        card.style.display = on ? '' : 'none';
+      });
+    });
+
+    // Theme toggle reuses global handler from assets/app.js (sets data-theme)
+    // Phone frame toggle (wrap cards visually)
+    const pfState = $('#pfState');
+    let phoneOn = false;
+    $('#togglePhone').addEventListener('click', ()=>{
+      phoneOn = !phoneOn;
+      pfState.textContent = phoneOn ? 'On' : 'Off';
+      $$('.card-ui').forEach(c=>{
+        c.parentElement.classList.toggle('phone-frame', phoneOn);
+      });
+    });
+
+    // Variant generator (simple client-side copy tweaks)
+    const variants = [
+      (h)=>h.replace('→','⟶'),
+      (h)=>h.replace(/ with .*$/i,'').replace(/.$/,'…'),
+      (h)=>'Predict the best minute. Publish on autopilot.'
+    ];
+    let vIndex = -1;
+    $('#genVariants').addEventListener('click', ()=>{
+      vIndex = (vIndex+1)%variants.length;
+      const next = variants[vIndex](headline.value || '');
+      headline.value = next || 'Predict the best minute. Publish on autopilot.';
+      updateText();
+      const tag = $('#variantTag'); tag.style.display = ''; tag.textContent = `Variant: ${String.fromCharCode(65+vIndex)}`;
+    });
+
+    // Active link highlight is handled in assets/app.js after partials load
+  </script>
+</body>
+</html>
