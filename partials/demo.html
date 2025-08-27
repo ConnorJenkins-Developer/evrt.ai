@@ -1,81 +1,177 @@
-<section class="container section" id="live-demo" data-reveal>
-  <div class="card" style="padding:0; overflow:hidden">
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid var(--line)">
-      <div style="display:flex; align-items:center; gap:10px">
-        <div class="icon" aria-hidden="true">✨</div>
+<section class="container section" id="evrtDemoPro" data-reveal>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="demo-head">
+      <div class="demo-head__left">
+        <div class="icon">✨</div>
         <div>
-          <strong>Live Demo — EVRT Social AI</strong>
-          <div style="color:var(--muted); font-size:.95rem">Compose → Predict best minute → Preview</div>
+          <strong>EVRT Social AI — Interactive Demo</strong>
+          <div class="muted tiny">Compose → Predict timing → Build a schedule → See projected impact</div>
         </div>
       </div>
-      <a class="btn" href="social-ai.html">Full product page</a>
+      <div class="demo-head__right">
+        <a class="btn" href="social-ai.html">Product page</a>
+        <a class="btn primary" href="pricing.html">Start trial</a>
+      </div>
     </div>
 
-    <div class="grid grid-2" style="padding:16px">
-      <!-- Left: Composer -->
-      <div class="card" style="margin:0">
-        <div class="mini-tabs" id="demoPlatforms" role="tablist" aria-label="Platforms">
-          <button class="active" data-platform="x" role="tab" aria-selected="true">X</button>
-          <button data-platform="linkedin" role="tab" aria-selected="false">LinkedIn</button>
-          <button data-platform="instagram" role="tab" aria-selected="false">Instagram</button>
-          <button data-platform="tiktok" role="tab" aria-selected="false">TikTok</button>
+    <div class="demo-tabs" role="tablist" aria-label="Demo">
+      <button class="tab active" data-tab="compose" role="tab" aria-selected="true">Compose</button>
+      <button class="tab" data-tab="timing" role="tab" aria-selected="false">Timing</button>
+      <button class="tab" data-tab="schedule" role="tab" aria-selected="false">Schedule</button>
+      <button class="tab" data-tab="analytics" role="tab" aria-selected="false">Analytics</button>
+    </div>
+
+    <!-- COMPOSE -->
+    <div class="demo-panel active" data-panel="compose">
+      <div class="grid grid-2" style="padding:16px">
+        <div class="card" style="margin:0">
+          <div class="demo-row">
+            <div class="demo-label">Platforms</div>
+            <div class="chips" id="dPlatforms" role="group" aria-label="Platforms">
+              <button class="chip selected" data-platform="x">X</button>
+              <button class="chip" data-platform="linkedin">LinkedIn</button>
+              <button class="chip" data-platform="instagram">Instagram</button>
+              <button class="chip" data-platform="tiktok">TikTok</button>
+            </div>
+          </div>
+
+          <div class="demo-row">
+            <div class="demo-label">Tone</div>
+            <div class="chips" id="dTone" role="group" aria-label="Tone">
+              <button class="chip selected" data-tone="professional">Professional</button>
+              <button class="chip" data-tone="playful">Playful</button>
+              <button class="chip" data-tone="bold">Bold</button>
+            </div>
+          </div>
+
+          <div class="demo-row sliders">
+            <div class="slider">
+              <div class="demo-label">Clarity</div>
+              <input type="range" min="0" max="100" value="65" id="dSClarity">
+            </div>
+            <div class="slider">
+              <div class="demo-label">Energy</div>
+              <input type="range" min="0" max="100" value="70" id="dSEnergy">
+            </div>
+            <div class="slider">
+              <div class="demo-label">Depth</div>
+              <input type="range" min="0" max="100" value="55" id="dSDepth">
+            </div>
+          </div>
+
+          <label for="dText" class="demo-label">Post text <span class="kbd">⌘/Ctrl+Enter</span></label>
+          <textarea id="dText" rows="7" placeholder="Write or paste your post…"
+            class="demo-text"></textarea>
+          <div class="demo-actions">
+            <button class="btn" id="dVariant">Generate variant</button>
+            <button class="btn primary" id="dPredict">Predict best minute</button>
+            <span class="muted tiny" id="dCount">0 chars</span>
+          </div>
+
+          <div class="demo-hints" id="dHints"></div>
+          <div class="demo-tags" id="dTags"></div>
         </div>
 
-        <label for="demoText" style="display:block; margin:.6rem 0 .4rem; color:var(--muted); font-size:.95rem">
-          Post text
-          <span class="kbd" title="Shortcut">⌘↵ to predict</span>
-        </label>
-        <textarea id="demoText" rows="6" placeholder="Write or paste your post…"
-          style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--line); background:#0e121b; color:var(--text); resize:vertical"></textarea>
+        <div class="card" style="margin:0">
+          <div class="preview-head">
+            <strong>Preview</strong>
+            <span class="pill" id="dPlatPill">X</span>
+          </div>
+          <div class="preview-frame" id="dPreview">
+            <div class="preview-meta">
+              <div class="avatar"></div>
+              <div>
+                <div class="name">EVRT</div>
+                <div class="meta muted tiny">Scheduled — <span id="dRec">—</span></div>
+              </div>
+            </div>
+            <div id="dCopy" class="preview-copy">Your post preview will appear here…</div>
+            <div class="preview-media" id="dMedia">+ Add image/video (mock)</div>
+          </div>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px">
-          <button class="btn" id="btnVariant" type="button">Generate variant</button>
-          <button class="btn primary" id="btnPredict" type="button">Predict best minute</button>
+          <div class="kpis" style="margin-top:12px">
+            <div class="kpi"><div id="kReach" class="kval">—</div><div class="muted">Expected reach</div></div>
+            <div class="kpi"><div id="kCtr" class="kval">—</div><div class="muted">CTR</div></div>
+            <div class="kpi"><div id="kConf" class="kval">—</div><div class="muted">Confidence</div></div>
+          </div>
+
+          <canvas id="dSpark" width="640" height="120" class="spark-canvas"></canvas>
         </div>
-
-        <div id="demoHints" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:12px"></div>
       </div>
+    </div>
 
-      <!-- Right: Preview & Metrics -->
-      <div class="card" style="margin:0">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px">
-          <strong>Preview & Metrics</strong>
-          <span class="pill" id="demoPlatformPill">X</span>
-        </div>
-
-        <div id="demoPreview" class="card" style="padding:14px; background:#0e121b">
-          <div style="color:var(--muted); font-size:.9rem; margin-bottom:.35rem">Scheduled</div>
-          <div id="demoRec" style="font-weight:700; font-size:1.05rem">—</div>
-          <div id="demoCopy" style="margin-top:10px; white-space:pre-wrap">Your post preview will appear here…</div>
-        </div>
-
-        <div class="kpis" style="margin-top:14px">
-          <div class="kpi"><div id="kpiReach" style="font-weight:800;font-size:1.2rem">—</div><div class="muted">Expected reach</div></div>
-          <div class="kpi"><div id="kpiCtr" style="font-weight:800;font-size:1.2rem">—</div><div class="muted">CTR</div></div>
-          <div class="kpi"><div id="kpiConf" style="font-weight:800;font-size:1.2rem">—</div><div class="muted">Confidence</div></div>
-        </div>
-
-        <div style="margin-top:14px">
-          <svg id="demoSpark" class="spark" width="100%" height="60" viewBox="0 0 100 30" preserveAspectRatio="none" role="img" aria-label="Projected performance sparkline">
-            <polyline fill="none" stroke="currentColor" stroke-width="1.5" points="0,15 20,15 40,15 60,15 80,15 100,15" opacity=".8"/>
-          </svg>
-          <div style="display:flex; gap:8px; justify-content:space-between; color:var(--muted); font-size:.85rem; margin-top:6px">
-            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+    <!-- TIMING -->
+    <div class="demo-panel" data-panel="timing">
+      <div class="grid" style="padding:16px">
+        <div class="card" style="margin:0">
+          <div class="preview-head">
+            <strong>Heatmap — best minute windows (7 days × 24 hours)</strong>
+            <div class="muted tiny">Click cells to select. Auto-pick finds top windows.</div>
+          </div>
+          <div class="heat-wrap">
+            <div class="heat-legend">
+              <span class="muted tiny">Low</span>
+              <span class="muted tiny">High</span>
+            </div>
+            <div class="heat" id="dHeat" role="grid" aria-label="Timing heatmap"></div>
+          </div>
+          <div class="demo-actions" style="margin-top:10px">
+            <button class="btn" id="dAutoPick">Auto-pick best windows</button>
+            <button class="btn primary" id="dApplySchedule">Apply to schedule</button>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Scoped styles for demo -->
-  <style>
-    .mini-tabs{display:flex; gap:6px; flex-wrap:wrap}
-    .mini-tabs>button{padding:.45rem .7rem; border:1px solid var(--line); background:#10131c; color:var(--text);
-      border-radius:999px; font-weight:600; cursor:pointer}
-    .mini-tabs>button.active{background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2))); color:white; border-color:transparent}
-    .pill{padding:.25rem .6rem; border:1px solid var(--line); border-radius:999px; font-size:.85rem; opacity:.9}
-    .kbd{margin-left:.4rem; padding:.1rem .4rem; border:1px solid var(--line); border-radius:6px; font-size:.8rem; opacity:.8}
-    .spark{color:hsl(var(--accent))}
-    @media (max-width: 900px){ .kbd{display:none} }
-  </style>
+    <!-- SCHEDULE -->
+    <div class="demo-panel" data-panel="schedule">
+      <div class="grid" style="padding:16px">
+        <div class="card" style="margin:0">
+          <div class="preview-head">
+            <strong>Schedule Queue</strong>
+            <div class="muted tiny">Edit or remove rows. “Download JSON” exports your plan.</div>
+          </div>
+          <div class="table-wrap">
+            <table class="queue" id="dQueue" aria-label="Scheduled posts">
+              <thead>
+                <tr><th>Platform</th><th>Date</th><th>Time</th><th>Text</th><th></th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="demo-actions">
+            <button class="btn" id="dDownload">Download JSON</button>
+            <button class="btn ghost" id="dClear">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="demo-panel" data-panel="analytics">
+      <div class="grid grid-2" style="padding:16px">
+        <div class="card" style="margin:0">
+          <div class="preview-head"><strong>Projected performance</strong></div>
+          <canvas id="dBars" width="640" height="280" class="bars-canvas"></canvas>
+        </div>
+        <div class="card" style="margin:0">
+          <div class="preview-head"><strong>A/B variants</strong></div>
+          <div id="dAB" class="ab">
+            <div class="ab-row">
+              <div class="ab-label">Variant A</div>
+              <div class="ab-bar"><span style="width:40%"></span></div>
+              <div class="ab-score" id="dA">—</div>
+            </div>
+            <div class="ab-row">
+              <div class="ab-label">Variant B</div>
+              <div class="ab-bar"><span style="width:60%"></span></div>
+              <div class="ab-score" id="dB">—</div>
+            </div>
+            <div class="demo-actions"><button class="btn primary" id="dPickWinner">Pick winner</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </section>
