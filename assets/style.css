@@ -59,6 +59,81 @@ header{
   background:color-mix(in oklab, var(--bg) 85%, transparent);
   backdrop-filter:blur(10px);
 }
+/* ==== Compact header + variables ==== */
+:root { --hdr-h: 60px; }
+.hdr-compact .nav { padding: 10px 0; }
+
+/* Make links comfy to tap */
+.links a { padding: .55rem .7rem; border-radius: 10px; line-height: 1.2; }
+
+/* “More” dropdown (desktop) */
+.links .menu.more { position: relative; }
+.links .menu.more summary {
+  list-style: none; cursor: pointer;
+  border:1px solid var(--line); border-radius:999px; padding:.45rem .75rem; opacity:.9;
+}
+.links .menu.more summary::-webkit-details-marker { display:none; }
+.links .menu.more[open] summary {
+  background:linear-gradient(90deg,hsl(var(--accent)/.18),hsl(var(--accent-2)/.18)); opacity:1;
+}
+.links .menu.more .dropdown {
+  position:absolute; top:120%; left:0; min-width:220px;
+  background:var(--surface); border:1px solid var(--line); border-radius:12px;
+  padding:8px; display:grid; gap:4px; box-shadow:0 10px 30px rgba(0,0,0,.35); z-index:60;
+}
+.links .menu.more .dropdown a { padding:.5rem .6rem; border-radius:8px; }
+.links .menu.more .dropdown a:hover { background:rgba(255,255,255,.04); }
+
+/* Desktop-only CTA */
+.hide-on-mobile { display:inline-flex; }
+.only-mobile-cta { display:none; }
+
+/* ===== Mobile: slide-down panel ===== */
+@media (max-width: 960px){
+  /* Show burger, hide desktop CTA */
+  .menu-btn{ display:inline-flex; }
+  .hide-on-mobile { display:none; }
+
+  /* Convert nav links into a fixed panel below the header */
+  header .links {
+    position: fixed;
+    top: calc(var(--hdr-h) + env(safe-area-inset-top));
+    left: 0; right: 0; bottom: 0;
+    display: grid; gap: 8px; padding: 14px 16px 24px;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    transform: translateY(-8px);
+    opacity: 0; pointer-events: none;
+    transition: transform .25s ease, opacity .25s ease;
+  }
+  /* Larger tap targets in panel */
+  header .links a,
+  header .links .dropdown a { padding: 14px 12px; border-radius: 12px; }
+
+  /* Flatten “More”: always open, summary hidden */
+  .links .menu.more { position: static; }
+  .links .menu.more[open] > summary { display:none; }
+  .links .menu.more .dropdown {
+    position: static; border:none; padding:0; box-shadow:none; gap:2px; min-width:unset;
+  }
+
+  /* Mobile CTA appears inside panel */
+  .only-mobile-cta { display:inline-flex; margin-top:8px; }
+
+  /* Backdrop */
+  header .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.35);
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease;
+  }
+
+  /* When body.nav-open => show panel + backdrop, lock scroll */
+  body.nav-open { overflow: hidden; }
+  body.nav-open header .links { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  body.nav-open header .overlay { opacity: 1; pointer-events: auto; }
+}
+
 /* Compact header variant */
 .hdr-compact .nav { padding:10px 0 }
 
