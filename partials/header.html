@@ -1,4 +1,4 @@
-<header class="hdr-compact">
+<header>
   <div class="container nav">
     <a class="logo" href="index.html">
       <span class="logo-mark" aria-hidden="true">
@@ -10,40 +10,57 @@
     </a>
 
     <nav class="links" id="navLinks" aria-label="Main">
-      <!-- Primaries -->
+      <!-- Core -->
       <a href="consulting.html">Consulting</a>
-      <a href="social-ai.html">Product</a>
+      <a href="apps.html">Apps</a>
+      <a href="projects.html">Projects</a>
       <a href="blog.html">Insights</a>
-      <a href="dashboard.html">Live Demo</a>
 
-      <!-- Secondary nav grouped -->
-      <details class="menu more">
-        <summary>More ▾</summary>
-        <div class="dropdown">
-          <a href="apps.html">Apps</a>
-          <a href="projects.html">Projects</a>
-          <a href="pricing.html">Pricing</a>
-          <a href="industries.html">Industries</a>
-          <a href="about.html">About</a>
-          <a href="careers.html">Careers</a>
-          <a href="press.html">Press</a>
-          <a href="privacy.html">Privacy</a>
+      <!-- Desktop-only items -->
+      <a href="social-ai.html" class="hide-on-mobile">EVRT Social AI</a>
+      <a href="pricing.html" class="hide-on-mobile">Pricing</a>
+
+      <!-- Desktop dropdown -->
+      <details class="menu more hide-on-mobile">
+        <summary aria-haspopup="menu" aria-expanded="false">More</summary>
+        <div class="dropdown" role="menu">
+          <a href="industries.html" role="menuitem">Industries</a>
+          <a href="about.html" role="menuitem">About</a>
+          <a href="careers.html" role="menuitem">Careers</a>
+          <a href="press.html" role="menuitem">Press</a>
+          <a href="privacy.html" role="menuitem">Privacy</a>
         </div>
       </details>
 
-      <!-- Mobile-only CTA (visible inside panel) -->
-      <a class="btn primary only-mobile-cta" href="contact.html">Get in touch</a>
+      <!-- Mobile-only (flattened) -->
+      <a href="social-ai.html" class="only-mobile-cta">EVRT Social AI</a>
+      <a href="pricing.html" class="only-mobile-cta">Pricing</a>
+      <a href="industries.html" class="only-mobile-cta">Industries</a>
+      <a href="about.html" class="only-mobile-cta">About</a>
+      <a href="careers.html" class="only-mobile-cta">Careers</a>
+      <a href="press.html" class="only-mobile-cta">Press</a>
+      <a href="privacy.html" class="only-mobile-cta">Privacy</a>
     </nav>
 
     <div class="spacer"></div>
-    <button class="btn ghost" id="themeBtn" aria-label="Toggle theme">🌓</button>
+
+    <!-- Actions -->
+    <button class="btn ghost hide-on-mobile" id="themeBtn" aria-label="Toggle theme">🌓</button>
     <a class="btn primary hide-on-mobile" href="contact.html">Get in touch</a>
-    <button class="btn ghost menu-btn" id="menuBtn" aria-controls="navLinks" aria-expanded="false" aria-label="Open menu">☰</button>
+
+    <!-- Mobile menu button -->
+    <button
+      class="btn ghost menu-btn"
+      id="menuBtn"
+      aria-controls="navLinks"
+      aria-expanded="false"
+      aria-label="Open menu">☰</button>
   </div>
 
   <!-- Backdrop for mobile panel -->
   <div class="overlay" id="navOverlay" hidden></div>
 </header>
+
 
     <button class="btn ghost menu-btn" id="menuBtn" aria-controls="navLinks" aria-expanded="false">☰</button>
   </div>
