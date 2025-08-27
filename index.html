@@ -12,227 +12,207 @@
 </head>
 <body>
   <div class="bg-orbs" aria-hidden="true"></div>
+  <!-- Header partial -->
   <div data-include="partials/header.html"></div>
 
+  <!-- HERO -->
   <section class="container hero">
-    <span class="eyebrow">Enterprise-grade strategy & AI delivery</span>
+    <span class="eyebrow">Enterprise-grade strategy &amp; AI delivery</span>
     <h1 class="gradient-text">Consulting. Apps. Intelligence.</h1>
     <p class="sub">We design, build, and scale outcomes—then productize what works.</p>
-    <div class="row" style="margin-top:16px">
-      <button id="launchDemo" class="btn primary">Launch interactive demo</button>
+    <div class="hero-cta">
+      <a class="btn primary" href="#" id="openDemo">Launch live demo</a>
       <a class="btn" href="social-ai.html">Product page</a>
     </div>
   </section>
 
-  <!-- Service quick-cards -->
+  <!-- 3-UP CARDS -->
   <section class="container section grid grid-3">
-    <a class="card pad-lg" href="consulting.html" data-reveal>
-      <div class="icon">🧭</div><h3>Consulting</h3>
+    <a class="card" href="consulting.html" data-reveal>
+      <div class="icon">🧭</div>
+      <h3>Consulting</h3>
       <p class="muted">Audit → roadmap → execution. Strategy, ops, enablement.</p>
     </a>
-    <a class="card pad-lg" href="apps.html" data-reveal>
-      <div class="icon">⚙️</div><h3>App Development</h3>
+    <a class="card" href="apps.html" data-reveal>
+      <div class="icon">⚙️</div>
+      <h3>App Development</h3>
       <p class="muted">Ship AI-forward products: experiments to enterprise rollouts.</p>
     </a>
-    <a class="card pad-lg" href="blog.html" data-reveal>
-      <div class="icon">📈</div><h3>Insights</h3>
+    <a class="card" href="blog.html" data-reveal>
+      <div class="icon">📈</div>
+      <h3>Insights</h3>
       <p class="muted">Attribution, cohorting, and predictive models that drive decisions.</p>
     </a>
   </section>
 
-  <!-- Product spotlight -->
+  <!-- SOCIAL AI SPOTLIGHT -->
   <section class="container section">
     <div class="spotlight" data-reveal>
-      <div class="row" style="align-items:flex-start">
-        <div class="minw0" style="flex:1;min-width:260px">
-          <h2 class="gradient-text">EVRT Social AI</h2>
-          <p class="muted">On-brand content generation, predictive scheduling, closed-loop analytics.</p>
-          <div class="row" style="margin-top:12px">
-            <button id="launchDemo2" class="btn primary">Try the demo</button>
+      <div style="display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap">
+        <div style="min-width:260px;flex:1">
+          <h2 class="gradient-text" style="margin:0 0 6px;font-family:'Space Grotesk',Inter,sans-serif">EVRT Social AI</h2>
+          <p class="muted" style="margin:0">On-brand content generation, predictive scheduling, closed-loop analytics.</p>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <a href="#" class="btn primary" id="openDemo2">Try the live demo</a>
             <a href="pricing.html" class="btn">Pricing</a>
           </div>
         </div>
         <div class="grid grid-3" style="flex:2;min-width:280px">
-          <div class="card pad-md"><strong>AI Composer</strong><p class="muted">On-brand drafts & variants trained on your library.</p></div>
-          <div class="card pad-md"><strong>Predictive Timing</strong><p class="muted">Channel-specific best-minute optimization.</p></div>
-          <div class="card pad-md"><strong>Closed-Loop Analytics</strong><p class="muted">Creative-level lift, not just vanity metrics.</p></div>
+          <div class="card" style="padding:14px"><strong>AI Composer</strong><p class="muted" style="margin:.35rem 0 0">On-brand drafts &amp; variants trained on your library.</p></div>
+          <div class="card" style="padding:14px"><strong>Predictive Timing</strong><p class="muted" style="margin:.35rem 0 0">Channel-specific best-minute optimization.</p></div>
+          <div class="card" style="padding:14px"><strong>Closed-Loop Analytics</strong><p class="muted" style="margin:.35rem 0 0">Creative-level lift, not just vanity metrics.</p></div>
         </div>
       </div>
-      <div class="kpis">
-        <div class="kpi"><div class="num">+31%</div><div class="muted">Avg. CTR lift</div></div>
-        <div class="kpi"><div class="num">-26%</div><div class="muted">Time to publish</div></div>
-        <div class="kpi"><div class="num">+18%</div><div class="muted">Reach consistency</div></div>
-      </div>
     </div>
   </section>
 
-  <!-- Recent Projects -->
+  <!-- PROJECTS -->
   <section class="container section">
-    <h2 class="gradient-text">Recent Projects</h2>
-    <div class="home-grid cards-3">
-      <a class="home-card" href="projects.html#dtc-apparel" data-reveal>
-        <div class="icon">👟</div><div class="title">DTC Apparel</div>
-        <p>Hook testing + predictive windows → <strong>+31% CTR</strong>.</p>
-      </a>
-      <a class="home-card" href="projects.html#hospitality" data-reveal>
-        <div class="icon">🏨</div><div class="title">Hospitality</div>
-        <p>Geo-localized windows increased saves by <strong>22%</strong>.</p>
-      </a>
-      <a class="home-card" href="projects.html#saas" data-reveal>
-        <div class="icon">💻</div><div class="title">SaaS</div>
-        <p>Education sequences reduced activation time by <strong>17%</strong>.</p>
-      </a>
+    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">Recent Projects</h2>
+    <div class="grid grid-3">
+      <a class="card" href="projects.html#dtc-apparel" data-reveal><div class="icon">👟</div><strong>DTC Apparel</strong><p class="muted">Hook testing + predictive windows → +31% CTR.</p></a>
+      <a class="card" href="projects.html#hospitality" data-reveal><div class="icon">🏨</div><strong>Hospitality</strong><p class="muted">Geo-localized windows increased saves by 22%.</p></a>
+      <a class="card" href="projects.html#saas" data-reveal><div class="icon">💻</div><strong>SaaS</strong><p class="muted">Education sequences reduced activation time by 17%.</p></a>
     </div>
   </section>
 
-  <!-- Insights -->
+  <!-- INSIGHTS -->
   <section class="container section">
-    <div class="row spread" style="gap:12px">
-      <h2 class="gradient-text" style="margin:0">Insights</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0">Insights</h2>
       <a class="btn" href="blog.html">View all</a>
     </div>
-    <div class="home-grid cards-3" style="margin-top:12px">
-      <a class="home-card" href="blog-post.html#best-minute" data-reveal>
-        <div class="icon">📓</div><div class="title">Best minute to post</div>
-        <p>Building activity curves from noisy engagement.</p>
-      </a>
-      <a class="home-card" href="blog-post.html#creative-scoring" data-reveal>
-        <div class="icon">🧩</div><div class="title">Creative scoring 101</div>
-        <p>From n-grams to embeddings—what matters.</p>
-      </a>
-      <a class="home-card" href="blog-post.html#privacy" data-reveal>
-        <div class="icon">🔒</div><div class="title">Listening without creepiness</div>
-        <p>Privacy-first monitoring patterns.</p>
-      </a>
+    <div class="grid grid-3" style="margin-top:14px">
+      <a class="card" href="blog-post.html#best-minute" data-reveal><div class="icon">📓</div><strong>Best minute to post</strong><p class="muted">Building activity curves from noisy engagement.</p></a>
+      <a class="card" href="blog-post.html#creative-scoring" data-reveal><div class="icon">🧩</div><strong>Creative scoring 101</strong><p class="muted">From n-grams to embeddings—what matters.</p></a>
+      <a class="card" href="blog-post.html#privacy" data-reveal><div class="icon">🔒</div><strong>Listening without creepiness</strong><p class="muted">Privacy-first monitoring patterns.</p></a>
     </div>
   </section>
 
   <!-- CTA -->
   <section class="container section">
-    <div class="card pad-lg row spread" data-reveal>
+    <div class="card" style="display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap" data-reveal>
       <div>
         <h3 style="margin:.25rem 0">Ready to build your next S-curve?</h3>
         <p class="muted" style="margin:.25rem 0 0">Partner with our consulting team or start with EVRT Social AI.</p>
       </div>
-      <div class="row">
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
         <a href="consulting.html" class="btn">Talk to Consulting</a>
-        <button id="launchDemo3" class="btn primary">Launch demo</button>
+        <a href="#" class="btn primary" id="openDemo3">Launch demo</a>
       </div>
     </div>
   </section>
 
+  <!-- Footer partial -->
   <div data-include="partials/footer.html"></div>
 
-  <!-- ===================== DEMO OVERLAY ===================== -->
-  <div id="demoLayer" class="demo-layer" aria-hidden="true">
-    <div class="demo-backdrop"></div>
-    <div class="demo-sheet" role="dialog" aria-modal="true" aria-label="EVRT Social AI — Interactive Demo">
-      <div class="demo-head">
-        <div class="demo-title">
-          <span class="badge">EVRT Social AI</span>
-          <span>Interactive Demo</span>
-        </div>
-        <div class="demo-actions">
-          <a class="btn" href="social-ai.html">Product page</a>
-          <button class="demo-close" id="closeDemo" aria-label="Close demo">✕</button>
-        </div>
+  <!-- ====== LIVE DEMO PORTAL (overlay) ====== -->
+  <div id="demoPortal" aria-hidden="true">
+    <div class="portal-shell" role="dialog" aria-modal="true" aria-labelledby="demoTitle">
+      <div class="portal-top">
+        <div class="portal-badge">EVRT Social AI — <strong>Interactive Demo</strong></div>
+        <div class="portal-spacer"></div>
+        <a class="btn" href="social-ai.html">Product page</a>
+        <button class="btn primary" id="btnStartTrial">Start trial</button>
+        <button class="btn ghost close" id="closeDemo" aria-label="Close demo">✕</button>
       </div>
 
-      <div class="studio">
-        <!-- Left controls -->
-        <aside class="panel pad sticky">
-          <div class="chips-row" style="margin-bottom:8px">
-            <button class="chip step is-active">Compose</button>
-            <button class="chip step">Timing</button>
-            <button class="chip step">Schedule</button>
-            <button class="chip step">Analytics</button>
+      <div class="portal-tabs" role="tablist">
+        <button class="tab active" data-tab="compose" role="tab">Compose</button>
+        <button class="tab" data-tab="timing" role="tab">Timing</button>
+        <button class="tab" data-tab="schedule" role="tab">Schedule</button>
+        <button class="tab" data-tab="analytics" role="tab">Analytics</button>
+      </div>
+
+      <div class="portal-grid">
+        <!-- LEFT: controls -->
+        <aside class="panel left">
+          <h4>Platforms</h4>
+          <div class="chips" id="platforms">
+            <button class="chip active" data-platform="facebook">Facebook</button>
+            <button class="chip" data-platform="instagram">Instagram</button>
+            <button class="chip" data-platform="tiktok">TikTok</button>
+            <button class="chip" data-platform="linkedin">LinkedIn</button>
+            <button class="chip" data-platform="x">X</button>
           </div>
 
-          <h4 style="margin:.4rem 0 .2rem">Platforms</h4>
-          <div class="chips-row" style="margin-bottom:10px">
-            <button class="pill" id="pX">X</button>
-            <button class="pill" id="pLinkedIn">LinkedIn</button>
-            <button class="pill" id="pInstagram">Instagram</button>
-            <button class="pill" id="pTikTok">TikTok</button>
-            <button class="pill is-on" id="pFacebook">Facebook</button>
+          <h4>Tone</h4>
+          <div class="chips tone">
+            <button class="chip tonebtn active" data-tone="pro">Professional</button>
+            <button class="chip tonebtn" data-tone="playful">Playful</button>
+            <button class="chip tonebtn" data-tone="bold">Bold</button>
           </div>
 
-          <h4 style="margin:.4rem 0 .2rem">Post text</h4>
-          <textarea id="postText" rows="6" style="width:100%;resize:vertical;border-radius:10px;border:1px solid var(--line);background:#0f1320;color:var(--text);padding:10px" placeholder="Write or paste your post…"></textarea>
+          <label class="sliderlbl">Clarity <input type="range" min="0" max="100" value="72" id="clarity"/></label>
+          <label class="sliderlbl">Energy <input type="range" min="0" max="100" value="64" id="energy"/></label>
+          <label class="sliderlbl">Depth <input type="range" min="0" max="100" value="48" id="depth"/></label>
 
-          <div class="row" style="margin-top:10px">
+          <h4>Post text</h4>
+          <textarea id="postInput" rows="6" placeholder="Write or paste your post…"></textarea>
+          <div class="row">
             <button class="btn" id="btnVariant">Generate variant</button>
-            <button class="btn primary" id="btnBestMinute">Predict best minute</button>
+            <button class="btn primary" id="btnPredict">Predict best minute</button>
           </div>
-
-          <div style="margin-top:12px">
-            <div class="chips-row" id="variantTray" aria-label="Variants tray">
-              <!-- mini variant cards appear here -->
-            </div>
-          </div>
+          <div class="muted" id="charCount">0 chars</div>
         </aside>
 
-        <!-- Middle preview canvas -->
-        <main class="panel pad">
-          <div class="row spread">
-            <div>
-              <h3 style="margin:.2rem 0">Preview</h3>
-              <p class="muted" style="margin:0">Your post preview will update live.</p>
+        <!-- CENTER: platform preview -->
+        <main class="panel center">
+          <h3 id="demoTitle">Preview</h3>
+          <div class="phone" id="phone">
+            <div class="phone-header">
+              <div class="avatar">E</div>
+              <div class="meta">
+                <div class="name">EVRT</div>
+                <div class="sub">Scheduled — —</div>
+              </div>
+              <div class="pill" id="statusPill">Scheduled</div>
             </div>
-          </div>
 
-          <div id="feedCard" class="feed-card fb preview-mount" style="margin-top:12px">
-            <div class="feed-head">
-              <div class="avatar" aria-hidden="true"></div>
-              <div class="handle">EVRT</div>
-              <div class="badge">Scheduled</div>
-            </div>
-            <div class="feed-body">
-              <div id="previewText">Your post preview will appear here…</div>
-              <div id="previewMedia" class="feed-media"></div>
-              <div class="row" style="gap:8px;margin-top:10px">
-                <button class="btn" id="btnAddMedia">+ Add image/video (mock)</button>
+            <div class="phone-body">
+              <div class="post-text" id="postPreview">Your post preview will appear here…</div>
+              <div class="media-stub">+ Add image/video (mock)</div>
+              <div class="stats">
+                <div class="stat"><span id="reachVal">—</span><label>Expected reach</label></div>
+                <div class="stat"><span id="ctrVal">—</span><label>CTR</label></div>
+                <div class="stat"><span id="confVal">—</span><label>Confidence</label></div>
               </div>
             </div>
           </div>
         </main>
 
-        <!-- Right analytics/schedule -->
-        <aside class="panel pad sticky">
-          <h4 style="margin:.2rem 0 .4rem">Projected window (heat)</h4>
-          <div id="hm" class="heatmap" aria-label="Heatmap of timing"></div>
+        <!-- RIGHT: timing + schedule -->
+        <aside class="panel right">
+          <h4>Projected window (heat)</h4>
+          <div id="heat" class="heat"></div>
 
-          <h4 style="margin:12px 0 .4rem">Recommended schedule</h4>
-          <div class="catalog">
-            <div class="tile">
-              <strong>Today 2:10 PM</strong>
-              <div class="meta"><span>Facebook</span><span>—</span><span>Reach +18%</span></div>
-            </div>
-            <div class="tile">
-              <strong>Tomorrow 9:04 AM</strong>
-              <div class="meta"><span>Instagram</span><span>—</span><span>CTR +11%</span></div>
-            </div>
-            <div class="tile">
-              <strong>Fri 6:32 PM</strong>
-              <div class="meta"><span>TikTok</span><span>—</span><span>Saves +9%</span></div>
-            </div>
+          <h4>Recommended schedule</h4>
+          <div id="slots" class="slots"></div>
+
+          <div class="row" style="margin-top:8px">
+            <button class="btn" id="btnSave">Save draft</button>
+            <button class="btn primary" id="btnSchedule">Schedule</button>
           </div>
+          <div class="muted small" style="margin-top:6px">Demo only — data is simulated.</div>
         </aside>
+      </div>
+
+      <!-- Analytics tab (simple canvas chart) -->
+      <div class="analytics-wrap" id="analyticsWrap" hidden>
+        <canvas id="chart" width="900" height="220"></canvas>
       </div>
     </div>
   </div>
-  <!-- =================== / DEMO OVERLAY =================== -->
 
   <script defer src="assets/app.js"></script>
+  <noscript><div style="padding:12px;text-align:center">Enable JavaScript to use the live demo.</div></noscript>
+
   <script>
-    // Launch from multiple buttons
-    window.addEventListener('DOMContentLoaded', ()=>{
-      const a = document.getElementById('launchDemo2');
-      const b = document.getElementById('launchDemo3');
-      const main = document.getElementById('launchDemo');
-      const open = () => document.getElementById('demoLayer')?.classList.add('open') || document.body.classList.add('no-scroll');
-      a?.addEventListener('click', e=>{ e.preventDefault(); main?.click(); });
-      b?.addEventListener('click', e=>{ e.preventDefault(); main?.click(); });
+    // Open demo from any CTA
+    document.addEventListener('DOMContentLoaded', ()=>{
+      for (const id of ['openDemo','openDemo2','openDemo3']) {
+        document.getElementById(id)?.addEventListener('click', (e)=>{ e.preventDefault(); window.EVRT.openPortal(); });
+      }
     });
   </script>
 </body>
