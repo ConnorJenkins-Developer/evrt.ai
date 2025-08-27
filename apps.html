@@ -3,71 +3,320 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Apps by EVRT — Catalog</title>
-  <meta name="description" content="A focused toolkit for content, timing, and analytics."/>
+  <title>Apps by EVRT — Social AI, Ads Optimizer, Monitor & More</title>
+  <meta name="description" content="The EVRT suite powers modern growth teams: Social AI for creation & timing, Ads Optimizer for creative lift, Monitor for privacy-first listening, and more."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="assets/style.css"/>
+
+  <!-- Page-scoped styles (minimal, plays nice with global CSS) -->
+  <style>
+    .subnav {
+      position: sticky; top: 64px; z-index: 40;
+      background: color-mix(in oklab, var(--bg) 90%, transparent);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .subnav .rail { display:flex; gap:10px; flex-wrap:wrap; padding:10px 0; }
+    .pill { display:inline-flex; align-items:center; gap:.5rem; padding:.55rem .8rem; border-radius:999px; border:1px solid var(--line); background:#0e121b; font-weight:600; font-size:.95rem; }
+    .pill:hover { border-color: color-mix(in oklab,var(--line) 60%, hsl(var(--accent)) 40%); transform: translateY(-1px); transition:.2s; }
+    .muted{ color:var(--muted); }
+
+    .spot-card { display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
+    .spot-card .left { min-width:260px; flex: 1 1 280px; }
+    .spot-card .right { flex: 2 1 340px; }
+
+    /* tiny mock components to “feel” productized */
+    .ui-badge { display:inline-flex; align-items:center; gap:.4rem; padding:.35rem .6rem; border:1px solid var(--line); border-radius:999px; font-size:.8rem; background: #0e121b; }
+    .ad-card {
+      background:#0c111a; border:1px solid var(--line); border-radius:14px; padding:14px;
+      max-width:520px; box-shadow: var(--shadow-lg);
+    }
+    .ad-head { display:flex; align-items:center; justify-content:space-between; }
+    .ad-brand { display:flex; align-items:center; gap:10px; font-weight:800; }
+    .ad-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,hsl(var(--accent)),hsl(var(--accent-2))); }
+    .ad-media { height:220px; border-radius:12px; margin-top:10px;
+      background: radial-gradient(100% 120% at 10% 10%, hsl(var(--accent)/.45), transparent),
+                  radial-gradient(120% 120% at 90% 20%, hsl(var(--accent-2)/.35), transparent),
+                  radial-gradient(120% 120% at 40% 80%, hsl(320 90% 55%/.30), transparent); }
+    .ad-footer { display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
+    .ad-cta { padding:.5rem .8rem; border-radius:999px; border:1px solid var(--line); background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2))); color:#fff; font-weight:700; }
+
+    .icons { display:grid; gap:14px; grid-template-columns:repeat(6,minmax(0,1fr)); }
+    @media (max-width: 980px){ .icons { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    .ico { display:grid; place-items:center; height:64px; border-radius:12px; border:1px solid var(--line); background:#0e121b; font-weight:700; }
+
+    .price-grid { display:grid; gap:22px; grid-template-columns: repeat(3,minmax(0,1fr)); }
+    @media (max-width: 980px) { .price-grid { grid-template-columns: 1fr; } }
+    .price .tag { font-size:.9rem; color:var(--muted); margin-bottom:.25rem; }
+    .price .value { font-size:2.1rem; font-weight:800; }
+    .price.pro { border-color:hsl(var(--accent)/.5); box-shadow:0 20px 50px hsl(var(--accent)/.18); }
+  </style>
 </head>
+
 <body>
   <div class="bg-orbs" aria-hidden="true"></div>
   <div data-include="partials/header.html"></div>
 
+  <!-- Hero -->
   <section class="container hero">
     <span class="eyebrow">Suite</span>
     <h1 class="gradient-text">Apps by EVRT</h1>
-    <p class="sub">A focused toolkit for content, timing, and analytics—built for growth teams.</p>
-  </section>
-
-  <!-- Auto-fit responsive catalog -->
-  <section class="container section autogrid-lg">
-    <a class="card catalog-card" href="social-ai.html" data-reveal>
-      <div class="icon">✨</div>
-      <div class="title">EVRT Social&nbsp;AI</div>
-      <div class="desc">Compose, predict best minute, schedule at scale, and measure lift.</div>
-    </a>
-
-    <div class="card catalog-card" data-reveal>
-      <div class="icon">🎯</div>
-      <div class="title">Ads Optimizer</div>
-      <div class="desc">Creative scoring, variant hints, & budget guardrails.</div>
-    </div>
-
-    <div class="card catalog-card" data-reveal>
-      <div class="icon">🛰️</div>
-      <div class="title">Monitor</div>
-      <div class="desc">Privacy-first brand & competitor listening with anomaly alerts.</div>
-    </div>
-
-    <div class="card catalog-card" data-reveal>
-      <div class="icon">📚</div>
-      <div class="title">Knowledge Hub</div>
-      <div class="desc">Centralize best-performing creative, copy, and postmortems.</div>
-    </div>
-
-    <div class="card catalog-card" data-reveal>
-      <div class="icon">🧪</div>
-      <div class="title">Experiment Deck</div>
-      <div class="desc">Plan hypotheses, track results, and auto-promote wins.</div>
-    </div>
-
-    <div class="card catalog-card" data-reveal>
-      <div class="icon">🔌</div>
-      <div class="title">Integrations</div>
-      <div class="desc">FB/IG, X, LinkedIn, TikTok • Slack • GA • Webhooks.</div>
+    <p class="sub">A focused toolkit for creation, predictive timing, analytics, and privacy-first listening—built for teams that ship.</p>
+    <div class="hero-cta">
+      <a class="btn primary" href="#social-ai">Launch Social AI</a>
+      <a class="btn" href="pricing.html">Compare plans</a>
     </div>
   </section>
 
-  <section class="container section card" data-reveal>
-    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
-      <div class="icon">🧰</div>
-      <div>
-        <strong>EVRT App Suite</strong>
-        <p class="muted" style="margin:.25rem 0 0">Modern tools for modern growth teams. Enterprise roles & audit.</p>
+  <!-- Sticky sub-nav -->
+  <div class="subnav">
+    <div class="container rail">
+      <a class="pill" href="#suite">Overview</a>
+      <a class="pill" href="#social-ai">Social AI</a>
+      <a class="pill" href="#ads">Ads Optimizer</a>
+      <a class="pill" href="#monitor">Monitor</a>
+      <a class="pill" href="#kit">Attribution Kit</a>
+      <a class="pill" href="#integrations">Integrations</a>
+      <a class="pill" href="#security">Security</a>
+      <a class="pill" href="#faq">FAQ</a>
+      <a class="pill" href="#cta">Get started</a>
+    </div>
+  </div>
+
+  <!-- Suite overview -->
+  <section id="suite" class="container section">
+    <div class="grid grid-3">
+      <a class="card" href="#social-ai" data-reveal>
+        <div class="icon">✨</div>
+        <h3>EVRT Social AI</h3>
+        <p class="muted">Compose on-brand content, predict best-minute timing per platform, schedule everywhere, measure lift.</p>
+        <span class="ui-badge">Live demo available</span>
+      </a>
+
+      <a class="card" href="#ads" data-reveal>
+        <div class="icon">🎯</div>
+        <h3>Ads Optimizer</h3>
+        <p class="muted">Score creative, generate variants, and get budget/split hints informed by historical performance.</p>
+        <span class="ui-badge">Creative scoring</span>
+      </a>
+
+      <a class="card" href="#monitor" data-reveal>
+        <div class="icon">🛰️</div>
+        <h3>Monitor</h3>
+        <p class="muted">Brand & competitor listening without creepiness. Clear signals, anomaly alerts, and idea pipelines.</p>
+        <span class="ui-badge">Privacy-first</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Social AI Spotlight -->
+  <section id="social-ai" class="container section">
+    <div class="spot-card spotlight" data-reveal>
+      <div class="left">
+        <h2 class="gradient-text" style="margin:0 0 6px;font-family:'Space Grotesk',Inter,sans-serif">EVRT Social AI</h2>
+        <p class="muted" style="margin:0">Draft once → tailor per platform → schedule at the best minute → measure creative-level lift.</p>
+        <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+          <a class="btn primary" href="index.html#demo">Launch live demo</a>
+          <a class="btn" href="social-ai.html">Product page</a>
+          <a class="btn" href="pricing.html">Pricing</a>
+        </div>
+        <ul class="check" style="margin-top:12px">
+          <li><div></div><div><strong>AI Composer</strong> trained on your library with brand guardrails</div></li>
+          <li><div></div><div><strong>Predictive timing</strong> windows per FB/IG, TikTok, X, LinkedIn</div></li>
+          <li><div></div><div><strong>Closed-loop analytics</strong>—creative-level lift, not vanity metrics</div></li>
+        </ul>
       </div>
-      <div class="spacer"></div>
-      <a href="pricing.html" class="btn">View pricing</a>
+
+      <div class="right">
+        <!-- tiny ad-style preview to give product “texture” -->
+        <div class="ad-card">
+          <div class="ad-head">
+            <div class="ad-brand"><span class="ad-avatar"></span><span>EVRT</span></div>
+            <span class="ui-badge">Scheduled</span>
+          </div>
+          <p class="muted" style="margin:.6rem 0 0">Draft once → schedule everywhere with predictive timing.</p>
+          <div class="ad-media"></div>
+          <div class="ad-footer">
+            <span class="muted">evrt.ai</span>
+            <span class="ad-cta">Start trial</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ads Optimizer -->
+  <section id="ads" class="container section">
+    <div class="spot-card card" data-reveal>
+      <div class="left">
+        <div class="icon">🎯</div>
+        <h3 style="margin:.25rem 0">Ads Optimizer</h3>
+        <p class="muted">Quantify creative quality, generate variants, and route budget to what wins—fast.</p>
+        <ul class="check">
+          <li><div></div><div><strong>Creative scoring</strong> from text & assets → ranked shortlist</div></li>
+          <li><div></div><div><strong>Variant generator</strong> (hooks, bodies, CTAs) aligned to constraints</div></li>
+          <li><div></div><div><strong>Spend hints</strong> by predicted lift & uncertainty</div></li>
+          <li><div></div><div><strong>Experiment templates</strong> for A/B and multi-cell tests</div></li>
+        </ul>
+        <div style="margin-top:10px"><a class="btn" href="pricing.html">Included in Pro</a></div>
+      </div>
+
+      <div class="right">
+        <div class="grid grid-2">
+          <div class="card">
+            <strong>Top hooks (predicted)</strong>
+            <p class="muted" style="margin:.35rem 0 0">“Draft once, schedule everywhere” • “Find your best minute” • “Close the loop”.</p>
+          </div>
+          <div class="card">
+            <strong>Budget hints</strong>
+            <p class="muted" style="margin:.35rem 0 0">Shift +15% to Variant B; pause Variant D (low confidence, low lift).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Monitor -->
+  <section id="monitor" class="container section">
+    <div class="spot-card card" data-reveal>
+      <div class="left">
+        <div class="icon">🛰️</div>
+        <h3 style="margin:.25rem 0">Monitor</h3>
+        <p class="muted">Stay ahead with brand/competitor signals—without surveillance creep. Transparent sources, smart summarization.</p>
+        <ul class="check">
+          <li><div></div><div><strong>Anomaly alerts</strong> (spikes, sentiment shifts, narrative change)</div></li>
+          <li><div></div><div><strong>Idea pipeline</strong> → convert signals into briefs & variants</div></li>
+          <li><div></div><div><strong>Privacy-first</strong> capture with retention policies</div></li>
+        </ul>
+      </div>
+
+      <div class="right">
+        <div class="grid grid-2">
+          <div class="card"><strong>Signals feed</strong><p class="muted" style="margin:.35rem 0 0">Daily summary → high-signal snippets you can trust.</p></div>
+          <div class="card"><strong>Briefs</strong><p class="muted" style="margin:.35rem 0 0">Auto-drafted creative briefs turn into drafts in Social AI.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Attribution / UTM Kit -->
+  <section id="kit" class="container section">
+    <div class="spot-card spotlight" data-reveal>
+      <div class="left">
+        <h3 style="margin:.25rem 0">Attribution & UTM Kit</h3>
+        <p class="muted">Keep your data clean from day one. Links, naming, and governance your BI team will love.</p>
+        <ul class="check">
+          <li><div></div><div>UTM builder with presets & link shortener</div></li>
+          <li><div></div><div>Auto-tagging per platform; link validation</div></li>
+          <li><div></div><div>Warehouse-friendly exports; GA4 alignment</div></li>
+        </ul>
+      </div>
+      <div class="right">
+        <div class="card"><strong>Governance</strong><p class="muted" style="margin:.35rem 0 0">Naming standards, required fields, and review flows.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Integrations -->
+  <section id="integrations" class="container section">
+    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">Integrations</h2>
+    <p class="muted" style="margin:0 0 10px">Plug into the tools you already use.</p>
+    <div class="icons" data-reveal>
+      <div class="ico">Facebook</div>
+      <div class="ico">Instagram</div>
+      <div class="ico">TikTok</div>
+      <div class="ico">LinkedIn</div>
+      <div class="ico">X</div>
+      <div class="ico">Slack</div>
+      <div class="ico">GA4</div>
+      <div class="ico">Shopify</div>
+      <div class="ico">Segment</div>
+      <div class="ico">HubSpot</div>
+      <div class="ico">BigQuery</div>
+      <div class="ico">Looker</div>
+    </div>
+  </section>
+
+  <!-- Security -->
+  <section id="security" class="container section">
+    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">Security & Privacy</h2>
+    <div class="grid grid-2">
+      <div class="card" data-reveal>
+        <ul class="check">
+          <li><div></div><div>Tenant isolation; encryption in transit & at rest</div></li>
+          <li><div></div><div>SSO/MFA, roles, approvals, and audit trails</div></li>
+          <li><div></div><div>Data retention controls & export options</div></li>
+        </ul>
+      </div>
+      <div class="card" data-reveal>
+        <strong>Compliance posture</strong>
+        <p class="muted" style="margin:.35rem 0 0">Privacy-first patterns and SOC 2–friendly controls. See <a href="privacy.html">Privacy</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Plans snapshot -->
+  <section class="container section">
+    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">Plans at a glance</h2>
+    <div class="price-grid">
+      <div class="card price" data-reveal>
+        <div class="tag">Starter</div>
+        <div class="value">$0</div>
+        <p class="muted">1 brand • 3 platforms • basic AI</p>
+        <a class="btn" href="pricing.html">Get started</a>
+      </div>
+      <div class="card price pro" data-reveal>
+        <div class="tag">Pro</div>
+        <div class="value">$49<span class="muted" style="font-size:1rem;font-weight:600">/mo</span></div>
+        <p class="muted">3 brands • 5 platforms • predictive • A/B • Ads Optimizer</p>
+        <a class="btn primary" href="pricing.html">Start trial</a>
+      </div>
+      <div class="card price" data-reveal>
+        <div class="tag">Enterprise</div>
+        <div class="value">Custom</div>
+        <p class="muted">SSO • roles • audit • SOC 2 workflows • support SLAs</p>
+        <a class="btn" href="contact.html">Talk to sales</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="container section">
+    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">FAQ</h2>
+    <div class="grid grid-2">
+      <details class="card" data-reveal>
+        <summary>Can we try Social AI without connecting accounts?</summary>
+        <p class="muted">Yes—use the live demo with simulated data, then connect when you’re ready.</p>
+      </details>
+      <details class="card" data-reveal>
+        <summary>Is Ads Optimizer included in Pro?</summary>
+        <p class="muted">Yes. Scoring, variants, and spend hints are part of the Pro plan.</p>
+      </details>
+      <details class="card" data-reveal>
+        <summary>How does Monitor handle privacy?</summary>
+        <p class="muted">Transparent sources, configurable retention, and tenant isolation. See <a href="privacy.html">Privacy</a> for details.</p>
+      </details>
+      <details class="card" data-reveal>
+        <summary>Do you have an API?</summary>
+        <p class="muted">We expose endpoints for catalog sync and analytics export on Pro/Enterprise. Contact us for access.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="cta" class="container section">
+    <div class="card" style="display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap" data-reveal>
+      <div>
+        <h3 style="margin:.25rem 0">Ready to build your compounding loop?</h3>
+        <p class="muted" style="margin:.25rem 0 0">Start a trial or talk to us about a pilot. You’ll see lift fast.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn primary" href="pricing.html">Start trial</a>
+        <a class="btn" href="contact.html">Talk to sales</a>
+      </div>
     </div>
   </section>
 
