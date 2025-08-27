@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b0d14"/>
+      <stop offset="100%" stop-color="#0a0c18"/>
+    </linearGradient>
+    <linearGradient id="a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6D5BFF"/><stop offset="100%" stop-color="#00D1FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <g transform="translate(120,120)">
+    <rect x="0" y="0" width="120" height="120" rx="28" fill="url(#a)"/>
+    <path d="M24 76h42l-8 20H8l12-52h59l-4 16H48" fill="none" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="260" y="170" fill="white" font-family="Space Grotesk, Inter, sans-serif" font-size="64" font-weight="700">EVRT</text>
+  <text x="260" y="230" fill="#9aa3b2" font-family="Inter, system-ui" font-size="30">Consulting • Apps • Intelligence</text>
+</svg>
