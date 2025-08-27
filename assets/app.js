@@ -311,4 +311,118 @@ function setupDemoPro(){
 
   /* ---------------- Model-ish helpers (seeded, deterministic) ---------------- */
   function currentTone(){
-    const b = tone.querySelector("
+    const b = tone.querySelector(".chip.selected");
+    return (b && b.dataset.tone) || "professional";
+  }
+  function sliders(){ return {
+    clarity: +sClarity.value||65,
+    energy:  +sEnergy.value ||70,
+    depth:   +sDepth.value  ||55
+  };}
+
+  function spinVariant(s, t="professional"){
+    const openers = {
+      professional:["Announcing","Introducing","We’re excited to share","New"],
+      playful:["Guess what?","Hot drop:","Tiny flex:","We made a thing:"],
+      bold:["Stop scrolling:","Big news:","🚨 Launch:","Unveiling:"]
+    }[t] || ["Announcing"];
+
+    const closers = {
+      professional:["Learn more →","Details inside →","Explore the update →"],
+      playful:["Peep this →","Tap for details →","Come see →"],
+      bold:["Don’t miss this →","Get in here →","Go deeper →"]
+    }[t] || ["Learn more →"];
+
+    const emojis = t==="professional" ? [""] : ["✨","🚀","🔥","⚡"];
+    const opener = openers[(hash(s+t)%openers.length)];
+    const closer = closers[(hash(t+s)%closers.length)];
+    const emoji = emojis[(hash(s).toString(16).length)%emojis.length] || "";
+    return `${opener} ${s.replace(/^[A-Z].*?:\s*/,'')}. ${closer} ${emoji}`.trim();
+  }
+
+  function scoreText(text, plat, w){
+    const len = (text||"").trim().length || 40;
+    const seed = hash(`${plat}|${len}|${w.clarity}|${w.energy}|${w.depth}`);
+    const r = rng(seed);
+    let s = 0.55 + r()*0.4;
+    if (/http/i.test(text)) s += 0.03;
+    if (/[!?]$/.test(text)) s += 0.02;
+    if (/#\w+/.test(text)) s += 0.02;
+    if (len>220) s -= 0.05;
+    return clamp(s, 0.4, 0.98);
+  }
+
+  function predict(text, plat, w){
+    const score = scoreText(text, plat, w);
+    const r = rng(hash(plat + ":" + (text||"").length + ":" + w.energy));
+    const hours = {x:[11,13,17,20],linkedin:[8,9,12,18],instagram:[9,12,18,20],tiktok:[19,21,22,23]}[plat]||[12,18,21,9];
+    const minutes = [5,12,18,25,35,45,55];
+    const h = hours[Math.floor(r()*hours.length)];
+    const m = minutes[Math.floor((r()*100+score*100)%minutes.length)];
+    const weekly = Array.from({length:7},(_,i)=> clamp(0.35 + 0.5*Math.abs(Math.sin((i+1)*1.25)) + (r()-0.5)*0.15, 0.1, 0.95));
+    const reach = Math.round( (score*100) + r()*60 );
+    const ctr = ( (0.9 + score*1.2) + (r()*0.3) ).toFixed(1);
+    const conf = Math.round( 60 + score*35 );
+    return { time:{h,m}, score, weekly, kpis:{ reach, ctr, conf } };
+  }
+
+  function buildHeat(plat, text, w){
+    const s = scoreText(text, plat, w);
+    const base = 0.25 + s*0.55;
+    const r = rng(hash("HEAT|" + plat + "|" + (text||"").length + "|" + w.clarity));
+    const mat = [];
+    for(let d=0; d<7; d++){
+      const row = [];
+      for(let h=0; h<24; h++){
+        // weekday bump mid-week + evening boost
+        const mid = Math.exp(-Math.pow((d-3)/2.2,2))*0.2;
+        const eve = Math.exp(-Math.pow((h-19)/4,2))*0.25;
+        const noise = (r()-0.5)*0.12;
+        row.push( clamp(base + mid + eve + noise, 0.05, 0.98) );
+      }
+      mat.push(row);
+    }
+    return mat;
+  }
+
+  /* Drawing */
+  function drawSparkline(canvas, arr){
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = "#0e121b"; ctx.fillRect(0,0,W,H);
+    const pad = 14;
+    ctx.strokeStyle = "#223"; ctx.lineWidth = 1;
+    for(let y=pad; y<H-pad; y+=20){ ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke(); }
+    ctx.strokeStyle = "#7aa5ff"; ctx.lineWidth = 2;
+    ctx.beginPath();
+    const step = (W - pad*2) / (arr.length - 1);
+    arr.forEach((v,i)=>{
+      const x = pad + i*step;
+      const y = H - pad - v*(H - pad*2);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+  }
+
+  /* Helpers */
+  function pad(n){ return String(n).padStart(2,"0"); }
+  function slotToDateTime(d, hm){ // d: 0..6
+    const now = new Date(); const diff = (d - (now.getDay()+6)%7 + 7)%7; // align to Mon..Sun
+    const date = new Date(now.getFullYear(), now.getMonth(), now.getDate()+diff);
+    return { date: date.toISOString().slice(0,10), time: hm };
+  }
+}
+
+/* ---------------- Boot ---------------- */
+window.addEventListener("DOMContentLoaded", async ()=>{
+  await includePartials();
+  setupNav(); setupTheme(); setupReveal(); markActiveLink();
+  setupDemoPro();
+
+  // Footer year + reduced motion
+  const y = document.getElementById("y"); if (y) y.textContent = new Date().getFullYear();
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    document.querySelector(".bg-orbs")?.style.setProperty("animation","none");
+  }
+});
