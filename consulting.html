@@ -1,45 +1,295 @@
-<!DOCTYPE html><html lang="en" data-theme="dark">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Consulting at EVRT — EVRT</title>
-  <meta name="description" content="Strategy, ops, and implementation to unlock your next S-curve."/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Consulting at EVRT — Data, Websites, Cyber, Social & Growth</title>
+  <meta name="description" content="EVRT Consulting helps brands scale with data & analytics, high-performance websites, security & compliance, social content systems, and growth operations."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
-  <link rel="icon" href="assets/favicon.svg">
-  <meta property="og:title" content="Consulting at EVRT — EVRT">
-  <meta property="og:description" content="Strategy, ops, and implementation to unlock your next S-curve.">
-  <meta property="og:image" content="assets/og-image.svg">
   <link rel="stylesheet" href="assets/style.css"/>
+
+  <!-- Page-scoped polish (kept minimal; plays nice with your global CSS) -->
+  <style>
+    .subnav {
+      position: sticky; top: 64px; z-index: 40;
+      background: color-mix(in oklab, var(--bg) 90%, transparent);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .subnav .rail {
+      display: flex; gap: 10px; flex-wrap: wrap; padding: 10px 0;
+    }
+    .pill {
+      display:inline-flex; align-items:center; gap:.5rem;
+      padding:.55rem .8rem; border-radius:999px; border:1px solid var(--line);
+      background:#0e121b; font-weight:600; font-size:.95rem;
+    }
+    .pill:hover { border-color: color-mix(in oklab,var(--line) 60%, hsl(var(--accent)) 40%); transform: translateY(-1px); transition:.2s; }
+    .muted { color: var(--muted); }
+
+    .step { display:flex; gap:14px; align-items:flex-start; }
+    .step .num {
+      width:32px; height:32px; border-radius:10px; flex:0 0 32px;
+      display:grid; place-items:center; color:#fff;
+      background: linear-gradient(135deg,hsl(var(--accent)),hsl(var(--accent-2)));
+      font-weight:800;
+      box-shadow: 0 10px 24px hsl(var(--accent)/.25);
+    }
+
+    details.card summary {
+      cursor: pointer; list-style: none; font-weight: 700;
+    }
+    details.card summary::-webkit-details-marker { display:none; }
+    details.card[open] { border-color: color-mix(in oklab, var(--line) 30%, hsl(var(--accent)) 70%); }
+
+    .price-grid { display:grid; gap:22px; grid-template-columns: repeat(3,minmax(0,1fr)); }
+    @media (max-width: 980px) { .price-grid { grid-template-columns: 1fr; } }
+    .price .tag { font-size:.9rem; color:var(--muted); margin-bottom:.25rem; }
+    .price .value { font-size:2.1rem; font-weight:800; }
+    .price.pro { border-color:hsl(var(--accent)/.5); box-shadow:0 20px 50px hsl(var(--accent)/.18); }
+  </style>
 </head>
+
 <body>
   <div class="bg-orbs" aria-hidden="true"></div>
   <div data-include="partials/header.html"></div>
 
+  <!-- Hero -->
   <section class="container hero">
     <span class="eyebrow">Services</span>
     <h1 class="gradient-text">Consulting at EVRT</h1>
-    <p class="sub">Strategy, ops, and implementation to unlock your next S-curve.</p>
-    <div class="hero-cta"></div>
+    <p class="sub">We scale brands with data-driven decisions, high-performance websites, security by default, and social systems that compound.</p>
+    <div class="hero-cta">
+      <a class="btn primary" href="#contact">Book a consult</a>
+      <a class="btn" href="social-ai.html">See EVRT Social&nbsp;AI</a>
+    </div>
   </section>
 
-  
-<section class="container section grid grid-3">
-  <div class="card" data-reveal><div class="icon">🧭</div><h3>Strategy</h3><p class="muted">ICP, messaging, channel maps, metrics that matter.</p></div>
-  <div class="card" data-reveal><div class="icon">⚙️</div><h3>Execution</h3><p class="muted">Playbooks, pipelines, dashboards, run-cadence.</p></div>
-  <div class="card" data-reveal><div class="icon">🤝</div><h3>Enablement</h3><p class="muted">Workshops, training, templates, internal comms.</p></div>
-</section>
-<section class="container section prose">
-  <h2>Engagement Models</h2>
-  <ul class="check">
-    <li><div></div><div>Audit → roadmap (2–4 weeks) with priority stack & near-term wins</div></li>
-    <li><div></div><div>Embedded sprint teams for high-velocity implementation</div></li>
-    <li><div></div><div>Quarterly advisory for leadership & ops reviews</div></li>
-  </ul>
-  <div style="margin-top:14px"><a class="btn primary" href="contact.html">Request a scoping call</a></div>
-</section>
+  <!-- Sticky sub-nav -->
+  <div class="subnav">
+    <div class="container rail">
+      <a class="pill" href="#capabilities">Capabilities</a>
+      <a class="pill" href="#process">How we work</a>
+      <a class="pill" href="#snapshots">Results</a>
+      <a class="pill" href="#packages">Engagements</a>
+      <a class="pill" href="#faq">FAQ</a>
+      <a class="pill" href="#contact">Contact</a>
+    </div>
+  </div>
 
+  <!-- Capabilities -->
+  <section id="capabilities" class="container section">
+    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 10px">What we deliver</h2>
+    <p class="muted" style="margin:0 0 12px">Outcomes first. Below are the pillars we typically assemble into your growth stack.</p>
+
+    <div class="grid grid-3">
+      <div class="card" data-reveal>
+        <div class="icon">📊</div>
+        <h3>Data & Analytics</h3>
+        <ul class="check">
+          <li><div></div><div>Measurement framework & north-star metrics</div></li>
+          <li><div></div><div>Attribution, cohorting, LTV/CAC, MMM where it fits</div></li>
+          <li><div></div><div>Predictive models (timing, scoring, uplift)</div></li>
+          <li><div></div><div>Warehouse + BI dashboards (BigQuery/Redshift, Looker/Metabase)</div></li>
+          <li><div></div><div>Experimentation cadence & guardrail metrics</div></li>
+        </ul>
+      </div>
+
+      <div class="card" data-reveal>
+        <div class="icon">🛠️</div>
+        <h3>Websites & Product</h3>
+        <ul class="check">
+          <li><div></div><div>High-performance sites (Next.js/Static, CDN, image pipeline)</div></li>
+          <li><div></div><div>Information architecture & design system</div></li>
+          <li><div></div><div>CMS wiring (Contentful/Sanity/Headless WP)</div></li>
+          <li><div></div><div>Core Web Vitals, SEO foundations, analytics integrity</div></li>
+        </ul>
+      </div>
+
+      <div class="card" data-reveal>
+        <div class="icon">🛡️</div>
+        <h3>Cybersecurity</h3>
+        <ul class="check">
+          <li><div></div><div>Security review & hardening plan</div></li>
+          <li><div></div><div>SSO/MFA, secrets, least-privilege roles</div></li>
+          <li><div></div><div>Logging, backups, incident runbook</div></li>
+          <li><div></div><div>Privacy posture, SOC 2 readiness patterns</div></li>
+        </ul>
+      </div>
+
+      <div class="card" data-reveal>
+        <div class="icon">🛰️</div>
+        <h3>Social & Content</h3>
+        <ul class="check">
+          <li><div></div><div>On-brand AI workflows for ideation → variants → approvals</div></li>
+          <li><div></div><div>Predictive posting windows per platform</div></li>
+          <li><div></div><div>Creative catalogs & scorecards; feedback loops</div></li>
+          <li><div></div><div>Editorial calendar + briefs that ship</div></li>
+        </ul>
+      </div>
+
+      <div class="card" data-reveal>
+        <div class="icon">🔁</div>
+        <h3>Growth Ops & CRM</h3>
+        <ul class="check">
+          <li><div></div><div>Lifecycle messaging (email/SMS/in-app) with experiments</div></li>
+          <li><div></div><div>CRM & CDP integrations, UTM discipline, auto-tagging</div></li>
+          <li><div></div><div>Pipeline health dashboards & weekly run-cadence</div></li>
+        </ul>
+      </div>
+
+      <div class="card" data-reveal>
+        <div class="icon">🎓</div>
+        <h3>Training & Enablement</h3>
+        <ul class="check">
+          <li><div></div><div>Playbooks, templates, and internal docs</div></li>
+          <li><div></div><div>Team workshops; hands-on pairing; office hours</div></li>
+          <li><div></div><div>Change management and executive updates</div></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Process -->
+  <section id="process" class="container section">
+    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">How we work</h2>
+    <div class="grid grid-2">
+      <div class="card step" data-reveal>
+        <div class="num">1</div>
+        <div>
+          <strong>Discover & Diagnose (1–2 weeks)</strong>
+          <p class="muted">Interviews, data integrity checks, KPIs, constraints. We align on the outcome and baseline the system.</p>
+        </div>
+      </div>
+      <div class="card step" data-reveal>
+        <div class="num">2</div>
+        <div>
+          <strong>Model & Plan (1–2 weeks)</strong>
+          <p class="muted">Roadmap with quick wins + longer bets. Measurement plan, dashboards, and experiment slate.</p>
+        </div>
+      </div>
+      <div class="card step" data-reveal>
+        <div class="num">3</div>
+        <div>
+          <strong>Ship the Loop (2–6 weeks)</strong>
+          <p class="muted">Implement site/ops changes, wire EVRT Social AI, launch tests, and start weekly run-cadence.</p>
+        </div>
+      </div>
+      <div class="card step" data-reveal>
+        <div class="num">4</div>
+        <div>
+          <strong>Scale & Handoff (ongoing/quarterly)</strong>
+          <p class="muted">Double-down on winners, retire duds, and productize patterns. Train the team and step back.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results -->
+  <section id="snapshots" class="container section">
+    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">Recent results</h2>
+    <div class="grid grid-3">
+      <div class="card" data-reveal>
+        <div class="icon">👟</div>
+        <strong>DTC Apparel</strong>
+        <p class="muted">Hook testing + predictive windows → <strong>+31% CTR</strong> in 6 weeks.</p>
+      </div>
+      <div class="card" data-reveal>
+        <div class="icon">🏨</div>
+        <strong>Hospitality</strong>
+        <p class="muted">Geo-localized timing + creative sequences → <strong>+22% saves</strong>.</p>
+      </div>
+      <div class="card" data-reveal>
+        <div class="icon">💻</div>
+        <strong>SaaS</strong>
+        <p class="muted">Education flows + site perf → <strong>−17% time-to-activation</strong>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Engagement models -->
+  <section id="packages" class="container section">
+    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">Engagements</h2>
+    <div class="price-grid">
+      <div class="card price" data-reveal>
+        <div class="tag">Sprint Audit</div>
+        <div class="value">2–4 weeks</div>
+        <p class="muted">Full diagnostic + roadmap, quick wins, measurement plan, and executive brief.</p>
+        <ul class="check">
+          <li><div></div><div>Analytics integrity & KPIs</div></li>
+          <li><div></div><div>Website perf & SEO checklist</div></li>
+          <li><div></div><div>Security posture snapshot</div></li>
+        </ul>
+        <div style="margin-top:10px"><a class="btn" href="#contact">Start an audit</a></div>
+      </div>
+
+      <div class="card price pro" data-reveal>
+        <div class="tag">Pilot Build</div>
+        <div class="value">4–8 weeks</div>
+        <p class="muted">Ship the first compounding loop: content → timing → measure → iterate.</p>
+        <ul class="check">
+          <li><div></div><div>EVRT Social AI wired to your brand</div></li>
+          <li><div></div><div>Creative catalog + scorecard</div></li>
+          <li><div></div><div>Dashboards with weekly cadence</div></li>
+        </ul>
+        <div style="margin-top:10px"><a class="btn primary" href="#contact">Launch a pilot</a></div>
+      </div>
+
+      <div class="card price" data-reveal>
+        <div class="tag">Scale Program</div>
+        <div class="value">Quarterly</div>
+        <p class="muted">Dedicated pod for roadmap execution, training, and productization.</p>
+        <ul class="check">
+          <li><div></div><div>Experiment backlog & governance</div></li>
+          <li><div></div><div>Lifecycle/CRM & site improvements</div></li>
+          <li><div></div><div>Security/Privacy milestones</div></li>
+        </ul>
+        <div style="margin-top:10px"><a class="btn" href="#contact">Scope a quarter</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="container section">
+    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">FAQ</h2>
+    <div class="grid grid-2">
+      <details class="card" data-reveal>
+        <summary>Can you work with our in-house team/agency?</summary>
+        <p class="muted">Yes. We often plug into an existing data, design, or media team and focus on the glue—measurement, process, and the compounding loops.</p>
+      </details>
+      <details class="card" data-reveal>
+        <summary>Do we have to adopt the whole EVRT stack?</summary>
+        <p class="muted">No. We meet you where you are. Use our playbooks and the parts of EVRT Social AI that make sense; swap others over time.</p>
+      </details>
+      <details class="card" data-reveal>
+        <summary>What about compliance and privacy?</summary>
+        <p class="muted">We design for privacy by default—least privilege, encryption in transit/at rest, audit trails, data residency options, and SOC 2-friendly patterns.</p>
+      </details>
+      <details class="card" data-reveal>
+        <summary>How do you prove lift?</summary>
+        <p class="muted">We baseline, define guardrails, and instrument per-creative/per-channel attribution so wins are visible and defensible.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- Contact CTA -->
+  <section id="contact" class="container section">
+    <div class="card" style="display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap" data-reveal>
+      <div>
+        <h3 style="margin:.25rem 0">Let’s scale your brand—responsibly and fast.</h3>
+        <p class="muted" style="margin:.25rem 0 0">Tell us where you are and where you want to go. We’ll map the shortest path.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn" href="contact.html">Contact form</a>
+        <a class="btn primary" href="social-ai.html">See Social AI</a>
+      </div>
+    </div>
+  </section>
 
   <div data-include="partials/footer.html"></div>
   <script defer src="assets/app.js"></script>
-</body></html>
+</body>
+</html>
