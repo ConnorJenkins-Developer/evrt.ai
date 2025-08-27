@@ -30,19 +30,33 @@
 
     /* tiny mock components to “feel” productized */
     .ui-badge { display:inline-flex; align-items:center; gap:.4rem; padding:.35rem .6rem; border:1px solid var(--line); border-radius:999px; font-size:.8rem; background: #0e121b; }
+
+    /* Ad preview mock */
+    .seg { display:inline-flex; gap:6px; border:1px solid var(--line); background:#0e121b; padding:4px; border-radius:999px; }
+    .seg button { border:0; background:transparent; color:var(--text); padding:.45rem .8rem; border-radius:999px; font-weight:700; cursor:pointer; }
+    .seg button.active { background:linear-gradient(90deg,hsl(var(--accent)/.35),hsl(var(--accent-2)/.35)); }
     .ad-card {
+      --media-h: 220px;
+      --cta: linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2)));
       background:#0c111a; border:1px solid var(--line); border-radius:14px; padding:14px;
-      max-width:520px; box-shadow: var(--shadow-lg);
+      max-width:520px; box-shadow: var(--shadow-lg); transition: .28s ease;
     }
-    .ad-head { display:flex; align-items:center; justify-content:space-between; }
+    .ad-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
     .ad-brand { display:flex; align-items:center; gap:10px; font-weight:800; }
     .ad-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,hsl(var(--accent)),hsl(var(--accent-2))); }
-    .ad-media { height:220px; border-radius:12px; margin-top:10px;
+    .ad-media { height:var(--media-h); border-radius:12px; margin-top:10px;
       background: radial-gradient(100% 120% at 10% 10%, hsl(var(--accent)/.45), transparent),
                   radial-gradient(120% 120% at 90% 20%, hsl(var(--accent-2)/.35), transparent),
-                  radial-gradient(120% 120% at 40% 80%, hsl(320 90% 55%/.30), transparent); }
+                  radial-gradient(120% 120% at 40% 80%, hsl(320 90% 55%/.30), transparent);
+      transition:height .28s ease;
+    }
     .ad-footer { display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
-    .ad-cta { padding:.5rem .8rem; border-radius:999px; border:1px solid var(--line); background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2))); color:#fff; font-weight:700; }
+    .ad-cta { padding:.5rem .8rem; border-radius:999px; border:1px solid var(--line); background:var(--cta); color:#fff; font-weight:800; }
+
+    /* platform variants via data-attr */
+    .ad-card[data-platform="facebook"] { --media-h: 220px; --cta: linear-gradient(90deg,#2d6bff,#00b7ff); }
+    .ad-card[data-platform="instagram"] { --media-h: 300px; --cta: linear-gradient(90deg,#ff4ecd,#ffb347); }
+    .ad-card[data-platform="tiktok"] { --media-h: 420px; --cta: linear-gradient(90deg,#00f2ea,#ff0050); }
 
     .icons { display:grid; gap:14px; grid-template-columns:repeat(6,minmax(0,1fr)); }
     @media (max-width: 980px){ .icons { grid-template-columns:repeat(3,minmax(0,1fr)); } }
@@ -95,14 +109,12 @@
         <p class="muted">Compose on-brand content, predict best-minute timing per platform, schedule everywhere, measure lift.</p>
         <span class="ui-badge">Live demo available</span>
       </a>
-
       <a class="card" href="#ads" data-reveal>
         <div class="icon">🎯</div>
         <h3>Ads Optimizer</h3>
         <p class="muted">Score creative, generate variants, and get budget/split hints informed by historical performance.</p>
         <span class="ui-badge">Creative scoring</span>
       </a>
-
       <a class="card" href="#monitor" data-reveal>
         <div class="icon">🛰️</div>
         <h3>Monitor</h3>
@@ -112,7 +124,7 @@
     </div>
   </section>
 
-  <!-- Social AI Spotlight -->
+  <!-- Social AI Spotlight (with platform picker & live mock) -->
   <section id="social-ai" class="container section">
     <div class="spot-card spotlight" data-reveal>
       <div class="left">
@@ -131,17 +143,29 @@
       </div>
 
       <div class="right">
-        <!-- tiny ad-style preview to give product “texture” -->
-        <div class="ad-card">
+        <!-- Platform segmented control -->
+        <div class="seg" role="tablist" aria-label="Choose preview platform" style="margin-bottom:10px">
+          <button class="active" data-p="facebook" role="tab" aria-selected="true">Facebook</button>
+          <button data-p="instagram" role="tab" aria-selected="false">Instagram</button>
+          <button data-p="tiktok" role="tab" aria-selected="false">TikTok</button>
+        </div>
+
+        <!-- Ad-style preview mock -->
+        <div class="ad-card" id="adMock" data-platform="facebook">
           <div class="ad-head">
-            <div class="ad-brand"><span class="ad-avatar"></span><span>EVRT</span></div>
-            <span class="ui-badge">Scheduled</span>
+            <div class="ad-brand">
+              <span class="ad-avatar" aria-hidden="true"></span>
+              <span class="ad-name" id="adName">EVRT</span>
+            </div>
+            <span class="ui-badge ad-tag" id="adTag">Sponsored · 1h</span>
           </div>
-          <p class="muted" style="margin:.6rem 0 0">Draft once → schedule everywhere with predictive timing.</p>
-          <div class="ad-media"></div>
+          <p class="muted ad-copy" id="adCopy" style="margin:.6rem 0 0">
+            Draft once → schedule everywhere with predictive timing.
+          </p>
+          <div class="ad-media" id="adMedia" aria-label="Ad media"></div>
           <div class="ad-footer">
-            <span class="muted">evrt.ai</span>
-            <span class="ad-cta">Start trial</span>
+            <span class="muted ad-url" id="adUrl">evrt.ai</span>
+            <span class="ad-cta" id="adCta">Start trial</span>
           </div>
         </div>
       </div>
@@ -163,7 +187,6 @@
         </ul>
         <div style="margin-top:10px"><a class="btn" href="pricing.html">Included in Pro</a></div>
       </div>
-
       <div class="right">
         <div class="grid grid-2">
           <div class="card">
@@ -192,7 +215,6 @@
           <li><div></div><div><strong>Privacy-first</strong> capture with retention policies</div></li>
         </ul>
       </div>
-
       <div class="right">
         <div class="grid grid-2">
           <div class="card"><strong>Signals feed</strong><p class="muted" style="margin:.35rem 0 0">Daily summary → high-signal snippets you can trust.</p></div>
@@ -225,18 +247,10 @@
     <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">Integrations</h2>
     <p class="muted" style="margin:0 0 10px">Plug into the tools you already use.</p>
     <div class="icons" data-reveal>
-      <div class="ico">Facebook</div>
-      <div class="ico">Instagram</div>
-      <div class="ico">TikTok</div>
-      <div class="ico">LinkedIn</div>
-      <div class="ico">X</div>
-      <div class="ico">Slack</div>
-      <div class="ico">GA4</div>
-      <div class="ico">Shopify</div>
-      <div class="ico">Segment</div>
-      <div class="ico">HubSpot</div>
-      <div class="ico">BigQuery</div>
-      <div class="ico">Looker</div>
+      <div class="ico">Facebook</div><div class="ico">Instagram</div><div class="ico">TikTok</div>
+      <div class="ico">LinkedIn</div><div class="ico">X</div><div class="ico">Slack</div>
+      <div class="ico">GA4</div><div class="ico">Shopify</div><div class="ico">Segment</div>
+      <div class="ico">HubSpot</div><div class="ico">BigQuery</div><div class="ico">Looker</div>
     </div>
   </section>
 
@@ -321,6 +335,60 @@
   </section>
 
   <div data-include="partials/footer.html"></div>
+
+  <!-- Page script: platform picker for the ad mock -->
+  <script>
+    (function(){
+      const ad = document.getElementById('adMock');
+      const name = document.getElementById('adName');
+      const tag  = document.getElementById('adTag');
+      const copy = document.getElementById('adCopy');
+      const url  = document.getElementById('adUrl');
+      const cta  = document.getElementById('adCta');
+
+      const data = {
+        facebook: {
+          tag: 'Sponsored · 1h',
+          copy: 'Draft once → schedule everywhere with predictive timing.',
+          url:  'evrt.ai',
+          cta:  'Start trial'
+        },
+        instagram: {
+          tag: 'Sponsored',
+          copy: 'Create on-brand posts, publish at the best minute, measure lift.',
+          url:  'evrt.ai',
+          cta:  'Shop now'
+        },
+        tiktok: {
+          tag: 'Promoted',
+          copy: 'On-brand content + best-minute timing. Close the loop on lift.',
+          url:  '@evrt.ai',
+          cta:  'Learn more'
+        }
+      };
+
+      function render(p){
+        const d = data[p];
+        ad.dataset.platform = p;
+        name.textContent = p === 'tiktok' ? 'EVRT · Official' : 'EVRT';
+        tag.textContent  = d.tag;
+        copy.textContent = d.copy;
+        url.textContent  = d.url;
+        cta.textContent  = d.cta;
+      }
+
+      document.querySelectorAll('.seg [data-p]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          document.querySelectorAll('.seg [data-p]').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          render(btn.dataset.p);
+        });
+      });
+
+      render('facebook'); // initial
+    })();
+  </script>
+
   <script defer src="assets/app.js"></script>
 </body>
 </html>
