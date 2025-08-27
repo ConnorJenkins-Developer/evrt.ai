@@ -7,12 +7,40 @@ async function includePartials(){
   }
 }
 function setupNav(){
-  const menuBtn = document.getElementById("menuBtn");
-  const navLinks = document.getElementById("navLinks");
-  if (menuBtn && navLinks) menuBtn.addEventListener("click", ()=>{
-    const open = navLinks.classList.toggle("open");
-    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  const menuBtn   = document.getElementById("menuBtn");
+  const navLinks  = document.getElementById("navLinks");
+  const overlay   = document.getElementById("navOverlay");
+  if (!menuBtn || !navLinks || !overlay) return;
+
+  const open = () => {
+    document.body.classList.add("nav-open");
+    menuBtn.setAttribute("aria-expanded","true");
+    overlay.hidden = false;
+    // Close any desktop dropdown to avoid overlap
+    const more = navLinks.querySelector('details.more');
+    if (more) more.setAttribute('open','');
+  };
+  const close = () => {
+    document.body.classList.remove("nav-open");
+    menuBtn.setAttribute("aria-expanded","false");
+    overlay.hidden = true;
+  };
+
+  menuBtn.addEventListener("click", () => {
+    document.body.classList.contains("nav-open") ? close() : open();
   });
+  overlay.addEventListener("click", close);
+  window.addEventListener("keydown", (e)=>{ if(e.key==="Escape") close(); });
+
+  // Close panel when resizing up to desktop
+  let lastW = window.innerWidth;
+  window.addEventListener("resize", () => {
+    const now = window.innerWidth;
+    if (lastW <= 960 && now > 960) close();
+    lastW = now;
+  });
+
+  // Active link highlight (unchanged)
   const cur = location.pathname.split("/").pop() || "index.html";
   document.querySelectorAll("header nav a").forEach(a=>{
     const href = a.getAttribute("href"); if (!href) return;
@@ -20,6 +48,7 @@ function setupNav(){
     if (name === cur) a.classList.add("active");
   });
 }
+
 function setupTheme(){
   const root = document.documentElement;
   const saved = localStorage.getItem("evrt-theme");
