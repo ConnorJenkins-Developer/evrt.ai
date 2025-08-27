@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Live Demo — EVRT Social AI</title>
+  <meta name="description" content="Interactive demo of EVRT Social AI: compose, predict, analyze."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/style.css"/>
+  <!-- Chart.js for the activity curve -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    /* Page-specific polish (kept local to this file) */
+    .page-grid{display:grid;gap:18px;grid-template-columns:1.2fr .8fr}
+    @media (max-width:1100px){.page-grid{grid-template-columns:1fr}}
+    .panel{display:flex;flex-direction:column;gap:12px}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tabs .tab{padding:.55rem .8rem;border-radius:999px;border:1px solid var(--line);cursor:pointer}
+    .tabs .tab[aria-selected="true"]{background:linear-gradient(90deg,hsl(var(--accent)/.18),hsl(var(--accent-2)/.18))}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .input, .select, textarea.input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#0e121b;color:var(--text)}
+    .pill{border:1px solid var(--line);border-radius:999px;padding:.4rem .6rem}
+    .muted-sm{color:var(--muted);font-size:.9rem}
+    .list{display:grid;gap:10px}
+    .variant{border:1px dashed var(--line);border-radius:12px;padding:12px}
+    .flex{display:flex;gap:10px}
+    .flex-1{flex:1}
+    .right{justify-content:flex-end}
+
+    /* Chat area */
+    .chat{display:grid;gap:12px}
+    .chat-msg{border:1px solid var(--line);border-radius:12px;padding:12px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02))}
+    .chat-msg.ai{border-image:linear-gradient(90deg,hsl(var(--accent)/.5),hsl(var(--accent-2)/.5)) 1;border-width:1px;border-style:solid}
+    .typing{opacity:.8}
+
+    /* Tour overlay */
+    .tour-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);display:none;z-index:70}
+    .tour-card{position:fixed;max-width:420px;border-radius:14px;border:1px solid var(--line);padding:16px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));z-index:80;box-shadow:var(--glow)}
+    .tour-spotlight{position:fixed;border-radius:14px;box-shadow:0 0 0 9999px rgba(0,0,0,.6), 0 0 0 2px hsl(var(--accent));z-index:75;pointer-events:none}
+    .tour-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+    .hidden{display:none !important}
+  </style>
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true"></div>
+  <div data-include="partials/header.html"></div>
+
+  <section class="container hero">
+    <span class="eyebrow">Interactive</span>
+    <h1 class="gradient-text">EVRT Social AI — Live Demo</h1>
+    <p class="sub">Compose on-brand posts, pick the best minute to publish, and preview analytics — no login, no API keys.</p>
+    <div class="hero-cta">
+      <button class="btn primary" id="startTour">Start guided tour</button>
+      <a class="btn outline" href="social-ai.html">Product overview</a>
+    </div>
+  </section>
+
+  <section class="container section page-grid">
+    <!-- LEFT: Composer + Chat -->
+    <div class="panel">
+      <div class="card" data-reveal id="composeCard" data-tour="Compose your message; AI will generate 3 on-brand variants with hooks, CTAs, and hashtags.">
+        <div class="row"><h3 style="margin:.2rem 0">Composer</h3><span class="pill muted-sm">AI variants</span></div>
+        <div class="row">
+          <select class="select" id="brand">
+            <option>EVRT (Default Tone)</option>
+            <option>Bold / Challenger</option>
+            <option>Formal / Enterprise</option>
+            <option>Playful / DTC</option>
+          </select>
+          <div class="row">
+            <label class="pill"><input type="checkbox" id="ig" checked/> IG</label>
+            <label class="pill"><input type="checkbox" id="li" checked/> LinkedIn</label>
+            <label class="pill"><input type="checkbox" id="x"  checked/> X</label>
+            <label class="pill"><input type="checkbox" id="tt" /> TikTok</label>
+          </div>
+        </div>
+        <textarea class="input" rows="4" id="brief" placeholder="What are we announcing? Goals, audience, vibe…"></textarea>
+        <div class="row right">
+          <button class="btn glow" id="gen">Generate variants</button>
+        </div>
+        <div class="list" id="variants"></div>
+      </div>
+
+      <div class="card" data-reveal id="chatCard" data-tour="Ask the assistant anything — it ‘streams’ replies so it feels alive.">
+        <div class="row"><h3 style="margin:.2rem 0">Assistant</h3><span class="pill muted-sm">Live feel</span></div>
+        <div class="chat" id="chat"></div>
+        <div class="row">
+          <input class="input flex-1" id="chatInput" placeholder="Ask for alt hooks, different tone, or analytics reasoning…"/>
+          <button class="btn" id="chatSend">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Predictive Timing + Analytics -->
+    <div class="panel">
+      <div class="card" data-reveal id="predictCard" data-tour="We model audience activity per platform and surface the next best minutes by timezone.">
+        <div class="row"><h3 style="margin:.2rem 0">Predictive Timing</h3><span class="pill muted-sm">Best minute</span></div>
+        <div class="row">
+          <select class="select" id="platform">
+            <option value="Instagram">Instagram</option>
+            <option value="LinkedIn" selected>LinkedIn</option>
+            <option value="X">X</option>
+            <option value="TikTok">TikTok</option>
+          </select>
+          <select class="select" id="timezone">
+            <option value="0">UTC</option>
+            <option value="-5">ET (UTC-5)</option>
+            <option value="-8">PT (UTC-8)</option>
+            <option value="1">CET (UTC+1)</option>
+            <option value="5.5">IST (UTC+5:30)</option>
+          </select>
+          <button class="btn" id="predict">Predict</button>
+        </div>
+        <canvas id="activity" height="160" style="background:rgba(255,255,255,.02);border-radius:12px;border:1px solid var(--line)"></canvas>
+        <div id="bestTimes" class="row" style="flex-wrap:wrap"></div>
+      </div>
+
+      <div class="card" data-reveal id="analyticsCard" data-tour="Closed-loop analytics: see how variants and timing choices correlate with lift over your baseline.">
+        <div class="row"><h3 style="margin:.2rem 0">Analytics Snapshot</h3><span class="pill muted-sm">Closed loop</span></div>
+        <div class="grid grid-3">
+          <div class="kpi"><div style="font-weight:800;font-size:1.4rem">+28%</div><div class="muted">CTR vs. baseline</div></div>
+          <div class="kpi"><div style="font-weight:800;font-size:1.4rem">-22%</div><div class="muted">Time-to-publish</div></div>
+          <div class="kpi"><div style="font-weight:800;font-size:1.4rem">+16%</div><div class="muted">Consistency</div></div>
+        </div>
+        <p class="muted-sm" style="margin:.6rem 0 0">* Demo data — methodology: activity curve × creative score × recency decay.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOUR OVERLAY -->
+  <div class="tour-overlay" id="tourMask"></div>
+  <div class="tour-spotlight hidden" id="tourSpot"></div>
+  <div class="tour-card hidden" id="tourCard">
+    <div id="tourText" class="muted"></div>
+    <div class="tour-actions">
+      <button class="btn ghost" id="tourSkip">Skip</button>
+      <button class="btn" id="tourPrev">Back</button>
+      <button class="btn primary" id="tourNext">Next</button>
+    </div>
+  </div>
+
+  <div data-include="partials/footer.html"></div>
+  <script defer src="assets/app.js"></script>
+
+  <script>
+  // --------- DEMO STATE ---------
+  const rnd = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+  const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+
+  // Synthetic activity curves per platform (0..23 hours local)
+  const baseCurves = {
+    "LinkedIn":  [2,2,2,2,2,3,6,9,12,10,8,7,6,5,5,5,6,9,12,8,4,3,2,2],
+    "Instagram": [1,1,1,2,2,3,6,10,12,9,7,6,6,6,6,7,9,12,13,10,7,5,3,2],
+    "X":         [2,2,2,2,3,5,8,10,10,8,7,7,8,9,9,9,10,12,12,10,7,4,3,2],
+    "TikTok":    [1,1,1,1,2,4,7,10,12,12,10,8,7,7,8,10,12,13,12,9,6,4,2,1]
+  };
+  function shiftedCurve(platform, tzShift=0){
+    const curve = baseCurves[platform] || baseCurves["LinkedIn"];
+    const out = Array.from({length:24},(_,i)=>curve[(i-(-tzShift)+24)%24]); // shift by tz
+    // add light noise for demo realism
+    return out.map(v=>v + Math.round((Math.random()-0.5)*2));
+  }
+  function topMinutes(curve){
+    // find top 3 hours, then map to :15, :30, :45 variants
+    const hours = curve.map((v,i)=>({h:i, v}));
+    hours.sort((a,b)=>b.v-a.v);
+    const picks = hours.slice(0,3).map((o,idx)=>({
+      label: `${String(o.h).padStart(2,'0')}:${['15','30','45'][idx]}`,
+      score: o.v
+    }));
+    return picks;
+  }
+
+  // --------- COMPOSER VARIANTS ---------
+  const brandVoices = {
+    "EVRT (Default Tone)": (t)=>[
+      ["Hook",   "Level up your growth engine with predictive timing that meets your audience where they are."],
+      ["Value",  "Draft on-brand content, auto-test hooks, and schedule across channels — in minutes."],
+      ["CTA",    "Ship faster. Learn faster. Repeat."]
+    ],
+    "Bold / Challenger": (t)=>[
+      ["Hook",   "Stop guessing. Start compounding."],
+      ["Value",  "Your competitors post at random. You’ll post at the best minute — every time."],
+      ["CTA",    "Turn attention into outcomes."]
+    ],
+    "Formal / Enterprise": (t)=>[
+      ["Hook",   "Operationalize content with predictive intelligence."],
+      ["Value",  "Governance-ready drafting, approvals, and closed-loop analytics across teams."],
+      ["CTA",    "Standardize excellence."]
+    ],
+    "Playful / DTC": (t)=>[
+      ["Hook",   "Hooks > hope. Timing > luck."],
+      ["Value",  "Make scroll-stoppers and hit the moment your people actually show up."],
+      ["CTA",    "Let’s make your feed unskippable."]
+    ]
+  };
+  function hashtags(brief){
+    const core = ["#EVRT","#SocialAI","#Predictive","#CreatorOps","#Growth","##"];
+    const extra = brief.toLowerCase().includes("launch") ? ["#ProductLaunch","#NowLive"] :
+                  brief.toLowerCase().includes("event")  ? ["#Event","#SaveTheDate"] :
+                  ["#AI","##"];
+    return [...core.slice(0,3), ...extra].filter(t=>t!=="##").join(" ");
+  }
+  function buildVariants(voiceName, brief){
+    const tmpl = brandVoices[voiceName] || brandVoices["EVRT (Default Tone)"];
+    const parts = tmpl(brief);
+    const inflect = (arr, spice)=> arr.map(([k,v])=>[k, v.replace("content","content "+spice)]);
+    const v1 = parts;
+    const v2 = inflect(parts,"/creative");
+    const v3 = inflect(parts,"— crafted with guardrails");
+    const tagz = hashtags(brief);
+    const toText = (arr)=>[
+      arr[0][1],
+      arr[1][1],
+      arr[2][1],
+      tagz
+    ].join(" ");
+    return [toText(v1), toText(v2), toText(v3)];
+  }
+
+  // --------- STREAMING CHAT (fake but feels real) ---------
+  const chatEl = document.getElementById("chat");
+  function addChat(role, text, stream=false){
+    const div = document.createElement("div");
+    div.className = "chat-msg " + (role==="ai" ? "ai" : "");
+    if(!stream){ div.textContent = text; chatEl.appendChild(div); return div; }
+    chatEl.appendChild(div);
+    (async ()=>{
+      for(let i=0;i<text.length;i++){
+        div.textContent = text.slice(0,i+1) + (i%4===0?"\u258B":"");
+        await sleep(10+Math.random()*12);
+      }
+      div.textContent = text;
+    })();
+    return div;
+  }
+
+  // --------- UI HOOKS ---------
+  const variantsEl = document.getElementById("variants");
+  document.getElementById("gen").addEventListener("click", ()=>{
+    const voice = document.getElementById("brand").value;
+    const brief = (document.getElementById("brief").value || "Announcing EVRT Social AI — compose, predict, analyze.").trim();
+    variantsEl.innerHTML = "";
+    const vs = buildVariants(voice, brief);
+    vs.forEach((txt,i)=>{
+      const wrap = document.createElement("div");
+      wrap.className = "variant";
+      wrap.innerHTML = `<strong>Variant ${i+1}</strong><p class="muted-sm" style="margin:.4rem 0">${txt}</p>
+        <div class="row right"><button class="btn" data-sched="${i}">Schedule →</button></div>`;
+      variantsEl.appendChild(wrap);
+    });
+    // auto nudge chat
+    addChat("ai","I generated three on-brand variants. Pick one and I’ll predict the best minute for each selected channel.", true);
+  });
+
+  document.addEventListener("click",(e)=>{
+    const btn = e.target.closest("button[data-sched]");
+    if(!btn) return;
+    const which = Number(btn.dataset.sched)+1;
+    addChat("ai",`Queued Variant ${which} for scheduling. You can tweak copy or request alternates by tone.`, true);
+  });
+
+  // chat send
+  document.getElementById("chatSend").addEventListener("click", async ()=>{
+    const inp = document.getElementById("chatInput");
+    const q = (inp.value||"").trim();
+    if(!q) return;
+    addChat("user", q);
+    inp.value="";
+    await sleep(150);
+    const answer = [
+      "Here are 3 alternative hooks and the reasoning behind them:",
+      "• Curiosity gap (benefit-first, avoid jargon).",
+      "• Proof-point opener (small win with % lift).",
+      "• Objection-handled CTA (clear next action).",
+      "Want me to swap tone to Formal or Challenger?"
+    ].join("\n");
+    addChat("ai", answer, true);
+  });
+
+  // --------- PREDICTIVE TIMING ---------
+  let chart;
+  function renderChart(platform="LinkedIn", tz="0"){
+    const tzShift = Number(tz);
+    const curve = shiftedCurve(platform, tzShift);
+    const labels = Array.from({length:24},(_,i)=>String(i).padStart(2,'0')+":00");
+    const data = {
+      labels,
+      datasets:[{
+        label:`${platform} audience activity`,
+        data: curve,
+        tension:.35,
+        fill: true,
+        borderWidth:2
+      }]
+    };
+    const ctx = document.getElementById("activity").getContext("2d");
+    if(chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type:"line",
+      data,
+      options:{
+        responsive:true,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{grid:{color:"rgba(255,255,255,.06)"}},
+          y:{grid:{color:"rgba(255,255,255,.06)"}, ticks:{precision:0}}
+        }
+      }
+    });
+    // Surface best minutes
+    const best = topMinutes(curve);
+    const container = document.getElementById("bestTimes");
+    container.innerHTML = "";
+    best.forEach((b,i)=>{
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = `#${i+1} • ${b.label} local`;
+      container.appendChild(tag);
+    });
+  }
+  document.getElementById("predict").addEventListener("click", ()=>{
+    const p = document.getElementById("platform").value;
+    const t = document.getElementById("timezone").value;
+    renderChart(p,t);
+    addChat("ai",`For ${p}, your next best minutes are highlighted. Want me to align the schedule across IG/LinkedIn/X?`, true);
+  });
+  // initial chart
+  window.addEventListener("load", ()=>renderChart("LinkedIn","0"));
+
+  // --------- GUIDED TOUR ---------
+  const steps = Array.from(document.querySelectorAll("[data-tour]")).map(el=>({
+    el, text: el.getAttribute("data-tour")
+  }));
+  let idx = 0;
+  const spot = document.getElementById("tourSpot");
+  const card = document.getElementById("tourCard");
+  const mask = document.getElementById("tourMask");
+  function placeStep(i){
+    const {el, text} = steps[i];
+    const r = el.getBoundingClientRect();
+    const pad = 8;
+    spot.style.left = (window.scrollX + r.left - pad) + "px";
+    spot.style.top = (window.scrollY + r.top - pad) + "px";
+    spot.style.width = (r.width + pad*2) + "px";
+    spot.style.height = (r.height + pad*2) + "px";
+    spot.classList.remove("hidden");
+    card.classList.remove("hidden");
+    mask.style.display="block";
+    document.getElementById("tourText").textContent = text;
+    // place card below or above
+    const belowTop = window.scrollY + r.bottom + 16;
+    const aboveTop = window.scrollY + r.top - card.offsetHeight - 16;
+    const useBelow = (belowTop + card.offsetHeight < window.scrollY + window.innerHeight);
+    card.style.left = (window.scrollX + r.left) + "px";
+    card.style.top  = (useBelow ? belowTop : Math.max(aboveTop, window.scrollY + 12)) + "px";
+    window.scrollTo({top: Math.max(r.top + window.scrollY - 80,0), behavior:"smooth"});
+  }
+  function endTour(){ mask.style.display="none"; spot.classList.add("hidden"); card.classList.add("hidden") }
+  document.getElementById("startTour").addEventListener("click", ()=>{ idx=0; placeStep(idx) });
+  document.getElementById("tourNext").addEventListener("click", ()=>{ idx=Math.min(idx+1, steps.length-1); placeStep(idx) });
+  document.getElementById("tourPrev").addEventListener("click", ()=>{ idx=Math.max(idx-1, 0); placeStep(idx) });
+  document.getElementById("tourSkip").addEventListener("click", endTour);
+  window.addEventListener("resize", ()=>{ if(mask.style.display==="block") placeStep(idx) });
+  </script>
+</body>
+</html>
