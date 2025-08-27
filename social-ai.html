@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>EVRT Social AI — Product</title>
-  <meta name="description" content="Create, predict, schedule, and analyze social content with EVRT Social AI."/>
+  <title>EVRT Social AI — Interactive Studio</title>
+  <meta name="description" content="Compose → Predict timing → Build a schedule → See projected impact. Live previews for Facebook, Instagram, and TikTok."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
@@ -12,162 +12,202 @@
 </head>
 <body>
   <div class="bg-orbs" aria-hidden="true"></div>
+
+  <!-- Shared header -->
   <div data-include="partials/header.html"></div>
 
-  <section class="container hero">
+  <!-- Hero -->
+  <section class="container wide hero">
     <span class="eyebrow">Product</span>
-    <h1 class="gradient-text">EVRT Social AI</h1>
-    <p class="sub">Compose → Predict timing → Build a schedule → See projected impact.</p>
+    <h1 class="gradient-text">EVRT Social AI — Interactive Studio</h1>
+    <p class="sub">Draft on-brand content, predict the best minute per platform, build a schedule, and see projected impact — all in one place.</p>
     <div class="hero-cta">
-      <a class="btn primary" href="#demo">Try the live demo</a>
-      <a class="btn" href="pricing.html">Pricing</a>
+      <a class="btn primary" href="pricing.html">Start trial</a>
+      <a class="btn" href="contact.html">Talk to sales</a>
     </div>
   </section>
 
-  <!-- =================== Virtual Demo =================== -->
-  <section class="container wide section" id="demo">
-    <div class="demo-wrap">
-      <div class="demo-bg" aria-hidden="true"></div>
-
-      <!-- LEFT: Control Panel -->
-      <aside class="demo-left">
-        <div class="demo-head">
-          <span class="badge-pill">⚡</span>
-          <div>
-            <div style="font-weight:800">EVRT Social AI — Interactive Demo</div>
-            <div class="muted" style="font-size:.92rem">Compose → Predict timing → Schedule → Analytics</div>
+  <!-- Unified Studio -->
+  <section class="container wide">
+    <div id="studio" class="studio" aria-live="polite">
+      <!-- LEFT: Controls -->
+      <aside class="panel sticky" aria-label="Composer and settings">
+        <div class="card pad-lg">
+          <div class="step-tabs" role="tablist" aria-label="Steps">
+            <button class="chip step is-active" data-step="compose" role="tab" aria-selected="true">Compose</button>
+            <button class="chip step" data-step="timing" role="tab">Timing</button>
+            <button class="chip step" data-step="schedule" role="tab">Schedule</button>
+            <button class="chip step" data-step="analytics" role="tab">Analytics</button>
           </div>
-          <div class="spacer"></div>
-          <a class="pill" href="social-ai.html">Product page</a>
-          <a class="pill primary" href="pricing.html">Start trial</a>
-        </div>
 
-        <div class="demo-tabs">
-          <button class="btn ghost" data-step="compose"   title="1">Compose</button>
-          <button class="btn ghost" data-step="timing"    title="2">Timing</button>
-          <button class="btn ghost" data-step="schedule"  title="3">Schedule</button>
-          <button class="btn ghost" data-step="analytics" title="4">Analytics</button>
-        </div>
-
-        <div class="demo-section">
-          <div class="kv"><strong>Platforms</strong><div class="muted" style="font-size:.9rem">multi-select</div></div>
-          <div class="chips" id="chips-platforms">
-            <button class="chip is-on" data-pl="x">X</button>
-            <button class="chip" data-pl="linkedin">LinkedIn</button>
-            <button class="chip" data-pl="instagram">Instagram</button>
-            <button class="chip" data-pl="tiktok">TikTok</button>
+          <!-- Platforms -->
+          <div class="block">
+            <div class="block-title">Platforms</div>
+            <div class="pills" id="platforms">
+              <button class="pill is-on" data-platform="x">X</button>
+              <button class="pill" data-platform="linkedin">LinkedIn</button>
+              <button class="pill" data-platform="instagram">Instagram</button>
+              <button class="pill" data-platform="tiktok">TikTok</button>
+            </div>
           </div>
-        </div>
 
-        <div class="demo-section">
-          <div class="kv"><strong>Tone</strong><div></div></div>
-          <div class="chips" id="chips-tone">
-            <button class="chip is-on" data-tone="pro">Professional</button>
-            <button class="chip" data-tone="playful">Playful</button>
-            <button class="chip" data-tone="bold">Bold</button>
+          <!-- Tone -->
+          <div class="block">
+            <div class="block-title">Tone</div>
+            <div class="pills" id="tone">
+              <button class="pill is-on" data-tone="professional">Professional</button>
+              <button class="pill" data-tone="playful">Playful</button>
+              <button class="pill" data-tone="bold">Bold</button>
+            </div>
           </div>
-        </div>
 
-        <div class="demo-section">
-          <div class="kv"><strong>Controls</strong><div class="muted" style="font-size:.9rem">affects preview + heatmap</div></div>
-          <label class="muted" style="display:block">Clarity</label>
-          <input id="s-clarity" class="slider" type="range" min="0" max="100" value="72">
-          <label class="muted" style="display:block;margin-top:6px">Energy</label>
-          <input id="s-energy" class="slider" type="range" min="0" max="100" value="66">
-          <label class="muted" style="display:block;margin-top:6px">Depth</label>
-          <input id="s-depth" class="slider" type="range" min="0" max="100" value="58">
-        </div>
-
-        <div class="demo-section">
-          <strong>Post text</strong>
-          <textarea id="post-text" class="textbox" placeholder="Write or paste your post…"></textarea>
-          <div style="display:flex; gap:8px; flex-wrap:wrap">
-            <button id="btn-variant" class="btn">Generate variant</button>
-            <button id="btn-predict" class="btn primary">Predict best minute</button>
+          <!-- Sliders -->
+          <div class="grid sliders">
+            <label class="slider">
+              <span>Clarity</span>
+              <input type="range" min="0" max="100" value="72" id="clarity">
+            </label>
+            <label class="slider">
+              <span>Energy</span>
+              <input type="range" min="0" max="100" value="64" id="energy">
+            </label>
+            <label class="slider">
+              <span>Depth</span>
+              <input type="range" min="0" max="100" value="58" id="depth">
+            </label>
           </div>
-          <div class="preview-card" style="margin-top:10px">
-            <div class="muted" style="font-size:.9rem">Preview</div>
-            <div id="preview" style="margin-top:6px">Your post preview will appear here…</div>
+
+          <!-- Compose -->
+          <div class="block" data-pane="compose">
+            <div class="block-title">Post text <span class="muted">⌘/Ctrl+Enter to preview</span></div>
+            <textarea id="postInput" rows="6" placeholder="Write or paste your post…"></textarea>
+            <div class="row gap">
+              <button id="genVariant" class="btn">Generate variants</button>
+              <button id="predictBtn" class="btn primary">Predict best minute</button>
+            </div>
+            <div id="variantsTray" class="tray" aria-label="Generated variants"></div>
+          </div>
+
+          <!-- Timing -->
+          <div class="block hidden" data-pane="timing">
+            <div class="block-title">Best minute heatmap</div>
+            <div id="heatmap" class="heatmap" role="img" aria-label="Engagement heatmap"></div>
+            <div class="muted" id="bestMinuteText" style="margin-top:6px">—</div>
+          </div>
+
+          <!-- Schedule -->
+          <div class="block hidden" data-pane="schedule">
+            <div class="block-title">Weekly schedule (mock)</div>
+            <div id="weekGrid" class="week-grid" aria-label="Weekly schedule grid"></div>
+          </div>
+
+          <!-- Analytics (left quick view) -->
+          <div class="block hidden" data-pane="analytics">
+            <div class="block-title">Quick metrics (simulated)</div>
+            <div class="grid grid-3 kpi-mini">
+              <div class="kpi"><div class="kpi-num" id="kpiReach">—</div><div class="muted">Expected reach</div></div>
+              <div class="kpi"><div class="kpi-num" id="kpiCtr">—</div><div class="muted">CTR</div></div>
+              <div class="kpi"><div class="kpi-num" id="kpiConf">—</div><div class="muted">Confidence</div></div>
+            </div>
           </div>
         </div>
       </aside>
 
-      <!-- RIGHT: Stage -->
-      <section class="demo-stage" data-view="timing">
-        <div class="stage-toolbar">
-          <div class="pill">Simulated network activity</div>
-          <div class="spacer"></div>
-          <button id="btn-schedule" class="btn">Add to mock schedule</button>
-          <button id="btn-clear" class="btn ghost">Clear</button>
-        </div>
+      <!-- MIDDLE: Scene / Canvas -->
+      <main class="scene" aria-label="Interactive canvas">
+        <div class="scene-bg"></div>
 
-        <div class="stage-canvas">
-          <!-- Compose -->
-          <div class="view view--compose">
-            <div class="phone">
-              <div class="screen">
-                <div class="muted" style="font-weight:700">EVRT</div>
-                <div class="post">
-                  <div id="post-preview">Your post preview will appear here…</div>
-                </div>
-                <div class="muted" style="font-size:.85rem">▲ Projected lift applied</div>
-              </div>
+        <!-- Compose -> “catalog” -->
+        <section class="canvas card pad-xl" data-canvas="compose">
+          <header class="canvas-head">
+            <h3>Creative Catalog</h3>
+            <p class="muted">Your post + variants. Click a tile to send it to the live preview.</p>
+          </header>
+          <div id="catalog" class="catalog"></div>
+        </section>
+
+        <!-- Timing -->
+        <section class="canvas card pad-xl hidden" data-canvas="timing">
+          <header class="canvas-head">
+            <h3>Predicted timing</h3>
+            <p class="muted">We simulate engagement probability per minute using platform activity curves and your sliders.</p>
+          </header>
+          <div class="grid grid-2">
+            <div class="card soft pad-md">
+              <div class="label muted">Top windows</div>
+              <ol id="topWindows" class="list"></ol>
+            </div>
+            <div class="card soft pad-md">
+              <div class="label muted">Projected lift</div>
+              <svg id="sparkline" width="100%" height="80" viewBox="0 0 300 80" preserveAspectRatio="none"></svg>
             </div>
           </div>
+        </section>
 
-          <!-- Timing -->
-          <div class="view view--timing">
-            <canvas id="heatmap"></canvas>
-            <canvas id="scanline"></canvas>
-          </div>
+        <!-- Schedule -->
+        <section class="canvas card pad-xl hidden" data-canvas="schedule">
+          <header class="canvas-head">
+            <h3>Schedule Builder</h3>
+            <p class="muted">Click a top window to add it. Drag chips to reorder. (Mock interactions.)</p>
+          </header>
+          <div id="scheduleChips" class="chips-row"></div>
+        </section>
 
-          <!-- Schedule -->
-          <div class="view view--schedule">
-            <div class="schedule" id="schedule-grid" aria-label="7×24 grid"></div>
-          </div>
-
-          <!-- Analytics -->
-          <div class="view view--analytics">
-            <div class="kpi-cards">
-              <div class="kpi">
-                <div class="muted">Expected reach</div>
-                <strong id="kpi-reach">—</strong>
-                <canvas class="spark" id="spark-reach"></canvas>
-              </div>
-              <div class="kpi">
-                <div class="muted">CTR</div>
-                <strong id="kpi-ctr">—</strong>
-                <canvas class="spark" id="spark-ctr"></canvas>
-              </div>
-              <div class="kpi">
-                <div class="muted">Consistency</div>
-                <strong id="kpi-consistency">—</strong>
-                <canvas class="spark" id="spark-cons"></canvas>
-              </div>
+        <!-- Analytics -->
+        <section class="canvas card pad-xl hidden" data-canvas="analytics">
+          <header class="canvas-head">
+            <h3>Closed-loop analytics (simulated)</h3>
+            <p class="muted">Creative-level lift, not just vanity metrics. Numbers here respond to your sliders & tone.</p>
+          </header>
+          <div class="grid grid-3">
+            <div class="card soft pad-md">
+              <div class="label muted">Engagement trend</div>
+              <svg id="chartEng" width="100%" height="120" viewBox="0 0 320 120" preserveAspectRatio="none"></svg>
+            </div>
+            <div class="card soft pad-md">
+              <div class="label muted">CTR trend</div>
+              <svg id="chartCtr" width="100%" height="120" viewBox="0 0 320 120" preserveAspectRatio="none"></svg>
+            </div>
+            <div class="card soft pad-md">
+              <div class="label muted">Reach quality</div>
+              <svg id="chartQual" width="100%" height="120" viewBox="0 0 320 120" preserveAspectRatio="none"></svg>
             </div>
           </div>
+        </section>
+      </main>
+
+      <!-- RIGHT: Live Preview -->
+      <aside class="panel sticky" aria-label="Live preview">
+        <div class="card pad-lg">
+          <div class="row spread mid">
+            <div class="block-title">Preview</div>
+            <button id="clearPreview" class="chip ghost">Clear</button>
+          </div>
+
+          <!-- platform toggle for preview -->
+          <div class="pills tight" id="previewPlatform">
+            <button class="pill is-on" data-pv="facebook">Facebook</button>
+            <button class="pill" data-pv="instagram">Instagram</button>
+            <button class="pill" data-pv="tiktok">TikTok</button>
+          </div>
+
+          <div id="previewMount" class="preview-mount">
+            <!-- JS injects a .feed-card here -->
+          </div>
+
+          <div class="grid grid-3 kpi-mini" style="margin-top:12px">
+            <div class="kpi"><div class="kpi-num" id="pvReach">—</div><div class="muted">Exp. reach</div></div>
+            <div class="kpi"><div class="kpi-num" id="pvCtr">—</div><div class="muted">CTR</div></div>
+            <div class="kpi"><div class="kpi-num" id="pvConf">—</div><div class="muted">Confidence</div></div>
+          </div>
         </div>
-      </section>
-    </div>
-  </section>
-  <!-- =================== /Virtual Demo =================== -->
-
-  <section class="container section grid grid-2">
-    <div class="card" data-reveal>
-      <h3>Security & Privacy</h3>
-      <ul class="check">
-        <li><div></div><div>Tenant isolation; encryption in transit & at rest</div></li>
-        <li><div></div><div>Export controls & audit trails</div></li>
-        <li><div></div><div>Granular roles & approvals</div></li>
-      </ul>
-    </div>
-    <div class="card" data-reveal>
-      <h3>Integrations</h3>
-      <p class="muted">FB/IG, X, LinkedIn, TikTok • Slack • Google Analytics</p>
+      </aside>
     </div>
   </section>
 
+  <!-- Shared footer -->
   <div data-include="partials/footer.html"></div>
+
   <script defer src="assets/app.js"></script>
 </body>
 </html>
