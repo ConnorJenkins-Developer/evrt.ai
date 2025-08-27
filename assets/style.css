@@ -59,6 +59,50 @@ header{
   background:color-mix(in oklab, var(--bg) 85%, transparent);
   backdrop-filter:blur(10px);
 }
+/* Compact header variant */
+.hdr-compact .nav { padding:10px 0 }
+
+/* “More” dropdown (details/summary) */
+.links .menu.more { position: relative; }
+.links .menu.more summary {
+  list-style: none;
+  cursor: pointer;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:.45rem .75rem;
+  opacity:.9;
+}
+.links .menu.more summary::-webkit-details-marker { display:none; }
+.links .menu.more[open] summary {
+  background:linear-gradient(90deg,hsl(var(--accent)/.18),hsl(var(--accent-2)/.18));
+  opacity:1;
+}
+
+.links .menu.more .dropdown {
+  position:absolute; top:120%; left:0;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:8px;
+  min-width:220px;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+  display:grid; gap:4px;
+  z-index:60;
+}
+.links .menu.more .dropdown a {
+  padding:.5rem .6rem; border-radius:8px;
+}
+.links .menu.more .dropdown a:hover {
+  background:rgba(255,255,255,.04);
+}
+
+/* Mobile: dropdown becomes inline */
+@media (max-width:960px){
+  .links.open { flex-direction:column; align-items:stretch; }
+  .links.open .menu.more { width:100%; }
+  .links.open .menu.more .dropdown { position:static; box-shadow:none; }
+}
+
 .nav{ display:flex; align-items:center; gap:18px; padding:14px 0 }
 .logo{ display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px }
 .logo-mark{
