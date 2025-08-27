@@ -187,3 +187,29 @@ display:grid;place-items:center;color:#fff;font-weight:700}
 
 /* Utility */
 .hidden{display:none}
+/* === Cinematic Demo Overlay === */
+.demo-overlay{position:fixed;inset:0;background:color-mix(in oklab, var(--bg) 60%, black 40%);
+backdrop-filter:blur(10px);display:none;z-index:70}
+.demo-overlay.open{display:block}
+.demo-chrome{position:fixed;inset:20px;display:grid;grid-template-rows:auto 1fr auto;gap:14px;
+border:1px solid var(--line);border-radius:18px;padding:16px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02))}
+.demo-head{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.demo-steps{display:flex;gap:8px}
+.step-dot{width:10px;height:10px;border-radius:999px;border:1px solid var(--line);background:#10131c;opacity:.7}
+.step-dot.active{background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2)));opacity:1}
+.demo-canvas{position:relative;overflow:auto;border:1px solid var(--line);border-radius:14px;padding:14px}
+.scene{display:none;min-height:min(70vh,860px)}
+.scene.active{display:block;animation:fadeIn .45s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.demo-controls{display:flex;gap:10px;justify-content:flex-end}
+
+/* Device frames for wow factor */
+.device{position:relative;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:#0c111a;
+box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.device:before{content:"";position:absolute;left:50%;top:10px;transform:translateX(-50%);width:90px;height:6px;border-radius:999px;background:#202636;opacity:.8}
+
+/* Heatmap canvas card */
+.hm-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));}
+
+/* Scroll lock helper */
+html.lock, body.lock{height:100%;overflow:hidden}
