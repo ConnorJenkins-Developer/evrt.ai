@@ -11,91 +11,69 @@
   <link rel="stylesheet" href="assets/style.css"/>
 
   <style>
-    /* Page-scoped polish */
-    .chips { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-    .chip { display:inline-flex; align-items:center; gap:.45rem; padding:.35rem .7rem; border-radius:999px; border:1px solid var(--line); background:#0e121b; }
-
-    /* Sections */
-    .section-tight { padding: 18px 0 26px; }
-
-    /* 3D demo layout */
-    .defense-grid { display:grid; gap:18px; }
-    @media (min-width: 1020px){ .defense-grid { grid-template-columns: 360px 1fr; } }
-    .tool { border:1px solid var(--line); background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02)); border-radius:16px; padding:16px; }
-    .tool h3 { margin:.25rem 0 .5rem; }
-    .muted { color: var(--muted); }
-
-    .btnbar { display:flex; gap:10px; flex-wrap:wrap; }
-    .btn.primary { background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2))); border-color:transparent; color:#fff; }
-
-    /* Scene card */
-    .scene-card { position:relative; border:1px solid var(--line); border-radius:16px; overflow:hidden;
-      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015)); }
-    #scene { display:block; width:100%; height:520px; }
-    @media (max-width: 520px){ #scene { height: 420px; } }
-
-    .hud {
-      position:absolute; left:12px; bottom:12px; display:flex; gap:8px; flex-wrap:wrap;
-      font-size:.85rem; color:#cfd6ff; pointer-events:none;
-      text-shadow:0 2px 12px rgba(0,0,0,.55);
-    }
-    .hud .k { background:rgba(10,14,23,.6); border:1px solid var(--line); padding:.35rem .55rem; border-radius:10px; }
-    .legend { position:absolute; right:12px; top:12px; display:flex; gap:8px; flex-wrap:wrap; }
-    .legend .key { display:flex; align-items:center; gap:.45rem; border:1px solid var(--line); padding:.25rem .5rem; border-radius:10px; background:rgba(10,14,23,.5); }
-    .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
-    .dot.blue { background:#6da8ff; box-shadow:0 0 10px #6da8ff; }
-    .dot.green{ background:#5cf2c9; box-shadow:0 0 10px #5cf2c9; }
-    .dot.red  { background:#ff6b91; box-shadow:0 0 10px #ff6b91; }
-
-    .metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:10px; }
-    .metrics .m { border:1px dashed var(--line); padding:10px; border-radius:12px; text-align:center; }
-    .metrics .v { font-weight:800; font-size:1.2rem; }
-
-    .toggles { display:grid; gap:8px; margin-top:8px; }
-    .toggles label { display:flex; align-items:center; gap:.6rem; }
-    .toggles input { accent-color:hsl(var(--accent)); }
-
-    .seg { display:inline-flex; gap:6px; border:1px solid var(--line); background:#0e121b; padding:4px; border-radius:999px; }
-    .seg button { border:0; background:transparent; color:var(--text); padding:.45rem .8rem; border-radius:999px; font-weight:700; cursor:pointer; }
-    .seg button.active { background:linear-gradient(90deg,hsl(var(--accent)/.35),hsl(var(--accent-2)/.35)); }
-
-    /* Services grid */
-    .svc-grid { display:grid; gap:18px; }
-    @media (min-width: 900px){ .svc-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
-    .card { border:1px solid var(--line); border-radius:16px; padding:16px; background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015)); }
-    .icon { width:40px; height:40px; border-radius:12px; display:grid; place-items:center; margin-bottom:10px;
-      background:linear-gradient(135deg,hsl(var(--accent)/.25),hsl(var(--accent-2)/.25)); color:#fff; }
+    .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .chip{display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .7rem;border-radius:999px;border:1px solid var(--line);background:#0e121b}
+    .defense-grid{display:grid;gap:18px}
+    @media(min-width:1020px){.defense-grid{grid-template-columns:360px 1fr}}
+    .tool{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border-radius:16px;padding:16px}
+    .muted{color:var(--muted)}
+    .btnbar{display:flex;gap:10px;flex-wrap:wrap}
+    .btn.primary{background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2)));border-color:transparent;color:#fff}
+    .toggles{display:grid;gap:8px;margin-top:8px}
+    .toggles label{display:flex;align-items:center;gap:.6rem}
+    .toggles input{accent-color:hsl(var(--accent))}
+    .seg{display:inline-flex;gap:6px;border:1px solid var(--line);background:#0e121b;padding:4px;border-radius:999px}
+    .seg button{border:0;background:transparent;color:var(--text);padding:.45rem .8rem;border-radius:999px;font-weight:700;cursor:pointer}
+    .seg button.active{background:linear-gradient(90deg,hsl(var(--accent)/.35),hsl(var(--accent-2)/.35))}
+    .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+    .metrics .m{border:1px dashed var(--line);padding:10px;border-radius:12px;text-align:center}
+    .metrics .v{font-weight:800;font-size:1.2rem}
+    .scene-card{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015))}
+    #scene{display:block;width:100%;height:560px}
+    @media(max-width:560px){#scene{height:440px}}
+    .legend{position:absolute;right:12px;top:12px;display:flex;gap:8px;flex-wrap:wrap}
+    .legend .key{display:flex;align-items:center;gap:.45rem;border:1px solid var(--line);padding:.25rem .5rem;border-radius:10px;background:rgba(10,14,23,.5)}
+    .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+    .dot.blue{background:#6da8ff;box-shadow:0 0 10px #6da8ff}
+    .dot.green{background:#5cf2c9;box-shadow:0 0 10px #5cf2c9}
+    .dot.red{background:#ff6b91;box-shadow:0 0 10px #ff6b91}
+    .svc-grid{display:grid;gap:18px}
+    @media(min-width:900px){.svc-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    .card{border:1px solid var(--line);border-radius:16px;padding:16px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015))}
+    .icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;margin-bottom:10px;background:linear-gradient(135deg,hsl(var(--accent)/.25),hsl(var(--accent-2)/.25));color:#fff}
   </style>
 </head>
 <body>
   <div class="bg-orbs" aria-hidden="true"></div>
   <div data-include="partials/header.html"></div>
 
-  <!-- Hero -->
   <section class="container hero">
     <span class="eyebrow">Security</span>
     <h1 class="gradient-text">Cybersecurity, engineered for blast-radius zero</h1>
-    <p class="sub">Zero-trust by default. Live anomaly detection. Incident automation. See it work in the 3D defense model below.</p>
+    <p class="sub">Zero-trust by default. Live anomaly detection. Incident automation. See it in the interactive 3D defense model.</p>
     <div class="chips">
-      <span class="chip">SOC 2 (in progress)</span>
-      <span class="chip">SASE / Zero-Trust</span>
-      <span class="chip">WAF / RASP</span>
-      <span class="chip">Managed Detection & Response</span>
+      <a class="chip" href="#soc2">SOC 2 (in progress)</a>
+      <a class="chip" href="#zt" data-jump="zt">SASE / Zero-Trust</a>
+      <a class="chip" href="#waf" data-jump="waf">WAF / RASP</a>
+      <a class="chip" href="#mdr" data-jump="mdr">Managed Detection & Response</a>
+    </div>
+    <div class="hero-cta" style="margin-top:12px">
+      <a class="btn primary" id="ctaAssess" href="#">Book a security assessment</a>
+      <a class="btn" href="#model" id="ctaSeeModel">See the 3D model</a>
     </div>
   </section>
 
-  <!-- 3D Defense Model -->
-  <section class="container section">
+  <section class="container section" id="model">
     <div class="defense-grid">
       <aside class="tool">
         <h3>Live defense controls</h3>
-        <p class="muted">Toggle protections and launch scenarios. The scene reacts in real-time.</p>
+        <p class="muted">Toggle protections and launch scenarios. The scene reacts in real time.</p>
 
         <div class="toggles" id="toggles">
-          <label><input type="checkbox" data-k="waf" checked/> WAF & API Shield</label>
-          <label><input type="checkbox" data-k="zt" checked/> Zero-Trust access (IAM/Policies)</label>
-          <label><input type="checkbox" data-k="mdr" checked/> Managed Detection & Response</label>
-          <label><input type="checkbox" data-k="rate" checked/> Adaptive rate-limit / DDoS</label>
+          <label><input type="checkbox" data-k="waf" checked> WAF & API Shield</label>
+          <label><input type="checkbox" data-k="zt" checked> Zero-Trust access (IAM/Policies)</label>
+          <label><input type="checkbox" data-k="mdr" checked> Managed Detection & Response</label>
+          <label><input type="checkbox" data-k="rate" checked> Adaptive rate-limit / DDoS</label>
         </div>
 
         <div style="margin:12px 0 6px"><strong>Launch a scenario</strong></div>
@@ -110,6 +88,7 @@
           <button class="btn" id="tour">Auto-tour</button>
           <button class="btn" id="reset">Reset</button>
           <button class="btn" id="exportPng">Export PNG</button>
+          <button class="btn" id="shareLink">Share scene link</button>
         </div>
 
         <div class="metrics">
@@ -126,7 +105,7 @@
           </div>
         </div>
 
-        <p class="muted" style="margin-top:10px">Tip: drag to orbit · scroll to zoom · dbl-click to focus core.</p>
+        <p class="muted" style="margin-top:10px">Tip: drag to orbit · scroll to zoom · dbl-tap to center.</p>
       </aside>
 
       <div class="scene-card">
@@ -136,416 +115,242 @@
           <div class="key"><span class="dot red"></span> Attack vector</div>
           <div class="key"><span class="dot green"></span> Sensor alert</div>
         </div>
-        <div class="hud">
-          <div class="k">WAF</div>
-          <div class="k">Zero-Trust</div>
-          <div class="k">MDR</div>
-        </div>
       </div>
     </div>
   </section>
 
-  <!-- Services -->
-  <section class="container section-tight">
+  <section class="container section">
     <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif">Security capabilities</h2>
     <div class="svc-grid" style="margin-top:12px">
-      <div class="card" data-reveal>
-        <div class="icon">🛡️</div>
-        <strong>Threat modeling</strong>
-        <p class="muted">Map assets, attack paths, and blast radius. Prioritize fixes that measurably reduce risk.</p>
-      </div>
-      <div class="card" data-reveal>
-        <div class="icon">🛰️</div>
-        <strong>MDR & SIEM</strong>
-        <p class="muted">Continuous monitoring with anomaly detection, playbooks, and on-call response.</p>
-      </div>
-      <div class="card" data-reveal>
-        <div class="icon">🧩</div>
-        <strong>AppSec: WAF / RASP</strong>
-        <p class="muted">Runtime protection at the edge and inside your apps. False-positive tuning included.</p>
-      </div>
-      <div class="card" data-reveal>
-        <div class="icon">☁️</div>
-        <strong>Cloud posture</strong>
-        <p class="muted">CSPM for AWS/GCP/Azure: identity, network, storage, and KMS baselines with drift alerts.</p>
-      </div>
-      <div class="card" data-reveal>
-        <div class="icon">🚨</div>
-        <strong>Incident response</strong>
-        <p class="muted">Retainers with SLAs. Contain, investigate, and recover with forensic reporting.</p>
-      </div>
-      <div class="card" data-reveal>
-        <div class="icon">🔐</div>
-        <strong>Zero-Trust rollout</strong>
-        <p class="muted">Strong auth, least-privilege policies, device posture, and segmented networks.</p>
-      </div>
-    </div>
-    <div style="margin-top:14px">
-      <a href="contact.html" class="btn primary">Get a security assessment</a>
+      <div class="card" data-reveal><div class="icon">🛡️</div><strong>Threat modeling</strong><p class="muted">Map assets, attack paths, and blast radius. Prioritize fixes that measurably reduce risk.</p></div>
+      <div class="card" data-reveal><div class="icon">🛰️</div><strong>MDR & SIEM</strong><p class="muted">Continuous monitoring with anomaly detection, playbooks, and on-call response.</p></div>
+      <div class="card" data-reveal><div class="icon">🧩</div><strong>AppSec: WAF / RASP</strong><p class="muted">Runtime protection at the edge and in-app. False-positive tuning included.</p></div>
+      <div class="card" data-reveal><div class="icon">☁️</div><strong>Cloud posture</strong><p class="muted">CSPM for AWS/GCP/Azure: identity, network, storage, and KMS baselines with drift alerts.</p></div>
+      <div class="card" data-reveal><div class="icon">🚨</div><strong>Incident response</strong><p class="muted">Retainers with SLAs. Contain, investigate, and recover with forensic reporting.</p></div>
+      <div class="card" data-reveal><div class="icon">🔐</div><strong>Zero-Trust rollout</strong><p class="muted">Strong auth, least-privilege policies, device posture, and segmented networks.</p></div>
     </div>
   </section>
 
   <div data-include="partials/footer.html"></div>
 
-  <!-- THREE.JS SCENE -->
-  <script type="module">
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+  <!-- Three.js (classic globals) -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
 
-    // --------- DOM helpers
+  <script>
+  (function(){
     const $ = s => document.querySelector(s);
     const $$ = s => [...document.querySelectorAll(s)];
 
-    // --------- State
+    // ---- state (shareable)
     const features = { waf:true, zt:true, mdr:true, rate:true };
-    const metrics = { blocked:0, anomalies:0, allowed:0 };
+    const metrics  = { blocked:0, anomalies:0, allowed:0 };
     let trafficMode = 'balanced';
 
-    // --------- Renderer / scene
-    const canvas = $('#scene');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true, powerPreference:'high-performance' });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    // ---- renderer / scene
+    const canvas = document.getElementById('scene');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
     const scene = new THREE.Scene();
-
-    const camera = new THREE.PerspectiveCamera(55, 2, 0.1, 100);
-    camera.position.set(10, 6, 12);
+    const camera = new THREE.PerspectiveCamera(55, 2, 0.1, 200);
+    camera.position.set(10,6,12);
     scene.add(camera);
+    const controls = new THREE.OrbitControls(camera, canvas);
+    controls.enableDamping = true; controls.maxDistance=28; controls.minDistance=3.5;
 
-    const controls = new OrbitControls(camera, canvas);
-    controls.enableDamping = true;
-    controls.maxDistance = 26;
-    controls.minDistance = 4;
+    // lights
+    scene.add(new THREE.AmbientLight(0x9eb2ff, 0.7));
+    const dir = new THREE.DirectionalLight(0x88aaff, 0.9); dir.position.set(5,8,5); scene.add(dir);
 
-    // Lights
-    const amb = new THREE.AmbientLight(0x98a8ff, 0.7);
-    scene.add(amb);
-    const dir = new THREE.DirectionalLight(0x88aaff, 0.7);
-    dir.position.set(5, 8, 5);
-    scene.add(dir);
+    // core + layers
+    const coreMat = new THREE.MeshStandardMaterial({ color:0x0d1628, metalness:0.25, roughness:0.55, emissive:0x1a2b55, emissiveIntensity:0.8 });
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.6, 2), coreMat); scene.add(core);
+    const halo = new THREE.Mesh(new THREE.SphereGeometry(2.05, 48, 48), new THREE.MeshBasicMaterial({ color:0x4ea6ff, transparent:true, opacity:0.08 })); scene.add(halo);
+    const wafRing = new THREE.Mesh(new THREE.TorusGeometry(6.4, 0.12, 24, 180), new THREE.MeshBasicMaterial({ color:0x6da8ff, transparent:true, opacity:0.9 })); scene.add(wafRing);
+    const ztShell = new THREE.Mesh(new THREE.SphereGeometry(4.7, 48, 48), new THREE.MeshBasicMaterial({ color:0x5cf2c9, wireframe:true, transparent:true, opacity:0.32 })); scene.add(ztShell);
 
-    // Core (Your protected services)
-    const coreMat = new THREE.MeshStandardMaterial({
-      color: 0x0e1a2a,
-      emissive: 0x1a2b55,
-      emissiveIntensity: 0.65,
-      roughness: 0.5,
-      metalness: 0.2
-    });
-    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.6, 2), coreMat);
-    scene.add(core);
+    // nodes around ring
+    const group = new THREE.Group(); scene.add(group);
+    const nodeCount = (innerWidth<900)?24:40;
+    const nodes=[], nodeGeo=new THREE.SphereGeometry(0.16,16,16);
+    function randOnSphere(r){ const u=Math.random(), v=Math.random(); const t=2*Math.PI*u, p=Math.acos(2*v-1); return new THREE.Vector3(r*Math.sin(p)*Math.cos(t), r*Math.sin(p)*Math.sin(t), r*Math.cos(p)); }
+    for(let i=0;i<nodeCount;i++){ const p = randOnSphere(6+Math.random()*0.3); const m = new THREE.MeshBasicMaterial(); m.color.setHSL(0.62+Math.random()*0.05,0.6,0.65); const n=new THREE.Mesh(nodeGeo,m); n.position.copy(p); group.add(n); nodes.push(n); }
+    const arcMat=new THREE.LineBasicMaterial({ color:0x2b3450, transparent:true, opacity:0.6 });
+    for(let i=0;i<nodeCount;i+=2){ const a=nodes[i].position, b=nodes[(i+7)%nodeCount].position; const mid=a.clone().add(b).multiplyScalar(0.5).setLength(6.6); const curve=new THREE.CatmullRomCurve3([a,mid,b]); const g=new THREE.BufferGeometry().setFromPoints(curve.getPoints(32)); scene.add(new THREE.Line(g, arcMat)); }
 
-    // Halo
-    const halo = new THREE.Mesh(
-      new THREE.SphereGeometry(2.1, 32, 32),
-      new THREE.MeshBasicMaterial({ color:0x4ea6ff, transparent:true, opacity:0.08 })
-    );
-    scene.add(halo);
+    // particles
+    const particles=[]; const pGeo=new THREE.SphereGeometry(0.075,8,8); const legitMat=new THREE.MeshBasicMaterial({ color:0x6da8ff }); const attackMat=new THREE.MeshBasicMaterial({ color:0xff6b91 });
+    function spawnParticle(type='legit'){ const start=randOnSphere(9.5); const target=(type==='legit')?randOnSphere(3.3):new THREE.Vector3(0,0,0); const mat=(type==='legit'?legitMat:attackMat).clone(); const mesh=new THREE.Mesh(pGeo,mat); mesh.position.copy(start); const speed=(type==='legit')?(0.020+Math.random()*0.015):(0.028+Math.random()*0.02); particles.push({mesh,target,type,speed,alive:true}); scene.add(mesh); }
 
-    // Shields
-    const wafRing = new THREE.Mesh(
-      new THREE.TorusGeometry(6.2, 0.08, 16, 160),
-      new THREE.MeshBasicMaterial({ color:0x6da8ff, transparent:true, opacity:0.65 })
-    );
-    scene.add(wafRing);
+    // sensors
+    const sensors=[], sGeo=new THREE.SphereGeometry(0.09,12,12);
+    for(let i=0;i<10;i++){ const s=new THREE.Mesh(sGeo,new THREE.MeshBasicMaterial({ color:0x5cf2c9 })); s.position.copy(randOnSphere(4.9)); sensors.push(s); scene.add(s); }
 
-    const ztShell = new THREE.Mesh(
-      new THREE.SphereGeometry(4.6, 48, 48),
-      new THREE.MeshBasicMaterial({ color:0x5cf2c9, wireframe:true, transparent:true, opacity:0.25 })
-    );
-    scene.add(ztShell);
+    // beams
+    function beam(from,to,color=0xff6b91){ const pts=new THREE.CatmullRomCurve3([from, from.clone().add(to).multiplyScalar(0.5).setLength(7.2), to]).getPoints(40); const g=new THREE.BufferGeometry().setFromPoints(pts); const m=new THREE.LineBasicMaterial({ color, transparent:true, opacity:0.9 }); const l=new THREE.Line(g,m); scene.add(l); let life=26; const id=setInterval(()=>{ life--; m.opacity*=0.92; if(life<=0){ clearInterval(id); scene.remove(l); g.dispose(); } },16); }
 
-    // Network nodes
-    const group = new THREE.Group();
-    scene.add(group);
-    const nodeCount = (innerWidth < 900) ? 24 : 40;
-    const nodes = [];
-    const nodeGeo = new THREE.SphereGeometry(0.15, 16, 16);
-    const nodeMat = new THREE.MeshBasicMaterial({ color:0xa6b4ff });
+    // scenarios
+    function scenarioPhish(){ for(let i=0;i<6;i++){ const n=nodes[(Math.random()*nodes.length)|0]; beam(n.position.clone(), new THREE.Vector3(0,0,0), 0xff6b91); spawnParticle('attack'); } highlight('zt'); }
+    function scenarioDdos(){ for(let i=0;i<32;i++){ setTimeout(()=>spawnParticle('attack'), i*40); } highlight('waf'); }
+    function scenarioLateral(){ for(let i=0;i<8;i++) spawnParticle('legit'); for(let i=0;i<6;i++) setTimeout(()=>spawnParticle('attack'), i*60); highlight('mdr'); }
 
-    function randomOnSphere(r){
-      const u = Math.random();
-      const v = Math.random();
-      const theta = 2*Math.PI*u;
-      const phi = Math.acos(2*v - 1);
-      const x = r*Math.sin(phi)*Math.cos(theta);
-      const y = r*Math.sin(phi)*Math.sin(theta);
-      const z = r*Math.cos(phi);
-      return new THREE.Vector3(x,y,z);
+    // highlight a layer (visual pulse)
+    function highlight(layer){
+      if(layer==='waf'){ const base=wafRing.material.opacity; let t=0; const id=setInterval(()=>{ t+=0.08; wafRing.material.opacity=base+Math.sin(t)*0.35; if(t>Math.PI*2){ clearInterval(id); wafRing.material.opacity=base; } },16); }
+      if(layer==='zt'){ const base=ztShell.material.opacity; let t=0; const id=setInterval(()=>{ t+=0.08; ztShell.material.opacity=base+Math.sin(t)*0.25; if(t>Math.PI*2){ clearInterval(id); ztShell.material.opacity=base; } },16); }
+      if(layer==='mdr'){ for(const s of sensors){ const base=s.material.color.getHex(); s.material.color.set(0xffffff); setTimeout(()=>s.material.color.set(base), 280); } }
     }
 
-    for (let i=0;i<nodeCount;i++){
-      const p = randomOnSphere(5.8 + Math.random()*0.6);
-      const n = new THREE.Mesh(nodeGeo, nodeMat.clone());
-      n.position.copy(p);
-      n.material.color.setHSL(0.62 + Math.random()*0.05, 0.6, 0.65);
-      group.add(n);
-      nodes.push(n);
-    }
+    // resize
+    function resize(){ const w = canvas.clientWidth || canvas.parentElement.clientWidth || 800; const h = canvas.clientHeight || 560; if (canvas.width!==w || canvas.height!==h){ renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); } }
+    if('ResizeObserver' in window){ new ResizeObserver(resize).observe(canvas); } window.addEventListener('resize', resize, { passive:true }); resize();
 
-    // Thin connecting arcs (aesthetic)
-    const arcMat = new THREE.LineBasicMaterial({ color:0x2b3450, transparent:true, opacity:0.6 });
-    for (let i=0;i<nodeCount;i+=2){
-      const a = nodes[i].position;
-      const b = nodes[(i+7)%nodeCount].position;
-      const mid = a.clone().add(b).multiplyScalar(0.5).setLength(6.3);
-      const curve = new THREE.CatmullRomCurve3([a, mid, b]);
-      const g = new THREE.BufferGeometry().setFromPoints(curve.getPoints(32));
-      const l = new THREE.Line(g, arcMat);
-      scene.add(l);
-    }
+    // HUD
+    function updateMetrics(){ $('#mBlocked').textContent=metrics.blocked; $('#mAnom').textContent=metrics.anomalies; $('#mAllowed').textContent=metrics.allowed; }
 
-    // Traffic particles
-    const particles = [];
-    const pGeo = new THREE.SphereGeometry(0.07, 8, 8);
-    const legitMat = new THREE.MeshBasicMaterial({ color:0x6da8ff });
-    const attackMat = new THREE.MeshBasicMaterial({ color:0xff6b91 });
+    // fx
+    function explode(pos,color=0xffffff){ const N=18,g=new THREE.BufferGeometry(),positions=new Float32Array(N*3),dirs=[]; for(let i=0;i<N;i++){ const v=randOnSphere(1).multiplyScalar(0.06+Math.random()*0.06); positions.set([pos.x,pos.y,pos.z], i*3); dirs.push(v); } g.setAttribute('position', new THREE.BufferAttribute(positions,3)); const m=new THREE.PointsMaterial({ size:0.06, color, transparent:true, opacity:0.95 }); const pts=new THREE.Points(g,m); scene.add(pts); let life=22; const id=setInterval(()=>{ life--; const arr=pts.geometry.attributes.position.array; for(let i=0;i<N;i++){ arr[i*3]+=dirs[i].x; arr[i*3+1]+=dirs[i].y; arr[i*3+2]+=dirs[i].z; } pts.geometry.attributes.position.needsUpdate=true; m.opacity*=0.92; if(life<=0){ clearInterval(id); scene.remove(pts); g.dispose(); } },16); }
+    function ping(pos){ const geo=new THREE.RingGeometry(0.1,0.13,32); const mat=new THREE.MeshBasicMaterial({ color:0x5cf2c9, transparent:true, opacity:0.95, side:THREE.DoubleSide }); const r=new THREE.Mesh(geo,mat); r.position.copy(pos); scene.add(r); let s=1,life=24; const id=setInterval(()=>{ life--; s+=0.12; r.scale.set(s,s,1); mat.opacity*=0.9; if(life<=0){ clearInterval(id); scene.remove(r); geo.dispose(); } },16); }
 
-    function spawnParticle(type='legit'){
-      const start = randomOnSphere(9.5);
-      const target = (type==='legit') ? randomOnSphere(3.2) : new THREE.Vector3(0,0,0);
-      const m = (type==='legit') ? legitMat.clone() : attackMat.clone();
-      const mesh = new THREE.Mesh(pGeo, m);
-      mesh.position.copy(start);
-      const speed = (type==='legit') ? (0.02 + Math.random()*0.015) : (0.028 + Math.random()*0.02);
-      particles.push({ mesh, start, target, type, speed, alive:true });
-      scene.add(mesh);
-    }
-
-    // Sensors (MDR beacons)
-    const sensorGeo = new THREE.SphereGeometry(0.09, 12, 12);
-    for (let i=0;i<10;i++){
-      const s = new THREE.Mesh(sensorGeo, new THREE.MeshBasicMaterial({ color:0x5cf2c9 }));
-      s.position.copy(randomOnSphere(4.8));
-      scene.add(s);
-    }
-
-    // Scenarios
-    function scenarioPhish(){
-      // a few attacks slipping past edge; ZT should catch
-      for (let i=0;i<6;i++) spawnParticle('attack');
-    }
-    function scenarioDdos(){
-      for (let i=0;i<28;i++) setTimeout(()=>spawnParticle('attack'), i*45);
-    }
-    function scenarioLateral(){
-      // legit traffic + hidden attack
-      for (let i=0;i<8;i++) spawnParticle('legit');
-      for (let i=0;i<5;i++) setTimeout(()=>spawnParticle('attack'), i*60);
-    }
-
-    // Traffic pump
-    let pump = 0;
-    function pumpRate(){
-      return trafficMode==='high' ? 3 : trafficMode==='low' ? 0.5 : 1;
-    }
-
-    // Resize
-    function resizeRendererToDisplaySize(){
-      const { clientWidth, clientHeight } = canvas;
-      const needResize = canvas.width !== clientWidth || canvas.height !== clientHeight;
-      if (needResize){
-        renderer.setSize(clientWidth, clientHeight, false);
-        camera.aspect = clientWidth / clientHeight;
-        camera.updateProjectionMatrix();
-      }
-      return needResize;
-    }
-    const ro = new ResizeObserver(()=>resizeRendererToDisplaySize());
-    ro.observe(canvas);
-
-    // HUD metrics
-    function updateMetrics(){
-      $('#mBlocked').textContent = metrics.blocked;
-      $('#mAnom').textContent = metrics.anomalies;
-      $('#mAllowed').textContent = metrics.allowed;
-    }
-
-    // Collision helpers (radii)
-    const R_WAF = 6.2, R_ZT = 4.6, R_CORE = 1.6;
-
-    // Animation loop
-    let t = 0;
+    // animate
+    const R_WAF=6.4, R_ZT=4.7, R_CORE=1.6; let pump=0;
+    function pumpRate(){ return trafficMode==='high'?3:(trafficMode==='low'?0.5:1); }
     function animate(){
-      requestAnimationFrame(animate);
-      t += 0.016;
-
-      // gentle movement
-      group.rotation.y += 0.0008;
-      wafRing.rotation.z += 0.0012;
-      ztShell.rotation.y -= 0.0009;
-
-      // spawn ambient legit traffic
-      pump += 0.02 * pumpRate();
-      if (pump > 1){ pump = 0; spawnParticle('legit'); }
-
-      // step particles
-      for (const p of particles){
-        if (!p.alive) continue;
-        const dir = p.target.clone().sub(p.mesh.position).normalize();
-        p.mesh.position.addScaledVector(dir, p.speed);
-
-        const r = p.mesh.position.length();
-
-        // WAF / edge block
-        if (features.waf && p.type==='attack' && r < R_WAF - 0.05 && r > R_ZT + 0.05){
-          // randomize: block most at edge
-          if (Math.random() < 0.8){
-            p.alive = false;
-            metrics.blocked++;
-            updateMetrics();
-            // spark
-            explode(p.mesh.position, 0xff6b91);
-            scene.remove(p.mesh);
-            continue;
-          }
+      requestAnimationFrame(animate); resize();
+      group.rotation.y+=0.0009; wafRing.rotation.z+=0.0012; ztShell.rotation.y-=0.0007; core.rotation.x-=0.0007; halo.rotation.y+=0.0005;
+      pump += 0.02 * pumpRate(); if (pump>1){ pump=0; spawnParticle('legit'); }
+      for(const p of particles){
+        if(!p.alive) continue;
+        const dir=p.target.clone().sub(p.mesh.position).normalize(); p.mesh.position.addScaledVector(dir, p.speed);
+        const r=p.mesh.position.length();
+        if(features.waf && p.type==='attack' && r < R_WAF-0.1 && r > R_ZT+0.1){
+          if(Math.random() < (features.rate?0.88:0.75)){ p.alive=false; metrics.blocked++; updateMetrics(); explode(p.mesh.position,0xff6b91); scene.remove(p.mesh); continue; }
         }
-
-        // Zero-Trust block near services
-        if (features.zt && p.type==='attack' && r < R_ZT - 0.05){
-          if (Math.random() < 0.85){
-            p.alive = false;
-            metrics.blocked++;
-            updateMetrics();
-            explode(p.mesh.position, 0x5cf2c9);
-            scene.remove(p.mesh);
-            continue;
-          }
+        if(features.zt && p.type==='attack' && r < R_ZT-0.05){
+          if(Math.random() < 0.88){ p.alive=false; metrics.blocked++; updateMetrics(); explode(p.mesh.position,0x5cf2c9); scene.remove(p.mesh); continue; }
         }
-
-        // MDR anomaly ping (visual only)
-        if (features.mdr && p.type==='attack' && r < 5.2 && Math.random() < 0.015){
-          metrics.anomalies++; updateMetrics();
-          ping(p.mesh.position);
-        }
-
-        // Reached core
-        if (r < R_CORE + 0.05){
-          p.alive = false;
-          scene.remove(p.mesh);
-          if (p.type === 'attack'){
-            // Breach if protections off
-            core.material.emissiveIntensity = 1.2;
-            setTimeout(()=> core.material.emissiveIntensity = 0.65, 220);
-          } else {
-            metrics.allowed++; updateMetrics();
-          }
-        }
+        if(features.mdr && p.type==='attack' && r < 5.4 && Math.random()<0.015){ metrics.anomalies++; updateMetrics(); ping(p.mesh.position); }
+        if(r < R_CORE+0.05){ p.alive=false; scene.remove(p.mesh); if(p.type==='attack'){ core.material.emissiveIntensity=1.3; setTimeout(()=>core.material.emissiveIntensity=0.8,220); } else { metrics.allowed++; updateMetrics(); } }
       }
-
-      // clean up dead
-      for (let i=particles.length-1; i>=0; i--){
-        if (!particles[i].alive) particles.splice(i,1);
-      }
-
-      controls.update();
-      resizeRendererToDisplaySize();
-      renderer.render(scene, camera);
+      for(let i=particles.length-1;i>=0;i--) if(!particles[i].alive) particles.splice(i,1);
+      wafRing.material.opacity = features.waf ? 0.9 : 0.25;
+      ztShell.material.opacity = features.zt ? 0.32 : 0.08;
+      controls.update(); renderer.render(scene, camera);
     }
     animate();
 
-    // Simple FX
-    function explode(pos, color=0xffffff){
-      const g = new THREE.BufferGeometry();
-      const N = 20;
-      const positions = new Float32Array(N*3);
-      const dirs = [];
-      for (let i=0;i<N;i++){
-        const v = randomOnSphere(1);
-        positions.set([pos.x,pos.y,pos.z], i*3);
-        dirs.push(v.multiplyScalar(0.06 + Math.random()*0.06));
-      }
-      g.setAttribute('position', new THREE.BufferAttribute(positions,3));
-      const m = new THREE.PointsMaterial({ size: 0.06, color, transparent:true, opacity:0.95 });
-      const pts = new THREE.Points(g,m);
-      scene.add(pts);
-      let life = 24;
-      const id = setInterval(()=>{
-        life--;
-        const arr = pts.geometry.attributes.position.array;
-        for (let i=0;i<N;i++){
-          arr[i*3]   += dirs[i].x;
-          arr[i*3+1] += dirs[i].y;
-          arr[i*3+2] += dirs[i].z;
-        }
-        pts.geometry.attributes.position.needsUpdate = true;
-        pts.material.opacity *= 0.92;
-        if (life<=0){ clearInterval(id); scene.remove(pts); pts.geometry.dispose(); }
-      }, 16);
-    }
+    // UI wiring
+    document.getElementById('sPhish').addEventListener('click', scenarioPhish);
+    document.getElementById('sDdos').addEventListener('click', scenarioDdos);
+    document.getElementById('sLateral').addEventListener('click', scenarioLateral);
 
-    function ping(pos){
-      const geo = new THREE.RingGeometry(0.1, 0.12, 32);
-      const mat = new THREE.MeshBasicMaterial({ color:0x5cf2c9, transparent:true, opacity:0.9, side:THREE.DoubleSide });
-      const ring = new THREE.Mesh(geo, mat);
-      ring.position.copy(pos);
-      scene.add(ring);
-      let s = 1, life = 24;
-      const id = setInterval(()=>{
-        life--;
-        s += 0.12;
-        ring.scale.set(s,s,1);
-        ring.material.opacity *= 0.9;
-        if (life<=0){ clearInterval(id); scene.remove(ring); geo.dispose(); }
-      }, 16);
-    }
-
-    // --------- UI bindings
-    $('#sPhish').addEventListener('click', scenarioPhish);
-    $('#sDdos').addEventListener('click', scenarioDdos);
-    $('#sLateral').addEventListener('click', scenarioLateral);
-
-    $('#tour').addEventListener('click', ()=>{
-      const start = camera.position.clone();
-      const target = new THREE.Vector3(0,0,0);
-      let t = 0;
-      const id = setInterval(()=>{
-        t += 0.02;
+    document.getElementById('tour').addEventListener('click', ()=>{
+      const start=camera.position.clone(), target=new THREE.Vector3(0,0,0);
+      let t=0; const id=setInterval(()=>{ t+=0.02;
         camera.position.x = start.x*Math.cos(0.02) + start.z*Math.sin(0.02);
         camera.position.z = start.z*Math.cos(0.02) - start.x*Math.sin(0.02);
-        camera.lookAt(target);
-        if (t>6){ clearInterval(id); }
-      }, 16);
+        camera.lookAt(target); if(t>6){ clearInterval(id); }
+      },16);
     });
 
-    $('#reset').addEventListener('click', ()=>{
-      metrics.blocked = metrics.anomalies = metrics.allowed = 0;
-      updateMetrics();
-      for (const p of particles){ p.alive=false; scene.remove(p.mesh); }
-      particles.length = 0;
-      core.material.emissiveIntensity = 0.65;
-      camera.position.set(10,6,12);
-      controls.update();
+    document.getElementById('reset').addEventListener('click', ()=>{
+      metrics.blocked = metrics.anomalies = metrics.allowed = 0; updateMetrics();
+      for(const p of particles){ p.alive=false; scene.remove(p.mesh); } particles.length=0;
+      core.material.emissiveIntensity=0.8; camera.position.set(10,6,12); controls.update();
     });
 
-    // Export PNG of canvas
-    $('#exportPng').addEventListener('click', ()=>{
-      const url = canvas.toDataURL('image/png');
-      const a = document.createElement('a');
-      a.href = url; a.download = 'evrt-security-scene.png';
-      a.click();
+    document.getElementById('exportPng').addEventListener('click', ()=>{ const url=canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=url; a.download='evrt-security-scene.png'; a.click(); });
+
+    // Share scene link (encodes toggles + traffic)
+    function sceneLink(){
+      const payload = { features, trafficMode };
+      const hash = 'state=' + encodeURIComponent(btoa(JSON.stringify(payload)));
+      return `${location.origin}${location.pathname}#${hash}`;
+    }
+    document.getElementById('shareLink').addEventListener('click', async ()=>{
+      const link = sceneLink();
+      try{ await navigator.clipboard.writeText(link); alert('Shareable scene link copied!'); }
+      catch{ prompt('Copy this link:', link); }
     });
 
-    // Feature toggles
-    $$('#toggles input[type="checkbox"]').forEach(cb=>{
-      cb.addEventListener('change', ()=>{
-        features[cb.dataset.k] = cb.checked;
-      });
+    // Book assessment: export PNG + open mail
+    document.getElementById('ctaAssess').addEventListener('click', (e)=>{
+      e.preventDefault();
+      // download snapshot
+      const url=canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=url; a.download='evrt-security-scene.png'; a.click();
+      // mailto with metrics + link
+      const subject = 'Security assessment request — EVRT scene snapshot';
+      const body =
+`Hello EVRT Security,
+
+Please review my environment snapshot.
+
+Features:
+- WAF/API Shield: ${features.waf?'ON':'OFF'}
+- Zero-Trust: ${features.zt?'ON':'OFF'}
+- MDR: ${features.mdr?'ON':'OFF'}
+- Rate-limit/DDoS: ${features.rate?'ON':'OFF'}
+Traffic mode: ${trafficMode}
+
+Metrics:
+- Blocked: ${metrics.blocked}
+- Anomalies: ${metrics.anomalies}
+- Allowed: ${metrics.allowed}
+
+Shareable scene link:
+${sceneLink()}
+
+(Attach the downloaded "evrt-security-scene.png")
+
+Thanks!`;
+      const mailto = `mailto:security@evrt.ai?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailto;
     });
 
-    // Traffic mode
+    // Toggle + traffic controls
+    $$('#toggles input[type="checkbox"]').forEach(cb=> cb.addEventListener('change', ()=>{ features[cb.dataset.k]=cb.checked; }));
     $$('[data-traffic]').forEach(b=>{
-      b.addEventListener('click', ()=>{
-        $$('[data-traffic]').forEach(x=>x.classList.remove('active'));
-        b.classList.add('active');
-        trafficMode = b.dataset.traffic;
-      });
+      b.addEventListener('click', ()=>{ $$('[data-traffic]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); trafficMode=b.dataset.traffic; });
     });
 
-    // Accessibility helpers
-    canvas.addEventListener('dblclick', ()=>{ controls.target.set(0,0,0); });
+    // Deep-link jumps from hero chips
+    function jumpTo(key){
+      document.getElementById('model').scrollIntoView({ behavior:'smooth', block:'start' });
+      if (key==='waf'){ scenarioDdos(); }
+      if (key==='zt'){ scenarioPhish(); }
+      if (key==='mdr'){ scenarioLateral(); }
+    }
+    $$('[data-jump]').forEach(a=>{
+      a.addEventListener('click', (e)=>{ e.preventDefault(); jumpTo(a.dataset.jump); });
+    });
+    document.getElementById('ctaSeeModel').addEventListener('click', (e)=>{ e.preventDefault(); document.getElementById('model').scrollIntoView({behavior:'smooth'}); });
 
-    // Initial metrics
-    updateMetrics();
+    // Hash handling: #waf / #zt / #mdr or #state=...
+    function handleHash(){
+      const h = (location.hash||'').replace(/^#/, '');
+      if(!h) return;
+      if (h.startsWith('state=')){
+        try{
+          const payload = JSON.parse(atob(decodeURIComponent(h.slice(6))));
+          if (payload && payload.features){
+            for (const k of ['waf','zt','mdr','rate']) features[k] = !!payload.features[k];
+            trafficMode = payload.trafficMode || 'balanced';
+            // reflect toggles UI
+            $$('#toggles input[type="checkbox"]').forEach(cb=> cb.checked = !!features[cb.dataset.k]);
+            $$('[data-traffic]').forEach(b=> b.classList.toggle('active', b.dataset.traffic===trafficMode));
+          }
+          document.getElementById('model').scrollIntoView({behavior:'smooth'});
+        }catch(e){}
+        return;
+      }
+      if (['waf','zt','mdr'].includes(h)) jumpTo(h);
+    }
+    window.addEventListener('hashchange', handleHash);
+    handleHash();
+
+    // dbl-click center
+    canvas.addEventListener('dblclick', ()=> controls.target.set(0,0,0));
+  })();
   </script>
 </body>
 </html>
