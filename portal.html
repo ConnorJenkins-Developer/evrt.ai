@@ -1,71 +1,260 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>EVRT — Portal</title>
-  <meta name="description" content="Sign in to the EVRT client portal." />
+  <meta name="description" content="Sign in to EVRT. Secure magic link or Google. Jump straight into your client app."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/style.css"/>
+
+  <!-- Social -->
+  <meta property="og:title" content="EVRT — Portal"/>
+  <meta property="og:description" content="Secure sign-in to your EVRT client app."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://connorjenkins-developer.github.io/evrt.ai/portal.html"/>
+  <meta property="og:image" content="https://connorjenkins-developer.github.io/evrt.ai/assets/evrt-og.png"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+
+  <style>
+    :root{
+      --neon:#6ee7ff; --accent:#63ffa5; --grid:rgba(255,255,255,.08); --mute:#8fa2b7;
+    }
+    body{ background: radial-gradient(1400px 900px at 80% -260px,#142034 0,#0a0e14 65%); }
+    .layers{ position:fixed; inset:0; z-index:0; pointer-events:none }
+    #halo{ position:absolute; inset:0; opacity:.26 }
+    .scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.26; mix-blend-mode:overlay }
+
+    .section{ position:relative; z-index:1 }
+    .muted{ color:var(--mute) }
+    .card{ border:1px solid var(--grid); border-radius:16px; background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); padding:16px }
+    .control{ width:100%; border:1px solid var(--grid); border-radius:12px; background:#0f141c; padding:12px; color:inherit }
+    .btn.neon{ background:linear-gradient(90deg,var(--neon),var(--accent)); color:#061019; border:0; font-weight:800 }
+    .btn.ghost{ border:1px solid var(--grid) }
+    .row{ display:flex; gap:10px; align-items:center; justify-content:space-between }
+    .row.wrap{ flex-wrap:wrap }
+    .center{ max-width:460px; margin-inline:auto }
+    .hint{ font-size:12px; color:var(--mute) }
+    .divider{ display:flex; align-items:center; gap:10px; margin:12px 0 }
+    .divider:before, .divider:after{ content:''; height:1px; flex:1; background:var(--grid) }
+    .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--grid); border-radius:999px; font-size:12px }
+    .ok{ color:#9fffcf }
+    .err{ color:#ff6b8a }
+    .spinner{ width:16px; height:16px; border-radius:50%; border:2px solid var(--grid); border-top-color:#6ee7ff; animation:spin .7s linear infinite }
+    @keyframes spin{ to{ transform:rotate(360deg) } }
+    .mono{ font-family:ui-monospace, Menlo, Consolas, monospace; font-size:12px; color:#9fb3c8 }
+  </style>
 </head>
 <body>
-  <div class="bg-orbs" aria-hidden="true"></div>
+  <!-- Backdrop -->
+  <div class="layers">
+    <canvas id="halo" aria-hidden="true"></canvas>
+    <div class="scan" aria-hidden="true"></div>
+  </div>
+
   <div data-include="partials/header.html"></div>
 
-  <section class="container hero">
-    <span class="eyebrow">Clients</span>
-    <h1 class="gradient-text">Client Portal Login</h1>
-    <p class="sub">Use your work email. We’ll email you a secure sign-in link.</p>
+  <!-- HERO -->
+  <section class="container hero section" style="margin-top:20px">
+    <span class="eyebrow muted">EVRT Portal</span>
+    <h1 class="gradient-text">Sign in. Jump in.<br/>Ship outcomes.</h1>
+    <p class="sub">Secure sign-in with **email magic link** or **Google**. You’ll land in the app immediately.</p>
   </section>
 
-  <section class="container section">
-    <div class="card" data-reveal style="max-width:520px">
-      <form id="login" class="grid" style="gap:10px">
-        <input id="email" type="email" placeholder="you@company.com" required />
-        <button class="btn primary" type="submit">Send magic link</button>
+  <!-- LOGIN PANEL -->
+  <section class="container section center">
+    <div class="card">
+      <div class="row wrap">
+        <h3 style="margin:0">Continue</h3>
+        <span class="badge">America/Chicago</span>
+      </div>
+
+      <form id="emailForm" style="margin-top:10px">
+        <label class="muted">Work email</label>
+        <input id="email" class="control" type="email" placeholder="you@company.com" autocomplete="email" required/>
+        <div class="row wrap" style="margin-top:10px">
+          <button id="sendLink" class="btn neon" type="submit">Send magic link</button>
+          <button id="withGoogle" class="btn" type="button">Continue with Google</button>
+        </div>
       </form>
-      <p id="msg" class="muted" style="margin-top:10px"></p>
-      <p id="err" class="muted" style="color:#f66;margin-top:6px"></p>
+
+      <div id="sentState" class="card" style="margin-top:12px; display:none; background:#07121b">
+        <div class="row wrap">
+          <div class="row" style="gap:8px"><div class="spinner"></div><strong>Check your email</strong></div>
+          <span class="badge">Magic link sent</span>
+        </div>
+        <p class="muted" style="margin-top:6px">Open the link on this device. We’ll drop you into the app.</p>
+        <div class="row wrap" style="margin-top:6px">
+          <button id="resend" class="btn ghost" type="button">Resend</button>
+          <button id="change" class="btn" type="button">Use a different email</button>
+        </div>
+      </div>
+
+      <div id="errorBox" class="mono" style="margin-top:8px; display:none"></div>
+
+      <div class="divider"><span class="muted">How it works</span></div>
+      <ul class="muted" style="margin:0 0 6px 16px">
+        <li>Enter your email → we send a one-time sign-in link.</li>
+        <li>Click the link → you’re signed in and redirected to the app.</li>
+        <li>No passwords. You can sign out from the app header.</li>
+      </ul>
+
+      <div class="divider"><span class="muted">Troubleshooting</span></div>
+      <div class="mono">
+        • Make sure the email opened to <span id="hostHint"></span><br/>
+        • If you see a 404, your redirect allowlist in Supabase must include:<br/>
+        &nbsp;&nbsp;<code>/evrt.ai/portal.html</code> and <code>/evrt.ai/app.html</code>
+      </div>
+    </div>
+
+    <!-- Session watcher -->
+    <div id="sessionState" class="card" style="margin-top:12px; display:none">
+      <div class="row" style="gap:8px">
+        <div class="spinner"></div>
+        <div><strong>You're signed in</strong><div class="muted">Redirecting to the app…</div></div>
+      </div>
     </div>
   </section>
 
   <div data-include="partials/footer.html"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = "https://onhkipsguouxsraxsxfq.supabase.co";        // TODO
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uaGtpcHNndW91eHNyYXhzeGZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1MTM2MTgsImV4cCI6MjA3MjA4OTYxOH0.FaOVD9FfW8Cy7mgyDIsNoSL8LLliV-L4V--I5rbHlFs";               // TODO
+  <script defer src="assets/app.js"></script>
+  <script>
+    // ========= ENV / PATHS =========
+    // If your repo name changes, this auto-detects the site root correctly on GitHub Pages.
+    const PATH_ROOT = (location.pathname.includes('/evrt.ai/')) ? '/evrt.ai/' : '/';
+    const APP_PATH   = PATH_ROOT + 'app.html';
+    const PORTAL_PATH= PATH_ROOT + 'portal.html';
+    const APP_URL    = location.origin + APP_PATH;
 
-// Build the redirect URL relative to THIS page.
-// If portal is at .../evrt-site/portal.html → redirect becomes .../evrt-site/app.html
-// If portal is at .../evrt.ai/portal.html    → redirect becomes .../evrt.ai/app.html
-const REDIRECT = new URL('app.html', window.location.href).toString();
+    // ====== CONFIG: paste your real values ======
+    const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co"; // TODO: paste from Supabase
+    const SUPABASE_ANON_KEY = "public-anon-key";              // TODO: paste from Supabase
+    // ============================================
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
 
-(async () => {
-  const { data:{ session } } = await supabase.auth.getSession();
-  if (session) { window.location.href = "app.html"; return; }
+    // UI refs
+    const ui = {
+      emailForm: document.getElementById('emailForm'),
+      email: document.getElementById('email'),
+      sendBtn: document.getElementById('sendLink'),
+      sent: document.getElementById('sentState'),
+      resend: document.getElementById('resend'),
+      change: document.getElementById('change'),
+      error: document.getElementById('errorBox'),
+      sessionState: document.getElementById('sessionState'),
+      hostHint: document.getElementById('hostHint'),
+      googleBtn: document.getElementById('withGoogle'),
+    };
 
-  // surface any Supabase error passed back in querystring
-  const err = new URLSearchParams(location.search).get("error_description");
-  if (err) console.warn(err);
-})();
+    ui.hostHint.textContent = location.origin + PORTAL_PATH;
 
-document.getElementById('login').addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const email = document.getElementById('email').value.trim();
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: REDIRECT, shouldCreateUser: true }
-  });
-  document.getElementById('msg').textContent =
-    error ? ("Error: " + error.message) : "Check your email and click the link.";
-});
+    // ===== Helpers =====
+    function show(el, on=true){ el.style.display = on ? '' : 'none'; }
+    function toastError(msg){
+      ui.error.textContent = 'Error: ' + msg;
+      show(ui.error, true);
+    }
+    function clearErr(){ show(ui.error, false); ui.error.textContent=''; }
 
-supabase.auth.onAuthStateChange((event)=>{
-  if (event === "SIGNED_IN") window.location.href = "app.html";
-});
-</script>
+    // ===== Auth: send magic link =====
+    ui.emailForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      clearErr();
+      const email = ui.email.value.trim();
+      if(!email){ toastError('Enter your email.'); return; }
+
+      ui.sendBtn.disabled = true;
+      try{
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: APP_URL  // after clicking the link → send to /app.html
+          }
+        });
+        if(error) throw error;
+        show(ui.sent, true);
+      } catch(err){
+        toastError(err.message || 'Could not send link.');
+      } finally{
+        ui.sendBtn.disabled = false;
+      }
+    });
+
+    // Resend / change
+    ui.resend.addEventListener('click', ()=> ui.emailForm.requestSubmit());
+    ui.change.addEventListener('click', ()=>{
+      show(ui.sent, false);
+      ui.email.focus();
+    });
+
+    // ===== Google OAuth (optional; requires redirect in Supabase OAuth settings) =====
+    ui.googleBtn.addEventListener('click', async ()=>{
+      clearErr();
+      try{
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: APP_URL } // goes straight to app
+        });
+        if(error) throw error;
+        // Supabase will redirect out; no further action here.
+      } catch(err){
+        toastError(err.message || 'Google sign-in failed (check Supabase OAuth config).');
+      }
+    });
+
+    // ===== Session handling & redirects =====
+    async function checkSessionAndMaybeRedirect(){
+      // If URL holds tokens (hash/query), supabase-js will process them when created (detectSessionInUrl: true).
+      const { data: { session } } = await supabase.auth.getSession();
+      if(session){
+        show(ui.sessionState, true);
+        // scrub tokens if this page was hit with a hash first
+        if(location.hash.includes('access_token') || location.search.includes('code')){
+          history.replaceState({}, document.title, PORTAL_PATH);
+        }
+        // Redirect to app
+        location.replace(APP_PATH);
+      }
+    }
+
+    // Run immediately
+    checkSessionAndMaybeRedirect();
+
+    // Also watch for auth state changes (e.g., after magic link redirect)
+    supabase.auth.onAuthStateChange((event, session)=>{
+      if(event === 'SIGNED_IN' && session){
+        show(ui.sessionState, true);
+        location.replace(APP_PATH);
+      }
+      if(event === 'SIGNED_OUT'){
+        // Stay here; user can sign in again.
+      }
+    });
+
+    // ===== Backdrop halo =====
+    (function haloFX(){
+      const c=document.getElementById('halo'), ctx=c.getContext('2d');
+      function resize(){ c.width=innerWidth; c.height=innerHeight; }
+      resize(); addEventListener('resize', resize);
+      const orbs = Array.from({length:7}, ()=>({x:Math.random()*c.width, y:Math.random()*c.height*0.6, r: 90+Math.random()*160, dx:(Math.random()-.5)*0.45, dy:(Math.random()-.5)*0.45, hue: 180+Math.random()*90}));
+      (function tick(){
+        ctx.clearRect(0,0,c.width,c.height);
+        orbs.forEach(o=>{
+          o.x+=o.dx; o.y+=o.dy; if(o.x<-120||o.x>c.width+120) o.dx*=-1; if(o.y<-120||o.y>c.height*0.8) o.dy*=-1;
+          const g=ctx.createRadialGradient(o.x,o.y, 0, o.x,o.y, o.r);
+          g.addColorStop(0, `hsla(${o.hue}, 100%, 60%, .12)`); g.addColorStop(1, 'transparent');
+          ctx.fillStyle=g; ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,6.283); ctx.fill();
+        });
+        requestAnimationFrame(tick);
+      })();
+    })();
+  </script>
+</body>
+</html>
