@@ -76,6 +76,20 @@
   // ====================================
 
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  
+    // 🔧 NEW: turn magic-link tokens in the URL hash into a session
+async function bootstrapSessionFromHash() {
+  const hash = new URLSearchParams(window.location.hash.slice(1));
+  const access_token = hash.get("access_token");
+  const refresh_token = hash.get("refresh_token");
+  if (access_token && refresh_token) {
+    // Set session from tokens carried in the magic link
+    const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+    // Clean the URL (remove the long token hash)
+    if (!error) history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+</script>
 
   const ui = {
     app: document.getElementById('app'),
