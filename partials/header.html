@@ -1,154 +1,39 @@
-<!-- partials/header.html -->
-<header class="site-header" role="banner">
-  <style>
-    :root{
-      --hdr-bg: rgba(7,18,27,.85);
-      --line: rgba(255,255,255,.12);
-      --line-strong: rgba(255,255,255,.92);
-      --neon:#6ee7ff; --accent:#63ffa5;
+// assets/cta-normalize.js
+(function(){
+  const ROOT = location.pathname.includes('/evrt.ai/') ? '/evrt.ai/' : '/';
+  const PORTAL = ROOT + 'portal.html';
+
+  function normalizeCTAs(){
+    const labels = [
+      'start trial','start your trial','launch demo','try now',
+      'get started','start','client portal','sign in','sign-in','sign in →'
+    ];
+    const anchors = Array.from(document.querySelectorAll('a, button'));
+    for(const el of anchors){
+      const text = (el.textContent || '').trim().toLowerCase();
+      const hasData = el.hasAttribute('data-cta');
+      const looksLikeCTA = hasData || labels.some(l => text.includes(l));
+      if(!looksLikeCTA) continue;
+
+      // Point to portal, but don't change classes/styles
+      if(el.tagName === 'A'){ el.setAttribute('href', PORTAL); }
+      else { el.addEventListener('click', ()=> location.href = PORTAL); }
     }
-    .site-header{position:sticky;top:0;z-index:1000;background:var(--hdr-bg);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08)}
-    .nav-wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px}
-    .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-    .brand .logo{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--neon),var(--accent))}
-    .brand span{font-weight:800;letter-spacing:.4px}
+  }
 
-    /* Desktop inline nav (unchanged look) */
-    .nav{display:flex;gap:10px;align-items:center}
-    .nav a{padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;text-decoration:none}
-    .nav a:hover{border-color:rgba(110,231,255,.45)}
-    .cta{background:linear-gradient(90deg,var(--neon),var(--accent));color:#061019;border:0;font-weight:800}
-
-    /* Mobile toggle (CSS-only) */
-    #navToggle{position:absolute;left:-9999px;top:-9999px}
-    .menu-btn{
-      display:none;align-items:center;gap:8px;
-      background:#0f141c;color:#fff;padding:8px 12px;border-radius:10px;
-      border:1px solid var(--line-strong); /* thin white border */
-      font-weight:600; cursor:pointer; user-select:none;
+  function sanitizeLinks(){
+    const anchors = Array.from(document.querySelectorAll('a[href]'));
+    for(const a of anchors){
+      const href = a.getAttribute('href');
+      if(!href) continue;
+      // Fix absolute root to repo-aware root
+      if (/^\/(?!evrt\.ai\/)/.test(href)) {
+        a.setAttribute('href', ROOT + href.replace(/^\//,''));
+      }
     }
-    .menu-btn:focus{outline:2px solid var(--neon);outline-offset:2px}
+  }
 
-    /* Mobile catalog panel */
-    .mnav{display:none;position:absolute;right:10px;top:58px;width:90vw;max-width:380px;
-      background:#0f141c;border:1px solid var(--line-strong);border-radius:12px;
-      box-shadow:0 16px 50px rgba(0,0,0,.45);padding:12px;z-index:1002}
-    .mnav .sec{padding:10px 0;border-top:1px solid var(--line)}
-    .mnav .sec:first-child{border-top:0}
-    .mnav .sec-title{font-weight:800;letter-spacing:.02em;margin-bottom:6px}
-    .mnav a{display:block;padding:8px 10px;border:1px solid var(--line);border-radius:10px;text-decoration:none;margin:6px 0}
-    .mnav a:hover{border-color:rgba(110,231,255,.45)}
-    .mnav .cta-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-    .mnav .cta-row .btn{border:1px solid var(--line-strong);border-radius:10px;padding:10px 12px;background:#0f141c;color:#fff}
-    .mnav .cta-row .neon{background:linear-gradient(90deg,var(--neon),var(--accent));color:#061019;border:0;font-weight:800}
-
-    /* Click-off backdrop */
-    .backdrop{display:none;position:fixed;inset:0;background:rgba(6,10,15,.6);backdrop-filter:blur(2px);z-index:1001}
-
-    /* When checked -> open menu & backdrop */
-    #navToggle:checked ~ .backdrop{display:block}
-    #navToggle:checked ~ .mnav{display:block}
-
-    /* Breakpoint */
-    @media(max-width:900px){
-      .nav{display:none}
-      .menu-btn{display:inline-flex}
-      .site-header{position:sticky}
-      .nav-wrap{position:relative}
-    }
-  </style>
-
-  <div class="nav-wrap container">
-    <a class="brand" href="index.html" aria-label="EVRT Home">
-      <i class="logo" aria-hidden="true"></i><span>EVRT</span>
-    </a>
-
-    <!-- Desktop nav (kept as-is) -->
-    <nav class="nav" aria-label="Primary">
-      <a href="apps.html">Apps</a>
-      <a href="social-ai.html">Social AI</a>
-      <a href="ad-studio.html">Ad Studio</a>
-      <a href="adlab.html">Ad Lab</a>
-      <a href="dashboard.html">Dashboards</a>
-      <a href="consulting.html">Consulting</a>
-      <a href="projects.html">Projects</a>
-      <a href="blog.html">Insights</a>
-      <a href="pricing.html">Pricing</a>
-      <a href="cybersecurity.html">Security</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="contact.html">Contact</a>
-      <a class="cta" data-cta="primary" href="portal.html">Start trial</a>
-    </nav>
-
-    <!-- Mobile: CSS-only toggle -->
-    <input type="checkbox" id="navToggle" aria-hidden="true"/>
-    <label for="navToggle" class="menu-btn" aria-controls="mobileCatalog" aria-expanded="false">Menu</label>
-    <label for="navToggle" class="backdrop" aria-hidden="true"></label>
-
-    <!-- SIMPLE CATALOG: 5 main categories with sub-links -->
-    <nav id="mobileCatalog" class="mnav" aria-label="Mobile catalog">
-      <div class="sec">
-        <div class="sec-title">Products</div>
-        <a href="apps.html">Apps overview</a>
-        <a href="social-ai.html">Social AI</a>
-        <a href="ad-studio.html">Ad Studio</a>
-        <a href="adlab.html">Ad Lab</a>
-        <a href="dashboard.html">Dashboards</a>
-      </div>
-
-      <div class="sec">
-        <div class="sec-title">Solutions</div>
-        <a href="consulting.html">Consulting</a>
-        <a href="industries.html">Industries</a>
-        <a href="projects.html">Projects & Case Studies</a>
-      </div>
-
-      <div class="sec">
-        <div class="sec-title">Trust</div>
-        <a href="cybersecurity.html">Cybersecurity</a>
-        <a href="privacy.html">Privacy</a>
-      </div>
-
-      <div class="sec">
-        <div class="sec-title">Resources</div>
-        <a href="blog.html">Insights</a>
-        <a href="pricing.html">Pricing</a>
-      </div>
-
-      <div class="sec">
-        <div class="sec-title">Company</div>
-        <a href="about.html">About</a>
-        <a href="press.html">Press</a>
-        <a href="careers.html">Careers</a>
-        <a href="contact.html">Contact</a>
-      </div>
-
-      <div class="sec">
-        <div class="sec-title">Account</div>
-        <div class="cta-row">
-          <a class="neon" data-cta="primary" href="portal.html">Start trial</a>
-          <a class="btn" href="portal.html">Client portal</a>
-        </div>
-      </div>
-    </nav>
-  </div>
-
-  <!-- CTA normalization (site-wide) -->
-  <script src="assets/cta-normalize.js" defer></script>
-
-  <script>
-    // A11y nicety: reflect expanded state and auto-close on link tap
-    (function(){
-      const cb = document.getElementById('navToggle');
-      const btn = document.querySelector('.menu-btn');
-      const mnav = document.getElementById('mobileCatalog');
-      if(!cb || !btn || !mnav) return;
-      const sync = ()=> btn.setAttribute('aria-expanded', cb.checked ? 'true' : 'false');
-      cb.addEventListener('change', sync);
-      mnav.addEventListener('click', (e)=>{
-        if(e.target.closest('a')){ cb.checked = false; sync(); }
-      });
-      sync();
-    })();
-  </script>
-</header>
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', ()=>{ sanitizeLinks(); normalizeCTAs(); });
+  } else { sanitizeLinks(); normalizeCTAs(); }
+})();
