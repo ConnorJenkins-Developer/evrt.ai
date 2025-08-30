@@ -13,7 +13,7 @@
     .brand .logo{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--neon),var(--accent))}
     .brand span{font-weight:800;letter-spacing:.4px}
 
-    /* Desktop inline nav */
+    /* Desktop inline nav (unchanged look) */
     .nav{display:flex;gap:10px;align-items:center}
     .nav a{padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;text-decoration:none}
     .nav a:hover{border-color:rgba(110,231,255,.45)}
@@ -33,7 +33,7 @@
     .mnav{display:none;position:absolute;right:10px;top:58px;width:90vw;max-width:380px;
       background:#0f141c;border:1px solid var(--line-strong);border-radius:12px;
       box-shadow:0 16px 50px rgba(0,0,0,.45);padding:12px;z-index:1002}
-    .mnav .sec{padding:8px 0;border-top:1px solid var(--line)}
+    .mnav .sec{padding:10px 0;border-top:1px solid var(--line)}
     .mnav .sec:first-child{border-top:0}
     .mnav .sec-title{font-weight:800;letter-spacing:.02em;margin-bottom:6px}
     .mnav a{display:block;padding:8px 10px;border:1px solid var(--line);border-radius:10px;text-decoration:none;margin:6px 0}
@@ -42,11 +42,8 @@
     .mnav .cta-row .btn{border:1px solid var(--line-strong);border-radius:10px;padding:10px 12px;background:#0f141c;color:#fff}
     .mnav .cta-row .neon{background:linear-gradient(90deg,var(--neon),var(--accent));color:#061019;border:0;font-weight:800}
 
-    /* Click-off backdrop (label) */
-    .backdrop{
-      display:none;position:fixed;inset:0;background:rgba(6,10,15,.6);
-      backdrop-filter:blur(2px);z-index:1001;
-    }
+    /* Click-off backdrop */
+    .backdrop{display:none;position:fixed;inset:0;background:rgba(6,10,15,.6);backdrop-filter:blur(2px);z-index:1001}
 
     /* When checked -> open menu & backdrop */
     #navToggle:checked ~ .backdrop{display:block}
@@ -66,7 +63,7 @@
       <i class="logo" aria-hidden="true"></i><span>EVRT</span>
     </a>
 
-    <!-- Desktop nav (unchanged look) -->
+    <!-- Desktop nav (kept as-is) -->
     <nav class="nav" aria-label="Primary">
       <a href="apps.html">Apps</a>
       <a href="social-ai.html">Social AI</a>
@@ -88,7 +85,7 @@
     <label for="navToggle" class="menu-btn" aria-controls="mobileCatalog" aria-expanded="false">Menu</label>
     <label for="navToggle" class="backdrop" aria-hidden="true"></label>
 
-    <!-- SIMPLE CATALOG with main topics + sub-links -->
+    <!-- SIMPLE CATALOG: 5 main categories with sub-links -->
     <nav id="mobileCatalog" class="mnav" aria-label="Mobile catalog">
       <div class="sec">
         <div class="sec-title">Products</div>
@@ -104,7 +101,6 @@
         <a href="consulting.html">Consulting</a>
         <a href="industries.html">Industries</a>
         <a href="projects.html">Projects & Case Studies</a>
-        <a href="pricing.html">Pricing</a>
       </div>
 
       <div class="sec">
@@ -114,11 +110,16 @@
       </div>
 
       <div class="sec">
+        <div class="sec-title">Resources</div>
+        <a href="blog.html">Insights</a>
+        <a href="pricing.html">Pricing</a>
+      </div>
+
+      <div class="sec">
         <div class="sec-title">Company</div>
         <a href="about.html">About</a>
         <a href="press.html">Press</a>
         <a href="careers.html">Careers</a>
-        <a href="blog.html">Insights</a>
         <a href="contact.html">Contact</a>
       </div>
 
@@ -136,7 +137,7 @@
   <script src="assets/cta-normalize.js" defer></script>
 
   <script>
-    // A11y + quality of life: reflect expanded state and auto-close on link tap
+    // A11y nicety: reflect expanded state and auto-close on link tap
     (function(){
       const cb = document.getElementById('navToggle');
       const btn = document.querySelector('.menu-btn');
@@ -144,10 +145,8 @@
       if(!cb || !btn || !mnav) return;
       const sync = ()=> btn.setAttribute('aria-expanded', cb.checked ? 'true' : 'false');
       cb.addEventListener('change', sync);
-      // Close when any link inside the mobile catalog is tapped
       mnav.addEventListener('click', (e)=>{
-        const a = e.target.closest('a');
-        if(a){ cb.checked = false; sync(); }
+        if(e.target.closest('a')){ cb.checked = false; sync(); }
       });
       sync();
     })();
