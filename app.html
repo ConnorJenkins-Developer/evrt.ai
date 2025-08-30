@@ -10,8 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="assets/style.css" />
   <style>
-    .preview-badge{position:fixed;top:10px;right:10px;padding:6px 10px;border-radius:999px;font-weight:600;background:#ffd54d;color:#222;z-index:9999}
     .muted-danger{color:#f66}
+    .badge{position:fixed;top:10px;right:10px;background:#ffd54d;color:#222;padding:6px 10px;border-radius:999px;font-weight:700;z-index:999}
   </style>
 </head>
 <body>
@@ -55,7 +55,7 @@
             <input id="file-input" type="file" style="display:none" />
             Upload file
           </label>
-          <p id="upload-hint" class="muted" style="margin-top:6px"></p>
+          <p class="muted" id="upload-hint" style="margin-top:6px"></p>
         </div>
       </div>
     </div>
@@ -72,17 +72,20 @@
 
   <div data-include="partials/footer.html"></div>
 
-  <!-- Supabase lib still loaded for later, but preview mode won't use it -->
+  <!-- Supabase lib (unused in mock mode; used later when flipping provider) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="assets/app.js"></script>
   <script>
-  // ====== CONFIG (only used when NOT in preview) ======
-  const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co"; // replace later
-  const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";        // replace later
-  // ====================================================
+  // ---------------- CONFIG ----------------
+  // Flip this to 'supabase' later, or add ?mode=supabase to the URL
+  const PROVIDER = new URLSearchParams(location.search).get('mode') || 'mock';
 
-  const PREVIEW = new URLSearchParams(location.search).has('preview');
+  // Only needed when PROVIDER === 'supabase'
+  const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";  // TODO later
+  const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";         // TODO later
+  // ---------------------------------------
 
+  // ---------- UI refs ----------
   const ui = {
     app: document.getElementById('app'),
     userEmail: document.getElementById('user-email'),
@@ -92,224 +95,227 @@
     msgs: document.getElementById('messages'),
     signout: document.getElementById('signout'),
     manage: document.getElementById('manage-link'),
-    uploadHint: document.getElementById('upload-hint')
+    uploadHint: document.getElementById('upload-hint'),
   };
 
-  // ---------- PREVIEW MODE (no auth, no backend) ----------
-  async function renderPreview(){
-    // Banner
-    const badge = document.createElement('div');
-    badge.className = 'preview-badge';
-    badge.textContent = 'PREVIEW MODE';
-    document.body.appendChild(badge);
+  // ---------- Data provider abstraction ----------
+  const Data = (function makeProvider(){
+    if (PROVIDER === 'supabase') {
+      // --- REAL backend (wire up later) ---
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Fake identity/account
-    ui.userEmail.textContent = 'demo@client.com';
-    ui.accountName.textContent = 'Demo Co.';
-    ui.app.style.display = '';
-
-    // Hide auth-only controls
-    ui.signout.style.display = 'none';
-    ui.manage.style.display = 'none';
-    ui.uploadHint.textContent = 'Uploads are disabled in preview.';
-
-    // Sample projects
-    const sampleProjects = [
-      { name: 'Kickoff', status: 'active' },
-      { name: 'Pilot Build', status: 'in progress' },
-      { name: 'Scale Program Q3', status: 'planning' }
-    ];
-    ui.projects.innerHTML = sampleProjects
-      .map(p => `<div class="row"><strong>${p.name}</strong><span class="muted">${p.status}</span></div>`)
-      .join('');
-
-    // Sample documents
-    const today = new Date();
-    const sampleDocs = [
-      { name: 'Discovery Report.pdf', date: new Date(today - 1000*60*60*24*2) },
-      { name: 'KPI Baseline.xlsx', date: new Date(today - 1000*60*60*24*5) },
-      { name: 'Creative Brief v1.docx', date: new Date(today - 1000*60*60*24*8) }
-    ];
-    ui.docs.innerHTML = sampleDocs
-      .map(d => `<div class="row"><a href="#">${d.name}</a><span class="muted">${d.date.toLocaleDateString()}</span></div>`)
-      .join('');
-
-    // Sample messages
-    const sampleMsgs = [
-      { who: 'Connor (EVRT)', at: new Date(today - 1000*60*30), body: 'Welcome! We\'ll use this thread for weekly updates.' },
-      { who: 'Client PM', at: new Date(today - 1000*60*10), body: 'Got it. We uploaded last month’s exports.' },
-      { who: 'Connor (EVRT)', at: new Date(today - 1000*60*5),  body: 'Perfect—baseline dashboard coming today.' }
-    ];
-    ui.msgs.innerHTML = sampleMsgs
-      .map(m => `<p><strong>${m.who}</strong> <span class="muted">${m.at.toLocaleString()}</span><br>${m.body}</p>`)
-      .join('');
-
-    // Disable forms in preview
-    document.getElementById('new-project').addEventListener('submit', (e)=>{
-      e.preventDefault(); alert('Preview mode: add project is disabled.');
-    });
-    document.getElementById('file-input').addEventListener('change', (e)=>{
-      e.preventDefault(); alert('Preview mode: uploads are disabled.');
-      e.target.value = '';
-    });
-    document.getElementById('msg-form').addEventListener('submit', (e)=>{
-      e.preventDefault(); alert('Preview mode: sending messages is disabled.');
-    });
-  }
-
-  // ---------- LIVE MODE (auth + backend) ----------
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  let session, user, accountId, accountName;
-
-  async function bootstrapSessionFromHash() {
-    const hash = new URLSearchParams(window.location.hash.slice(1));
-    const access_token = hash.get("access_token");
-    const refresh_token = hash.get("refresh_token");
-    if (access_token && refresh_token) {
-      const { error } = await supabase.auth.setSession({ access_token, refresh_token });
-      if (!error) history.replaceState({}, document.title, window.location.pathname);
-    }
-  }
-
-  async function requireSession(){
-    const { data } = await supabase.auth.getSession();
-    session = data.session;
-    if (!session) {
-      window.location.href = 'portal.html';
-      return false;
-    }
-    user = session.user;
-    ui.userEmail.textContent = user.email || '';
-    return true;
-  }
-
-  async function loadAccount(){
-    const { data: ms, error } = await supabase
-      .from('memberships')
-      .select('account_id, role')
-      .eq('user_id', user.id);
-    if (error || !ms?.length) { alert('No account access. Ask EVRT to invite you.'); return false; }
-    accountId = ms[0].account_id;
-
-    const { data: acct } = await supabase
-      .from('accounts')
-      .select('name')
-      .eq('id', accountId)
-      .maybeSingle();
-    accountName = acct?.name || accountId;
-    ui.accountName.textContent = accountName;
-    return true;
-  }
-
-  async function listProjects(){
-    const { data, error } = await supabase
-      .from('projects')
-      .select('id,name,status,updated_at')
-      .eq('account_id', accountId)
-      .order('updated_at', { ascending:false });
-    if (error) { ui.projects.innerHTML = `<p class="muted-danger">${error.message}</p>`; return; }
-    ui.projects.innerHTML =
-      (data||[]).map(p=>`<div class="row"><strong>${p.name}</strong><span class="muted">${p.status||''}</span></div>`).join('')
-      || '<p class="muted">No projects yet.</p>';
-  }
-
-  async function listDocuments(){
-    const { data, error } = await supabase
-      .from('documents')
-      .select('id,name,storage_path,created_at')
-      .eq('account_id', accountId)
-      .order('created_at', { ascending:false });
-    if (error) { ui.docs.innerHTML = `<p class="muted-danger">${error.message}</p>`; return; }
-    const items = await Promise.all((data||[]).map(async d=>{
-      try {
-        const { data: urlData } = await supabase.storage
-          .from('client-docs')
-          .createSignedUrl(d.storage_path, 60*10);
-        return `<div class="row"><a href="${urlData?.signedUrl||'#'}">${d.name}</a><span class="muted">${new Date(d.created_at).toLocaleDateString()}</span></div>`;
-      } catch {
-        return `<div class="row">${d.name}</div>`;
+      async function bootstrapSessionFromHash() {
+        const hash = new URLSearchParams(window.location.hash.slice(1));
+        const access_token = hash.get("access_token");
+        const refresh_token = hash.get("refresh_token");
+        if (access_token && refresh_token) {
+          const { error } = await client.auth.setSession({ access_token, refresh_token });
+          if (!error) history.replaceState({}, document.title, window.location.pathname);
+        }
       }
-    }));
-    ui.docs.innerHTML = items.join('') || '<p class="muted">No documents yet.</p>';
+      async function requireSession(){
+        const { data } = await client.auth.getSession();
+        const session = data.session;
+        if (!session) { window.location.href = 'portal.html'; return null; }
+        return session.user;
+      }
+      // NOTE: For now we keep a single-account assumption (first membership)
+      async function resolveAccount(userId){
+        const { data: ms } = await client.from('memberships').select('account_id').eq('user_id', userId);
+        return ms?.[0]?.account_id || null;
+      }
+      return {
+        mode: 'supabase',
+        async init(){ await bootstrapSessionFromHash(); const user = await requireSession(); return { user, accountId: user ? await resolveAccount(user.id) : null, client }; },
+        async userEmail(ctx){ return ctx.user?.email || ''; },
+        async accountName(ctx){
+          if (!ctx.accountId) return 'No Access';
+          const { data } = await ctx.client.from('accounts').select('name').eq('id', ctx.accountId).maybeSingle();
+          return data?.name || ctx.accountId;
+        },
+        async listProjects(ctx){
+          const { data, error } = await ctx.client.from('projects').select('id,name,status,updated_at').eq('account_id', ctx.accountId).order('updated_at', { ascending:false });
+          if (error) throw error; return data||[];
+        },
+        async addProject(ctx, name){
+          const { error } = await ctx.client.from('projects').insert({ account_id: ctx.accountId, name, status:'active' }); if (error) throw error;
+        },
+        async listDocuments(ctx){
+          const { data, error } = await ctx.client.from('documents').select('id,name,storage_path,created_at').eq('account_id', ctx.accountId).order('created_at', { ascending:false });
+          if (error) throw error;
+          // convert to {name, url, created_at}
+          const items = await Promise.all((data||[]).map(async d=>{
+            try {
+              const { data: urlData } = await ctx.client.storage.from('client-docs').createSignedUrl(d.storage_path, 60*10);
+              return { name: d.name, url: urlData?.signedUrl || '#', created_at: d.created_at };
+            } catch { return { name: d.name, url:'#', created_at: d.created_at }; }
+          }));
+          return items;
+        },
+        async uploadDocument(ctx, file){
+          const path = `${ctx.accountId}/${Date.now()}_${file.name}`;
+          const { error: upErr } = await ctx.client.storage.from('client-docs').upload(path, file, { upsert:false });
+          if (upErr) throw upErr;
+          await ctx.client.from('documents').insert({ account_id: ctx.accountId, name: file.name, storage_path: path });
+        },
+        async listMessages(ctx){
+          const { data, error } = await ctx.client.from('messages').select('id,body,created_at,author_name').eq('account_id', ctx.accountId).order('created_at',{ascending:false}).limit(100);
+          if (error) throw error; return data||[];
+        },
+        async sendMessage(ctx, body){
+          const { error } = await ctx.client.from('messages').insert({ account_id: ctx.accountId, author_name: (ctx.user?.email||'User'), body });
+          if (error) throw error;
+        },
+        subscribeMessages(ctx, cb){
+          const ch = ctx.client.channel('msgs-'+ctx.accountId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`account_id=eq.${ctx.accountId}`}, cb).subscribe();
+          return ()=>ctx.client.removeChannel(ch);
+        }
+      };
+    }
+
+    // --- MOCK provider (no auth, localStorage persistence) ---
+    const KEY = 'evrt_mock_v1';
+    const store = JSON.parse(localStorage.getItem(KEY) || 'null') || (function seed(){
+      const now = Date.now();
+      return {
+        userEmail: 'demo@client.com',
+        accountName: 'Demo Co.',
+        accountId: 'demo-account',
+        projects: [
+          { id: 'p1', name:'Kickoff', status:'active', updated_at: new Date(now-864e5).toISOString() },
+          { id: 'p2', name:'Pilot Build', status:'in progress', updated_at: new Date(now-432e5).toISOString() },
+          { id: 'p3', name:'Scale Program Q3', status:'planning', updated_at: new Date(now-216e5).toISOString() },
+        ],
+        documents: [
+          { id:'d1', name:'Discovery Report.pdf', url:'#', created_at: new Date(now-3*864e5).toISOString() },
+          { id:'d2', name:'KPI Baseline.xlsx',   url:'#', created_at: new Date(now-6*864e5).toISOString() },
+        ],
+        messages: [
+          { id:'m1', author_name:'Connor (EVRT)', body:"Welcome! We'll use this thread for weekly updates.", created_at:new Date(now-1800e3).toISOString() },
+          { id:'m2', author_name:'Client PM', body:'Got it. We uploaded last month’s exports.', created_at:new Date(now-600e3).toISOString() },
+        ]
+      };
+    })();
+    function save(){ localStorage.setItem(KEY, JSON.stringify(store)); }
+    function id(prefix){ return prefix + '_' + (Math.random().toString(36).slice(2,8)) + '_' + Date.now().toString(36); }
+
+    return {
+      mode: 'mock',
+      async init(){ return { user:{ email: store.userEmail }, accountId: store.accountId }; },
+      async userEmail(){ return store.userEmail; },
+      async accountName(){ return store.accountName; },
+      async listProjects(){ return [...store.projects].sort((a,b)=> new Date(b.updated_at)-new Date(a.updated_at)); },
+      async addProject(_, name){
+        store.projects.unshift({ id:id('p'), name, status:'active', updated_at: new Date().toISOString() }); save();
+      },
+      async listDocuments(){ return [...store.documents].sort((a,b)=> new Date(b.created_at)-new Date(a.created_at)); },
+      async uploadDocument(_, file){
+        // Small files only; keep preview realistic
+        const max = 3 * 1024 * 1024; // 3MB
+        if (file.size > max) { throw new Error('Preview limit: 3MB'); }
+        const url = await new Promise((res,rej)=>{
+          const r = new FileReader();
+          r.onload = ()=>res(r.result);
+          r.onerror = ()=>rej(new Error('Read failed'));
+          r.readAsDataURL(file);
+        });
+        store.documents.unshift({ id:id('d'), name:file.name, url, created_at:new Date().toISOString() });
+        save();
+      },
+      async listMessages(){ return [...store.messages].sort((a,b)=> new Date(b.created_at)-new Date(a.created_at)); },
+      async sendMessage(_, body){
+        store.messages.unshift({ id:id('m'), author_name: store.userEmail, body, created_at:new Date().toISOString() });
+        save();
+      },
+      subscribeMessages(_, cb){ // mock realtime via poll
+        let last = store.messages[0]?.id;
+        const iv = setInterval(()=>{
+          if (store.messages[0]?.id !== last){ last = store.messages[0]?.id; cb(); }
+        }, 1500);
+        return ()=>clearInterval(iv);
+      }
+    };
+  })();
+
+  // ---------- App wiring (works with either provider) ----------
+  let ctx = null, unsub = null;
+
+  async function renderProjects(){
+    try {
+      const items = await Data.listProjects(ctx);
+      ui.projects.innerHTML = items.length
+        ? items.map(p=>`<div class="row"><strong>${p.name}</strong><span class="muted">${p.status||''}</span></div>`).join('')
+        : '<p class="muted">No projects yet.</p>';
+    } catch (e){ ui.projects.innerHTML = `<p class="muted-danger">${e.message}</p>`; }
+  }
+  async function renderDocuments(){
+    try {
+      const items = await Data.listDocuments(ctx);
+      ui.docs.innerHTML = items.length
+        ? items.map(d=>`<div class="row"><a href="${d.url||'#'}">${d.name}</a><span class="muted">${new Date(d.created_at).toLocaleDateString()}</span></div>`).join('')
+        : '<p class="muted">No documents yet.</p>';
+    } catch (e){ ui.docs.innerHTML = `<p class="muted-danger">${e.message}</p>`; }
+  }
+  async function renderMessages(){
+    try {
+      const items = await Data.listMessages(ctx);
+      ui.msgs.innerHTML = items.map(m=>`
+        <p><strong>${m.author_name||'User'}</strong>
+        <span class="muted">${new Date(m.created_at).toLocaleString()}</span><br>${m.body}</p>
+      `).join('');
+    } catch (e){ ui.msgs.innerHTML = `<p class="muted-danger">${e.message}</p>`; }
   }
 
-  async function loadMessages(){
-    const { data, error } = await supabase
-      .from('messages')
-      .select('id,body,created_at,author_name')
-      .eq('account_id', accountId)
-      .order('created_at', { ascending:false })
-      .limit(100);
-    if (error) { ui.msgs.innerHTML = `<p class="muted-danger">${error.message}</p>`; return; }
-    ui.msgs.innerHTML = (data||[]).map(m=>`
-      <p><strong>${m.author_name||'User'}</strong>
-      <span class="muted">${new Date(m.created_at).toLocaleString()}</span><br>${m.body}</p>
-    `).join('');
-  }
-
-  // Events (live mode)
-  document.getElementById('signout').addEventListener('click', async ()=>{
-    if (PREVIEW) return; // no-op in preview
-    await supabase.auth.signOut();
-    window.location.href = 'portal.html';
-  });
-
+  // Events
   document.getElementById('new-project').addEventListener('submit', async (e)=>{
-    if (PREVIEW) { e.preventDefault(); alert('Preview mode: add project is disabled.'); return; }
     e.preventDefault();
     const name = document.getElementById('pname').value.trim();
     if (!name) return;
-    const { error } = await supabase.from('projects').insert({ account_id: accountId, name, status: 'active' });
-    if (!error) { document.getElementById('pname').value = ''; listProjects(); }
+    try { await Data.addProject(ctx, name); document.getElementById('pname').value=''; renderProjects(); }
+    catch(e){ alert(e.message); }
   });
 
   document.getElementById('file-input').addEventListener('change', async (e)=>{
-    if (PREVIEW) { e.preventDefault(); alert('Preview mode: uploads are disabled.'); e.target.value=''; return; }
     const f = e.target.files[0]; if (!f) return;
-    const path = `${accountId}/${Date.now()}_${f.name}`;
-    const { error: upErr } = await supabase.storage.from('client-docs').upload(path, f, { upsert:false });
-    if (upErr) { alert(upErr.message); return; }
-    await supabase.from('documents').insert({ account_id: accountId, name: f.name, storage_path: path });
-    await listDocuments();
+    try { await Data.uploadDocument(ctx, f); renderDocuments(); }
+    catch(e){ alert(e.message); }
     e.target.value = '';
   });
 
   document.getElementById('msg-form').addEventListener('submit', async (e)=>{
-    if (PREVIEW) { e.preventDefault(); alert('Preview mode: sending messages is disabled.'); return; }
     e.preventDefault();
     const t = document.getElementById('msg-text');
     const body = t.value.trim(); if(!body) return;
-    const { error } = await supabase.from('messages').insert({ account_id: accountId, author_name: (user?.email||'User'), body });
-    if (!error) { t.value=''; loadMessages(); }
+    try { await Data.sendMessage(ctx, body); t.value=''; renderMessages(); }
+    catch(e){ alert(e.message); }
   });
 
-  // Realtime (live mode only)
-  let channel;
-  function joinRealtime(){
-    if (PREVIEW) return;
-    if (channel) supabase.removeChannel(channel);
-    channel = supabase.channel('msgs-' + accountId)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `account_id=eq.${accountId}` }, loadMessages)
-      .subscribe();
-  }
+  document.getElementById('signout').addEventListener('click', async ()=>{
+    if (Data.mode === 'mock') { alert('Mock mode: no sign-out.'); return; }
+    // (In supabase mode we could call client.auth.signOut();)
+    location.href = 'portal.html';
+  });
 
-  // ---------- INIT ----------
+  // ---------- Init ----------
   (async ()=>{
-    if (PREVIEW) {
-      await renderPreview();
-      return;
+    if (Data.mode === 'mock') {
+      const badge = document.createElement('div');
+      badge.className = 'badge';
+      badge.textContent = 'MOCK MODE';
+      document.body.appendChild(badge);
+      ui.manage.style.display = 'none';
+      ui.uploadHint.textContent = 'Preview storage — small files only, saved locally.';
     }
-    // Live mode: normal auth flow
-    await bootstrapSessionFromHash();
-    const ok = await requireSession();
-    if (!ok) return;
-    const haveAcct = await loadAccount();
-    if (!haveAcct) return;
+
+    ctx = await Data.init();
+    ui.userEmail.textContent = await Data.userEmail(ctx);
+    ui.accountName.textContent = await Data.accountName(ctx) || 'Demo';
+
     ui.app.style.display = '';
-    await listProjects();
-    await listDocuments();
-    await loadMessages();
-    joinRealtime();
+    await renderProjects();
+    await renderDocuments();
+    await renderMessages();
+    if (unsub) unsub(); unsub = Data.subscribeMessages(ctx, renderMessages);
   })();
   </script>
 </body>
