@@ -3,343 +3,193 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>EVRT — Social AI Platform</title>
-  <meta name="description" content="EVRT unifies social creation, predictive media, and closed-loop analytics. Watch live automations, ad previews, and real-time predictions."/>
+  <title>EVRT — Proof-Driven Growth</title>
+  <meta name="description" content="EVRT builds Social AI, Ad Studio, and Dashboards with predictive analysis and security guardrails. Proof > promises."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="assets/style.css"/>
 
+  <!-- OG -->
+  <meta property="og:title" content="EVRT — Proof-Driven Growth"/>
+  <meta property="og:description" content="Social AI. Ad Studio. Dashboards. Guardrails. Proof > promises."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://connorjenkins-developer.github.io/evrt.ai/index.html"/>
+  <meta property="og:image" content="https://connorjenkins-developer.github.io/evrt.ai/assets/evrt-og.png"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+
   <style>
-    /* ===== Landing page (scoped) ===== */
-    :root{
-      --ln-neon:#6ee7ff; --ln-accent:#63ffa5; --ln-amber:#ffd75a; --ln-danger:#ff4d6d;
-      --ln-bg:#0a0e14; --ln-card:#0f141c; --ln-grid:rgba(255,255,255,.06); --ln-mute:#8fa2b7;
-    }
-    body{ background: radial-gradient(1400px 900px at 80% -260px,#142034 0,#0a0e14 65%); }
+    :root{ --neon:#6ee7ff; --accent:#63ffa5; --grid:rgba(255,255,255,.08); --mute:#8fa2b7; }
+    body{ background: radial-gradient(1400px 900px at 75% -260px,#142034 0,#0a0e14 65%); }
+    .layers{ position:fixed; inset:0; z-index:0; pointer-events:none }
+    #halo{ position:absolute; inset:0; opacity:.24 }
+    .scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.26; mix-blend-mode:overlay }
 
-    /* Background FX */
-    .ln-layers{ position:fixed; inset:0; z-index:0; pointer-events:none; }
-    #ln-matrix{ position:absolute; inset:0; opacity:.22; }
-    .ln-scan{ position:absolute; inset:0;
-      background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.25; mix-blend-mode:overlay;
-    }
+    .section{ position:relative; z-index:1 }
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:10px }
+    .row.wrap{ flex-wrap:wrap }
+    .muted{ color:var(--mute) }
+    .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--grid); border-radius:999px; font-size:12px }
+    .tag{ font-size:11px; padding:2px 8px; border:1px solid var(--grid); border-radius:999px; color:var(--mute) }
+    .card{ border:1px solid var(--grid); border-radius:16px; background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); padding:14px }
+    .btn.neon{ background:linear-gradient(90deg,var(--neon),var(--accent)); color:#061019; border:0; font-weight:800 }
+    .btn.ghost{ border:1px solid var(--grid) }
 
-    .ln-section{ position:relative; z-index:1; }
-    .eyebrow{ letter-spacing:.12em; text-transform:uppercase; color:var(--ln-mute); }
+    .grid{ display:grid; gap:14px }
+    .grid-3{ display:grid; gap:14px; grid-template-columns:1fr }
+    @media(min-width:980px){ .grid-3{ grid-template-columns:repeat(3,1fr) } }
 
-    /* HERO */
-    .ln-hero h1{ font-size: clamp(40px,6.2vw,78px); line-height:1.02; margin:.2rem 0 1rem; }
-    .ln-hero .sub{ max-width: 860px; }
-    .ln-badges{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
-    .ln-badge{
-      display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
-      border:1px solid var(--ln-grid); color:var(--ln-mute); font-weight:600;
-      background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
-    }
-    .ln-badge .dot{ width:8px; height:8px; border-radius:999px; background:#f44; animation:ln-pulse 1.8s infinite; }
-    @keyframes ln-pulse{0%{box-shadow:0 0 0 0 rgba(255,77,109,.6)}70%{box-shadow:0 0 0 8px rgba(255,77,109,0)}100%{box-shadow:0 0 0 0 rgba(255,77,109,0)}}
+    /* Sticky CTA */
+    .sticky-cta{ position:sticky; bottom:12px; z-index:40; display:flex; justify-content:center }
+    .sticky-cta .bar{ width:min(1080px,92vw); backdrop-filter:blur(8px); background:#07121b; border:1px solid rgba(110,231,255,.35); border-radius:14px; padding:10px; display:flex; gap:10px; align-items:center }
+    .ping{ width:8px; height:8px; border-radius:50%; background:#63ffa5; box-shadow:0 0 0 6px rgba(99,255,165,.15) }
 
-    .ln-cta{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
-    .btn.neon{ background:linear-gradient(90deg,var(--ln-neon),var(--ln-accent)); color:#061019; border:0; font-weight:800; }
-    .btn.ghost{ border:1px solid var(--ln-grid); }
-
-    /* COUNTERS */
-    .ln-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:18px; }
-    .ln-stat{ background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02)); border:1px solid var(--ln-grid); border-radius:14px; padding:12px; }
-    .ln-big{ font-size:28px; font-weight:900; letter-spacing:.02em; }
-
-    /* AD PREVIEW RAIL */
-    .rail{ position:relative; overflow:hidden; border-radius:16px; border:1px solid var(--ln-grid);
-      background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
-    }
-    .rail-track{ display:flex; gap:14px; padding:14px; animation:rail 28s linear infinite; }
-    @keyframes rail{ from{ transform:translateX(0) } to{ transform:translateX(-50%) } }
-    .ad{ min-width: 260px; max-width: 260px; border-radius:14px; background:#0d131c; border:1px solid rgba(255,255,255,.1); box-shadow:0 10px 30px rgba(0,0,0,.35); overflow:hidden; }
-    .ad-hero{ height:160px; background:linear-gradient(135deg,#1c2b3f,#122333); display:grid; place-items:center; color:#bfefff; font-weight:800; font-size:18px; letter-spacing:.02em; }
-    .ad-body{ padding:10px; }
-    .ad-meta{ display:flex; align-items:center; justify-content:space-between; color:var(--ln-mute); font-size:12px; }
-    .ad-pill{ display:inline-flex; align-items:center; gap:6px; padding:2px 8px; border:1px solid var(--ln-grid); border-radius:999px; font-size:11px; }
-    .roi{ position:absolute; top:10px; right:10px; background:linear-gradient(90deg,var(--ln-neon),var(--ln-accent)); color:#061019; font-weight:900; padding:6px 10px; border-radius:999px; box-shadow:0 8px 24px rgba(110,231,255,.3); transform:rotate(-2deg); }
-    .roi-glitch{ position:relative; }
-    .roi-glitch::after{ content:'3× ROI GUARANTEED'; position:absolute; inset:0; left:2px; color:#ff6; mix-blend-mode:screen; opacity:.6; animation:gl 2.2s infinite steps(2); }
-    @keyframes gl{ 50%{ clip-path: inset(0 0 60% 0); transform: translateY(-1px) } 55%{ clip-path: inset(40% 0 0 0); transform: translateY(1px) } }
-
-    /* PREDICTIVE OVERLAYS */
-    .predict-layer{ position:relative; min-height: 84px; }
-    .predict{ position:absolute; inset:auto 12px 12px auto; background:#061019; border:1px solid rgba(110,231,255,.35);
-      border-radius:12px; padding:10px; width:260px; color:#bfefff; box-shadow:0 12px 30px rgba(0,0,0,.45); opacity:0; transform:translateY(10px); transition:.4s;
-    }
-    .predict.show{ opacity:1; transform:translateY(0); }
-    .predict .row{ display:flex; align-items:center; justify-content:space-between; }
-    .predict .meter{ height:8px; background:#0b0e13; border:1px solid rgba(255,255,255,.15); border-radius:8px; overflow:hidden; margin-top:6px; }
-    .predict .meter>div{ height:100%; width:0%; background:linear-gradient(90deg,#63ffa5,#ffd75a,#ff4d6d); }
-
-    /* TERMINAL */
-    .terminal{
-      background:#05080d;border:1px solid rgba(110,231,255,.25);
-      box-shadow:0 0 40px rgba(110,231,255,.08) inset, 0 12px 40px rgba(0,0,0,.35);
-      border-radius:12px; overflow:hidden; color:#bfefff;
-      font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-    .term-top{ display:flex; align-items:center; gap:8px; padding:8px 12px; background:#07121b; border-bottom:1px solid rgba(255,255,255,.06); }
-    .dot{ width:10px; height:10px; border-radius:999px; }
-    .dot.r{ background:#ff5f56 } .dot.y{ background:#ffbd2e } .dot.g{ background:#27c93f }
-    .term-body{ height:280px; overflow:auto; padding:12px; }
-    .term-line{ white-space:pre-wrap }
-    .term-caret{ display:inline-block; width:9px; height:1.05em; background:#bfefff; vertical-align:-2px; animation:blink 1s steps(1) infinite }
-    @keyframes blink{ 50%{ opacity:0 } }
-    .term-success{ color:#63ffa5 } .term-warn{ color:#ffd75a } .term-err{ color:#ff8299 }
-
-    /* Feature grid */
-    .grid-3{ display:grid; gap:16px; grid-template-columns:1fr; }
-    @media(min-width:980px){ .grid-3{ grid-template-columns:repeat(3,1fr); } }
-    .ln-card{ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid var(--ln-grid); border-radius:14px; padding:14px; transition:.25s; }
-    .ln-card:hover{ transform:translateY(-4px); border-color:rgba(110,231,255,.55); box-shadow:0 12px 40px rgba(110,231,255,.08), 0 0 0 1px rgba(110,231,255,.25) inset; }
-
-    /* Grid overlay decoration */
-    .grid-overlay{ position:relative; }
-    .grid-overlay::before{
-      content:''; position:absolute; inset:0; pointer-events:none;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px,
-        linear-gradient(0deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px;
-      mask: linear-gradient(to bottom, transparent, rgba(0,0,0,.3) 20%, rgba(0,0,0,.3) 80%, transparent);
-      opacity:.25; border-radius:16px;
-    }
-
-    @media(max-width:920px){ .ln-stats{ grid-template-columns:1fr; } .rail-track{ animation-duration: 36s; } }
+    /* Demo label */
+    .live-label{ display:inline-flex; gap:8px; align-items:center; padding:4px 10px; border:1px solid var(--grid); border-radius:999px; font-size:12px; background:#07121b }
+    .kbd{ font-family:ui-monospace, Menlo, Consolas, monospace; font-size:12px; padding:2px 6px; border:1px solid var(--grid); border-radius:6px; }
   </style>
 </head>
 <body>
-  <!-- Background FX -->
-  <div class="ln-layers">
-    <canvas id="ln-matrix" aria-hidden="true"></canvas>
-    <div class="ln-scan" aria-hidden="true"></div>
+  <!-- Backdrop -->
+  <div class="layers">
+    <canvas id="halo" aria-hidden="true"></canvas>
+    <div class="scan" aria-hidden="true"></div>
   </div>
 
   <div data-include="partials/header.html"></div>
 
   <!-- HERO -->
-  <section class="container hero ln-hero ln-section" style="margin-top:20px">
-    <span class="eyebrow">EVRT Social AI</span>
-    <h1 class="gradient-text">Create. Predict. Scale.<br/>All in one motion.</h1>
-    <p class="sub">From concept to conversion: on-brand content, predictive timing, and ad decisions that compound. Watch the console and previews update in real time—then launch a live demo.</p>
-
-    <div class="ln-badges">
-      <span class="ln-badge"><span class="dot"></span> Live automations (simulated)</span>
-      <span class="ln-badge">Closed-loop analytics</span>
-      <span class="ln-badge">SOC2-friendly patterns</span>
+  <section class="container hero section" style="margin-top:20px">
+    <span class="eyebrow muted">EVRT</span>
+    <h1 class="gradient-text">Proof-driven growth.<br/>Predict. Decide. Ship.</h1>
+    <p class="sub">Social AI, Ad Studio, Dashboards, and Guardrails. We don’t sell slides — we ship lift you can screenshot.</p>
+    <div class="tags" style="margin-top:10px">
+      <span class="tag">Remote-first</span><span class="tag">America/Chicago</span><span class="tag">Security by default</span>
     </div>
-
-    <div class="ln-cta">
-      <a class="btn neon" href="adlab.html">Launch Ad Demo Lab</a>
-      <a class="btn ghost" href="social-ai.html">See how it works</a>
-      <a class="btn" href="contact.html">Talk to us</a>
-    </div>
-
-    <div class="ln-stats">
-      <div class="ln-stat"><div class="ln-big" id="s1">0</div><div class="muted">Campaigns optimized</div></div>
-      <div class="ln-stat"><div class="ln-big" id="s2">0</div><div class="muted">Signals/min processed</div></div>
-      <div class="ln-stat"><div class="ln-big" id="s3">0</div><div class="muted">Creative variants tested</div></div>
+    <div class="row wrap" style="margin-top:10px">
+      <a class="btn neon" data-cta="primary" href="portal.html">Start trial</a>
+      <a class="btn" href="consulting.html">Talk to sales</a>
+      <a class="btn ghost" href="#demo">Try the live demo</a>
     </div>
   </section>
 
-  <!-- AD PREVIEW RAIL + ROI + PREDICTIVE -->
-  <section class="container section ln-section">
-    <div class="card grid-overlay" style="position:relative">
-      <div class="roi roi-glitch">3× ROI GUARANTEED</div>
-      <div class="rail">
-        <div id="rail" class="rail-track"></div>
-      </div>
-      <div class="predict-layer">
-        <div id="predict" class="predict">
-          <div class="row"><strong>Predicted CTR</strong><span id="p-ctr">—%</span></div>
-          <div class="meter"><div id="p-bar"></div></div>
-          <div class="row" style="margin-top:6px"><span class="muted">Expected CPA</span><strong>$<span id="p-cpa">—</span></strong></div>
+  <!-- PRODUCTS STRIP -->
+  <section class="container section grid-3">
+    <a class="card" href="social-ai.html">
+      <strong>Social AI</strong>
+      <p class="muted">Draft, pick best-minute per platform, schedule, see outcomes.</p>
+    </a>
+    <a class="card" href="ad-studio.html">
+      <strong>Ad Studio</strong>
+      <p class="muted">Creative lab + ROAS simulators with real guardrails.</p>
+    </a>
+    <a class="card" href="dashboard.html">
+      <strong>Dashboards</strong>
+      <p class="muted">Executive clarity: performance, anomalies, and actions.</p>
+    </a>
+  </section>
+
+  <!-- LIVE DEMO -->
+  <section id="demo" class="container section">
+    <div class="row wrap">
+      <span class="live-label"><span class="ping"></span> LIVE DEMO (simulated)</span>
+      <span class="muted">Press <span class="kbd">Ctrl</span>/<span class="kbd">⌘</span> + <span class="kbd">Enter</span> to preview</span>
+    </div>
+    <div class="card" style="margin-top:8px">
+      <div class="grid" style="grid-template-columns:1.1fr .9fr">
+        <div>
+          <label class="muted">Post idea</label>
+          <textarea id="demoText" class="control" placeholder="Give me 3 hooks for a fall product drop…"></textarea>
+          <div class="row wrap" style="margin-top:8px">
+            <button id="demoRun" class="btn">Generate preview</button>
+            <a class="btn ghost" href="social-ai.html">Open Social AI</a>
+          </div>
+        </div>
+        <div>
+          <label class="muted">Preview</label>
+          <div id="demoOut" class="card" style="min-height:140px"></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- TERMINAL + VALUE PROP -->
-  <section class="container section ln-section">
-    <div class="grid grid-2">
-      <div class="terminal grid-overlay">
-        <div class="term-top">
-          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-          <strong style="margin-left:6px">/opt/evrt/media</strong>
-          <span class="muted" style="margin-left:auto">root@evrt:~$</span>
-        </div>
-        <div id="term" class="term-body" role="log" aria-live="polite"></div>
-      </div>
-
-      <div class="ln-card grid-overlay">
-        <h3>Why EVRT</h3>
-        <p class="muted">Hootsuite’s speed, Meta Ads Manager’s control, and a predictive loop that cuts waste. You’ll know what to post, when to deploy, and how to iterate—before the budget moves.</p>
-        <ul class="cta-sugg" style="margin-top:6px">
-          <li>On-brand creation with instant variants</li>
-          <li>Timing + placement predictions per platform</li>
-          <li>Creative-level lift, not vanity metrics</li>
-          <li>One-click “next best action”</li>
-        </ul>
-        <div style="display:flex; gap:8px; margin-top:10px">
-          <a class="btn neon" href="apps.html">Explore Apps</a>
-          <a class="btn ghost" href="projects.html">See results</a>
-        </div>
-      </div>
-    </div>
+  <!-- TRUST / LINKS -->
+  <section class="container section grid-3">
+    <a class="card" href="projects.html">
+      <strong>Recent Projects</strong>
+      <p class="muted">See what shipped. Methods, metrics, and screenshots.</p>
+    </a>
+    <a class="card" href="blog.html">
+      <strong>Insights</strong>
+      <p class="muted">Case studies and playbooks — how we got the lift.</p>
+    </a>
+    <a class="card" href="cybersecurity.html">
+      <strong>Guardrails</strong>
+      <p class="muted">Security posture you can skim and trust.</p>
+    </a>
   </section>
 
-  <!-- FEATURE GRID -->
-  <section class="container section ln-section">
-    <h2 class="gradient-text">Everything you need</h2>
-    <p class="sub">Built for operators. Loved by CFOs.</p>
-    <div class="grid-3">
-      <div class="ln-card">
-        <h3>Posting Studio</h3>
-        <p class="muted">Compose once, tailor everywhere. Approvals, schedules, and libraries that scale.</p>
-      </div>
-      <div class="ln-card">
-        <h3>Ad Studio</h3>
-        <p class="muted">Audience builder + creative variants with live predictions for CTR, CVR, and CPA.</p>
-      </div>
-      <div class="ln-card">
-        <h3>Predictive Timing</h3>
-        <p class="muted">Find the high-intent minutes for each channel and locale—automatically.</p>
-      </div>
-      <div class="ln-card">
-        <h3>Closed-Loop Analytics</h3>
-        <p class="muted">Tie creative to revenue. See what to cut and what to scale, fast.</p>
-      </div>
-      <div class="ln-card">
-        <h3>Integrations</h3>
-        <p class="muted">Meta, TikTok, Google, LinkedIn, X—plus web analytics and your warehouse.</p>
-      </div>
-      <div class="ln-card">
-        <h3>Security</h3>
-        <p class="muted">Least-privilege, key rotation, audit trails. See the <a href="cybersecurity.html">Cyber Ops console</a>.</p>
-      </div>
+  <!-- Sticky CTA -->
+  <div class="sticky-cta">
+    <div class="bar">
+      <span class="badge"><span class="ping"></span> Proof &gt; promises</span>
+      <div class="muted" style="flex:1">Start a trial or book a 15-min briefing. We’ll ship measurable lift.</div>
+      <a class="btn neon" data-cta="primary" href="portal.html">Start trial</a>
+      <a class="btn" href="contact.html">Book briefing</a>
     </div>
-  </section>
-
-  <!-- FINAL CTA -->
-  <section class="container section ln-section">
-    <div class="card" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
-      <div>
-        <h3 style="margin:0 0 4px">Ready to outlearn your market?</h3>
-        <p class="muted" style="margin:0">We’ll show you the loop, then tailor it to your funnel.</p>
-      </div>
-      <div style="display:flex;gap:8px">
-        <a class="btn neon" href="adlab.html">Launch the demo</a>
-        <a class="btn ghost" href="contact.html">Book a strategy call</a>
-      </div>
-    </div>
-  </section>
+  </div>
 
   <div data-include="partials/footer.html"></div>
 
   <script defer src="assets/app.js"></script>
   <script>
-    /* ===== Matrix backdrop ===== */
-    (function matrix(){
-      const c = document.getElementById('ln-matrix'); const ctx = c.getContext('2d');
-      function resize(){ c.width = window.innerWidth; c.height = window.innerHeight; }
-      resize(); window.addEventListener('resize', resize);
-      const chars = 'アカサタナハ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$#@!*%&';
-      const cols = ()=>Math.floor(c.width / 14); let drops = Array(cols()).fill(0).map(()=>Math.random()*c.height/14);
-      ctx.font = '14px monospace';
-      (function step(){
-        ctx.fillStyle = 'rgba(10,14,20,0.08)'; ctx.fillRect(0,0,c.width,c.height);
-        ctx.fillStyle = '#6ee7ff'; ctx.shadowColor = '#6ee7ff88'; ctx.shadowBlur = 8;
-        for(let i=0;i<drops.length;i++){ const x = i*14, y = drops[i]*14; const ch = chars[Math.floor(Math.random()*chars.length)];
-          ctx.fillText(ch,x,y); if(y > c.height && Math.random()>0.975) drops[i]=0; drops[i]++; }
-        requestAnimationFrame(step);
+    // Backdrop halo
+    (function haloFX(){
+      const c=document.getElementById('halo'), ctx=c.getContext('2d');
+      function resize(){ c.width=innerWidth; c.height=innerHeight; } resize(); addEventListener('resize', resize);
+      const orbs = Array.from({length:7}, ()=>({x:Math.random()*c.width, y:Math.random()*c.height*0.6, r:90+Math.random()*160, dx:(Math.random()-.5)*0.45, dy:(Math.random()-.5)*0.45, hue:180+Math.random()*90}));
+      (function tick(){ ctx.clearRect(0,0,c.width,c.height);
+        orbs.forEach(o=>{ o.x+=o.dx;o.y+=o.dy; if(o.x<-120||o.x>c.width+120) o.dx*=-1; if(o.y<-120||o.y>c.height*0.8) o.dy*=-1;
+          const g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r); g.addColorStop(0,`hsla(${o.hue},100%,60%,.12)`); g.addColorStop(1,'transparent');
+          ctx.fillStyle=g; ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,6.283); ctx.fill(); }); requestAnimationFrame(tick);
       })();
     })();
 
-    /* ===== Counters ===== */
-    function animateNumber(el, target, dur=1000){
-      const t0 = performance.now(); const start = 0;
-      function tick(t){ const p=Math.min(1,(t-t0)/dur); const v=Math.floor(start+(target-start)*(1-Math.cos(p*Math.PI))/2); el.textContent=v.toLocaleString(); if(p<1) requestAnimationFrame(tick); }
-      requestAnimationFrame(tick);
-    }
-    animateNumber(document.getElementById('s1'), 2419, 1200);
-    animateNumber(document.getElementById('s2'), 19840, 1200);
-    animateNumber(document.getElementById('s3'), 58213, 1200);
+    // Tiny demo (client-only, simulated)
+    (function demo(){
+      const input = document.getElementById('demoText');
+      const out = document.getElementById('demoOut');
+      const run = ()=>{
+        const v = (input.value||'').trim();
+        const ideas = v ? [
+          'Hook 1: “Your fall refresh, but smarter.”',
+          'Hook 2: “Stop scrolling: meet the ROI drop.”',
+          'Hook 3: “3 weeks to measurable lift.”'
+        ] : [
+          'Hook 1: “Give me a line and I’ll turn it into a preview.”',
+          'Hook 2: “Post at the best-minute. Not a guess.”',
+          'Hook 3: “Proof > promises.”'
+        ];
+        out.innerHTML = '<ul class="muted" style="margin:0 0 0 16px">'+ideas.map(x=>`<li>${x}</li>`).join('')+'</ul>';
+      };
+      document.getElementById('demoRun').addEventListener('click', run);
+      input.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key==='Enter'){ run(); } });
+      run();
+    })();
 
-    /* ===== Terminal demo ===== */
-    const term = document.getElementById('term');
-    function println(s, cls=''){ const d=document.createElement('div'); d.className='term-line '+cls; d.textContent=s; term.appendChild(d); term.scrollTop=term.scrollHeight; }
-    function typeCmd(cmd, cb){
-      const row=document.createElement('div'); row.className='term-line'; term.appendChild(row); let i=0;
-      const iv=setInterval(()=>{ row.textContent='$ '+cmd.slice(0,++i)+(i%2?'_':''); term.scrollTop=term.scrollHeight;
-        if(i>=cmd.length){ clearInterval(iv); row.innerHTML='$ '+cmd+' <span class="term-caret"></span>'; cb&&cb(); } }, 18);
-    }
-    const seq = [
-      ()=> typeCmd('evrt compose --brand ACME --variants 6', ()=>{
-        setTimeout(()=> println('> Generated 6 on-brand captions', 'term-success'), 250);
-        setTimeout(()=> println('> Safe words check: OK', 'term-success'), 520);
-      }),
-      ()=> typeCmd('evrt predict --platform meta --placements feed,reels', ()=>{
-        setTimeout(()=> println('> CTR@p50: 2.8%  • CTR@p75: 4.1%', 'term-success'), 320);
-        setTimeout(()=> println('> CPA est: $13.40  • Window: 9:12–9:24am CT', 'term-success'), 700);
-      }),
-      ()=> typeCmd('evrt deploy --budget 250 --split 60/40', ()=>{
-        setTimeout(()=> println('> Guardrails active: freq cap + creative fatigue', 'term-warn'), 380);
-        setTimeout(()=> println('✓ Deployed. Next action in 45 min.', 'term-success'), 820);
-      })
-    ];
-    (function loop(i=0){ seq[i](); setTimeout(()=> loop((i+1)%seq.length), 5200); })();
-
-    /* ===== Ad preview rail (auto) ===== */
-    const samples = [
-      { plat:'Meta',    title:'Scale ROAS with EVRT', body:'Predictive timing + creative variants = outsize returns.', tag:'Conversions' },
-      { plat:'TikTok',  title:'Hook fast. Win big.',  body:'Short-form crafted with data-backed openers.',       tag:'Traffic' },
-      { plat:'Google',  title:'Intent you can feel',  body:'Creative+keyword blend that squeezes CPA.',          tag:'Leads' },
-      { plat:'LinkedIn',title:'Pipeline, not vanity', body:'Board-ready metrics and buyer-first content.',       tag:'Pipeline' },
-      { plat:'X',       title:'Moments that move',    body:'Right-time placements meet high-signal creative.',   tag:'Awareness' },
-    ];
-    function adCard(s){
-      const el=document.createElement('div'); el.className='ad';
-      el.innerHTML = `
-        <div class="ad-hero">${s.plat} • ${s.tag}</div>
-        <div class="ad-body">
-          <strong>${s.title}</strong>
-          <p class="muted" style="margin:.25rem 0 .5rem">${s.body}</p>
-          <div class="ad-meta"><span class="ad-pill">Preview</span><span class="muted">✨</span></div>
-        </div>`;
-      return el;
-    }
-    const rail = document.getElementById('rail');
-    // create two loops to make seamless marquee
-    [...samples, ...samples].forEach(s => rail.appendChild(adCard(s)));
-
-    /* ===== Predictive popups (cycle) ===== */
-    const predict = document.getElementById('predict');
-    const pBar = document.getElementById('p-bar');
-    const pCTR = document.getElementById('p-ctr');
-    const pCPA = document.getElementById('p-cpa');
-    let pi = 0;
-    function cyclePred(){
-      const s = samples[pi % samples.length];
-      // mock numbers per platform
-      const ctr = (1.6 + Math.random()*3.2).toFixed(1);
-      const cpa = (9 + Math.random()*18).toFixed(2);
-      pCTR.textContent = ctr + '%'; pCPA.textContent = cpa;
-      pBar.style.width = Math.min(100, (ctr*18)).toFixed(0) + '%';
-      predict.classList.add('show');
-      setTimeout(()=> predict.classList.remove('show'), 2200);
-      pi++;
-    }
-    setInterval(cyclePred, 3000);
-    setTimeout(cyclePred, 800); // initial
-
-    /* ===== ROI badge wiggle (subtle) ===== */
-    (function(){
-      const el = document.querySelector('.roi'); let t=0;
-      function tick(){ t+=0.02; el.style.transform=`rotate(${(Math.sin(t)*2-2).toFixed(2)}deg)`; requestAnimationFrame(tick); }
-      tick();
+    // JSON-LD: Organization
+    (function schema(){
+      const s=document.createElement('script'); s.type='application/ld+json';
+      s.textContent = JSON.stringify({
+        '@context':'https://schema.org',
+        '@type':'Organization',
+        name:'EVRT',
+        url: location.origin + (location.pathname.includes('/evrt.ai/')? '/evrt.ai/' : '/'),
+        description:'Proof-driven growth systems: Social AI, Ad Studio, Dashboards.',
+        areaServed:'US',
+        sameAs:[]
+      });
+      document.head.appendChild(s);
     })();
   </script>
 </body>
