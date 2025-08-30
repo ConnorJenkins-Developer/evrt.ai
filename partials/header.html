@@ -1,56 +1,66 @@
-<!-- partials/header.html -->
+<!-- partials/header.html (scriptless; mobile works via CSS + <details>) -->
 <header class="evrt-header" role="banner">
   <a class="evrt-brand" href="index.html" aria-label="EVRT home">
     <span class="evrt-logo">EVRT</span>
   </a>
 
-  <button class="evrt-toggle" aria-expanded="false" aria-controls="evrt-nav">Menu</button>
+  <!-- Mobile menu toggle (checkbox hack; no JS needed) -->
+  <input type="checkbox" id="evrt-menu" class="evrt-menu-toggle" />
+  <label for="evrt-menu" class="evrt-toggle" aria-controls="evrt-nav">Menu</label>
 
   <nav id="evrt-nav" class="evrt-nav" role="navigation" aria-label="Primary">
     <ul class="evrt-top">
       <!-- PLATFORM -->
-      <li class="evrt-has-sub">
-        <button class="evrt-toplink" aria-expanded="false">Platform</button>
-        <div class="evrt-dropdown evrt-columns-2">
-          <a href="social-ai.html">EVRT Social AI (Overview)</a>
-          <a href="adlab.html">Ad Demo Lab (Live)</a>
-          <a href="ad-studio.html">Ad Studio</a>
-          <a href="dashboard.html">Dashboard</a>
-          <a href="apps.html">All Apps</a>
-        </div>
+      <li class="evrt-group">
+        <details>
+          <summary class="evrt-toplink">Platform</summary>
+          <div class="evrt-dropdown evrt-columns-2">
+            <a href="social-ai.html">EVRT Social AI (Overview)</a>
+            <a href="adlab.html">Ad Demo Lab (Live)</a>
+            <a href="ad-studio.html">Ad Studio</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="apps.html">All Apps</a>
+          </div>
+        </details>
       </li>
 
       <!-- SOLUTIONS -->
-      <li class="evrt-has-sub">
-        <button class="evrt-toplink" aria-expanded="false">Solutions</button>
-        <div class="evrt-dropdown">
-          <a href="consulting.html">Consulting</a>
-          <a href="cybersecurity.html">Cybersecurity</a>
-          <a href="industries.html">Industries</a>
-        </div>
+      <li class="evrt-group">
+        <details>
+          <summary class="evrt-toplink">Solutions</summary>
+          <div class="evrt-dropdown">
+            <a href="consulting.html">Consulting</a>
+            <a href="cybersecurity.html">Cybersecurity</a>
+            <a href="industries.html">Industries</a>
+          </div>
+        </details>
       </li>
 
       <!-- RESOURCES -->
-      <li class="evrt-has-sub">
-        <button class="evrt-toplink" aria-expanded="false">Resources</button>
-        <div class="evrt-dropdown">
-          <a href="projects.html">Projects / Case Studies</a>
-          <a href="blog.html">Insights (Blog)</a>
-          <a href="press.html">Press</a>
-        </div>
+      <li class="evrt-group">
+        <details>
+          <summary class="evrt-toplink">Resources</summary>
+          <div class="evrt-dropdown">
+            <a href="projects.html">Projects / Case Studies</a>
+            <a href="blog.html">Insights (Blog)</a>
+            <a href="press.html">Press</a>
+          </div>
+        </details>
       </li>
 
       <!-- COMPANY -->
-      <li class="evrt-has-sub">
-        <button class="evrt-toplink" aria-expanded="false">Company</button>
-        <div class="evrt-dropdown">
-          <a href="about.html">About</a>
-          <a href="pricing.html">Pricing</a>
-          <a href="contact.html">Contact</a>
-          <a href="portal.html">Client Portal</a>
-          <a href="privacy.html">Privacy</a>
-          <a href="careers.html">Careers</a>
-        </div>
+      <li class="evrt-group">
+        <details>
+          <summary class="evrt-toplink">Company</summary>
+          <div class="evrt-dropdown">
+            <a href="about.html">About</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="contact.html">Contact</a>
+            <a href="portal.html">Client Portal</a>
+            <a href="privacy.html">Privacy</a>
+            <a href="careers.html">Careers</a>
+          </div>
+        </details>
       </li>
     </ul>
 
@@ -60,14 +70,13 @@
     </div>
   </nav>
 
-  <!-- Scoped styles (no other files needed) -->
   <style>
-    /* Scope everything under .evrt- to avoid collisions */
+    /* ——— Base ——— */
     .evrt-header{
       position:sticky;top:0;z-index:60;
       display:flex;align-items:center;justify-content:space-between;
-      padding:12px 16px;
-      background:rgba(10,12,18,.6);backdrop-filter:blur(8px);
+      padding:12px 16px;background:rgba(10,12,18,.6);
+      backdrop-filter:blur(8px);
       border-bottom:1px solid rgba(255,255,255,.06)
     }
     .evrt-brand{font-weight:800;letter-spacing:.02em;text-decoration:none;color:inherit}
@@ -77,14 +86,25 @@
       display:none;background:transparent;color:inherit;cursor:pointer;
       border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:6px 10px
     }
+    .evrt-menu-toggle{position:absolute;left:-9999px;top:-9999px}
+
     .evrt-nav{display:flex;align-items:center;gap:22px}
     .evrt-top{display:flex;gap:18px;list-style:none;margin:0;padding:0}
-    .evrt-has-sub{position:relative}
-    .evrt-toplink{
-      background:transparent;border:0;color:inherit;cursor:pointer;
-      font:inherit;padding:8px 6px;border-radius:8px
+    .evrt-cta{display:flex;gap:10px}
+    .evrt-btn{display:inline-block;padding:8px 12px;border-radius:10px;
+      border:1px solid rgba(255,255,255,.2);text-decoration:none;color:inherit}
+    .evrt-primary{background:linear-gradient(90deg,#6ee7ff,#77ffcc);color:#0b0e13;border:0;font-weight:700}
+
+    /* ——— Groups / dropdowns ——— */
+    .evrt-group{position:relative}
+    details{position:relative}
+    summary.evrt-toplink{
+      list-style:none;cursor:pointer;user-select:none;
+      padding:8px 6px;border-radius:8px
     }
-    .evrt-toplink:hover{background:rgba(255,255,255,.06)}
+    summary.evrt-toplink::-webkit-details-marker{display:none}
+    summary.evrt-toplink:hover{background:rgba(255,255,255,.06)}
+
     .evrt-dropdown{
       position:absolute;left:0;top:100%;min-width:260px;display:none;
       grid-template-columns:1fr;gap:6px;margin-top:6px;
@@ -92,26 +112,19 @@
       border-radius:12px;padding:10px;box-shadow:0 12px 30px rgba(0,0,0,.35)
     }
     .evrt-columns-2{min-width:520px;grid-template-columns:1fr 1fr}
-    .evrt-dropdown a{
-      display:block;padding:8px 10px;border-radius:8px;text-decoration:none;color:inherit;white-space:nowrap
-    }
+    .evrt-dropdown a{display:block;padding:8px 10px;border-radius:8px;
+      text-decoration:none;color:inherit;white-space:nowrap}
     .evrt-dropdown a:hover{background:rgba(255,255,255,.06)}
-    /* Desktop: open on hover/focus */
+
+    /* Desktop: open dropdowns on hover/focus OR when details is [open] */
     @media (pointer:fine){
-      .evrt-has-sub:hover>.evrt-dropdown,
-      .evrt-has-sub:focus-within>.evrt-dropdown{display:grid}
+      .evrt-group:hover .evrt-dropdown,
+      .evrt-group:focus-within .evrt-dropdown{display:grid}
     }
+    /* Also respect details[open] (helps keyboard users) */
+    .evrt-group details[open] > .evrt-dropdown{display:grid}
 
-    .evrt-cta{display:flex;gap:10px}
-    .evrt-btn{
-      display:inline-block;padding:8px 12px;border-radius:10px;
-      border:1px solid rgba(255,255,255,.2);text-decoration:none;color:inherit
-    }
-    .evrt-primary{
-      background:linear-gradient(90deg,#6ee7ff,#77ffcc);color:#0b0e13;border:0;font-weight:700
-    }
-
-    /* Mobile */
+    /* ——— Mobile layout ——— */
     @media (max-width: 920px){
       .evrt-toggle{display:block}
       .evrt-nav{
@@ -119,46 +132,20 @@
         padding:12px;background:#0b0e13;border:1px solid rgba(255,255,255,.08);
         border-radius:16px;transform:translateY(-20px);opacity:0;pointer-events:none;transition:.2s
       }
-      .evrt-nav.evrt-open{transform:translateY(0);opacity:1;pointer-events:auto}
+      /* Open menu when checkbox is checked */
+      .evrt-menu-toggle:checked ~ .evrt-nav{
+        transform:translateY(0);opacity:1;pointer-events:auto
+      }
       .evrt-top{flex-direction:column;gap:8px}
-      .evrt-has-sub .evrt-dropdown{position:static;display:none;border:0;box-shadow:none;padding:6px 4px 8px;margin:0}
-      .evrt-has-sub.evrt-open > .evrt-dropdown{display:grid}
+
+      /* Mobile submenus use native <details> toggling */
+      .evrt-dropdown{
+        position:static;display:none;border:0;box-shadow:none;padding:6px 4px 8px;margin:0;
+        background:transparent
+      }
       .evrt-columns-2{min-width:0;grid-template-columns:1fr}
+      .evrt-group details[open] > .evrt-dropdown{display:grid}
       .evrt-cta{flex-direction:column}
     }
   </style>
-
-  <!-- Minimal behavior -->
-  <script>
-    (function(){
-      const toggle = document.querySelector('.evrt-toggle');
-      const nav = document.getElementById('evrt-nav');
-
-      // Open/close main menu (mobile)
-      toggle?.addEventListener('click', ()=>{
-        const open = nav.classList.toggle('evrt-open');
-        toggle.setAttribute('aria-expanded', String(open));
-      });
-
-      // Toggle submenus on mobile
-      document.querySelectorAll('.evrt-has-sub .evrt-toplink').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          if (window.matchMedia('(max-width:920px)').matches){
-            const li = btn.closest('.evrt-has-sub');
-            const open = li.classList.toggle('evrt-open');
-            btn.setAttribute('aria-expanded', String(open));
-          }
-        });
-      });
-
-      // Close menus on ESC / click-out
-      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ nav.classList.remove('evrt-open'); document.querySelectorAll('.evrt-has-sub').forEach(li=>li.classList.remove('evrt-open')); }});
-      document.addEventListener('click', (e)=>{
-        if (!nav.contains(e.target) && !toggle.contains(e.target)) {
-          nav.classList.remove('evrt-open');
-          document.querySelectorAll('.evrt-has-sub').forEach(li=>li.classList.remove('evrt-open'));
-        }
-      });
-    })();
-  </script>
 </header>
