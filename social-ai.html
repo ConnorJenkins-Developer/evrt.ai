@@ -4,270 +4,106 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>EVRT Social AI — Interactive Studio</title>
-  <meta name="description" content="Draft on-brand content, predict the best minute per platform, build a schedule, and export. Live previews, heatmaps, and a cinematic console."/>
+  <meta name="description" content="Draft on-brand content, predict the best minute per platform, schedule, and see outcomes. Proof > promises."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="assets/style.css"/>
 
+  <meta property="og:title" content="EVRT Social AI — Interactive Studio"/>
+  <meta property="og:description" content="Draft, predict best-minute, schedule, and analyze."/>
+  <meta property="og:type" content="product"/>
+  <meta property="og:url" content="https://connorjenkins-developer.github.io/evrt.ai/social-ai.html"/>
+  <meta property="og:image" content="https://connorjenkins-developer.github.io/evrt.ai/assets/evrt-og.png"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+
   <style>
-    /* ===== Page theme (scoped) ===== */
-    :root{
-      --sa-neon:#6ee7ff; --sa-accent:#63ffa5; --sa-amber:#ffd75a; --sa-danger:#ff4d6d;
-      --sa-bg:#0a0e14; --sa-card:#0f141c; --sa-grid:rgba(255,255,255,.06); --sa-mute:#8fa2b7;
-    }
-    body{ background: radial-gradient(1400px 900px at 80% -260px,#142034 0,#0a0e14 65%); }
-    .sa-layer{ position:fixed; inset:0; pointer-events:none; z-index:0; }
-    #sa-matrix{ position:absolute; inset:0; opacity:.22; }
-    .sa-scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.25; mix-blend-mode:overlay; }
+    :root{ --neon:#6ee7ff; --accent:#63ffa5; --grid:rgba(255,255,255,.08); --mute:#8fa2b7; }
+    body{ background: radial-gradient(1400px 900px at 78% -260px,#142034 0,#0a0e14 65%); }
+    .layers{ position:fixed; inset:0; z-index:0; pointer-events:none }
+    #halo{ position:absolute; inset:0; opacity:.24 }
+    .scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.26; mix-blend-mode:overlay }
 
-    .sa-section{ position:relative; z-index:1; }
-    .eyebrow{ letter-spacing:.12em; text-transform:uppercase; color:var(--sa-mute); }
-
-    /* Tabs */
-    .tabs{ display:flex; gap:8px; flex-wrap:wrap; }
-    .tab{ padding:8px 12px; border-radius:12px; border:1px solid var(--sa-grid); cursor:pointer; user-select:none; }
-    .tab.active{ background:linear-gradient(90deg,var(--sa-neon),var(--sa-accent)); color:#061019; border:0; font-weight:800; }
-    .panel{ display:none; }
-    .panel.active{ display:block; }
-
-    /* Cards */
-    .sa-card{ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid var(--sa-grid); border-radius:14px; padding:14px; }
-    .sa-card:hover{ border-color:rgba(110,231,255,.45); box-shadow:0 12px 40px rgba(110,231,255,.08), 0 0 0 1px rgba(110,231,255,.25) inset; }
-    .mini{ color:var(--sa-mute); font-size:12px; }
-
-    /* Composer */
-    .grid-2{ display:grid; gap:16px; grid-template-columns:1fr; }
-    @media(min-width:1050px){ .grid-2{ grid-template-columns: 1.1fr 1fr; } }
-    .grid-3{ display:grid; gap:10px; grid-template-columns:1fr; }
-    @media(min-width:700px){ .grid-3{ grid-template-columns:repeat(3,1fr); } }
-    .input, .select, .textarea{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--sa-grid); background:#0f141c; color:inherit; }
-    .textarea{ min-height:110px; resize:vertical; }
-    .btn.neon{ background:linear-gradient(90deg,var(--sa-neon),var(--sa-accent)); color:#061019; border:0; font-weight:800; }
-    .btn.ghost{ border:1px solid var(--sa-grid); }
-    .pill{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; border:1px solid var(--sa-grid); margin:4px 6px 0 0; }
-    .pill button{ background:transparent; border:0; color:var(--sa-mute); cursor:pointer; }
-
-    /* Previews */
-    .preview{ border:1px solid rgba(255,255,255,.1); border-radius:12px; background:#0d131c; padding:12px; }
-    .p-head{ display:flex; align-items:center; justify-content:space-between; color:var(--sa-mute); font-size:12px; margin-bottom:6px; }
-    .p-body strong{ display:block; margin-bottom:4px; }
-    .limit{ font-size:12px; color:var(--sa-mute); }
-
-    /* Heatmap */
-    .heat-wrap{ display:grid; grid-template-columns: 1fr; gap:12px; }
-    @media(min-width:1100px){ .heat-wrap{ grid-template-columns:1fr 1fr; } }
-    .heat-legend{ display:flex; gap:8px; align-items:center; }
-    .swatch{ width:16px; height:10px; border:1px solid var(--sa-grid); border-radius:6px; background:#192331; }
-    .swatch.hot{ background: linear-gradient(90deg,#63ffa5,#ffd75a,#ff4d6d); }
-    canvas#heat{ width:100%; max-width:100%; border-radius:12px; border:1px solid var(--sa-grid); background:#0f141c; }
-    .bestlist .row{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.06); }
-    .bestlist .row:last-child{ border-bottom:0; }
-
-    /* Scheduler */
-    .sched{ display:grid; gap:16px; grid-template-columns:1fr; }
-    @media(min-width:1100px){ .sched{ grid-template-columns: 1fr 1fr; } }
-    .slots{ max-height:260px; overflow:auto; }
-    .slot{ display:flex; align-items:center; justify-content:space-between; padding:8px; border:1px solid var(--sa-grid); border-radius:10px; margin-bottom:8px; }
-    .slot .mini{ margin:0 }
-    .notice{ display:inline-flex; align-items:center; gap:6px; padding:2px 8px; border-radius:999px; border:1px solid var(--sa-grid); font-size:12px; color:var(--sa-mute); }
-
-    /* Terminal */
-    .terminal{
-      background:#05080d;border:1px solid rgba(110,231,255,.25);
-      box-shadow:0 0 40px rgba(110,231,255,.08) inset, 0 12px 40px rgba(0,0,0,.35);
-      border-radius:12px; overflow:hidden; color:#bfefff;
-      font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-    .term-top{ display:flex; align-items:center; gap:8px; padding:8px 12px; background:#07121b; border-bottom:1px solid rgba(255,255,255,.06); }
-    .dot{ width:10px; height:10px; border-radius:999px; }
-    .dot.r{ background:#ff5f56 } .dot.y{ background:#ffbd2e } .dot.g{ background:#27c93f }
-    .term-body{ height:280px; overflow:auto; padding:12px; }
-    .term-line{ white-space:pre-wrap }
-    .term-caret{ display:inline-block; width:9px; height:1.05em; background:#bfefff; vertical-align:-2px; animation:blink 1s steps(1) infinite }
-    @keyframes blink{ 50%{ opacity:0 } }
-    .term-success{ color:#63ffa5 } .term-warn{ color:#ffd75a } .term-err{ color:#ff8299 }
-
-    /* Decorative grid overlay */
-    .grid-overlay{ position:relative; }
-    .grid-overlay::before{
-      content:''; position:absolute; inset:0; pointer-events:none;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px,
-        linear-gradient(0deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px;
-      mask: linear-gradient(to bottom, transparent, rgba(0,0,0,.3) 20%, rgba(0,0,0,.3) 80%, transparent);
-      opacity:.25; border-radius:16px;
-    }
-
-    @media(max-width:920px){
-      .grid-3{ grid-template-columns:1fr; }
-      .ln-stats{ grid-template-columns:1fr; }
-    }
+    .section{ position:relative; z-index:1 }
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:10px }
+    .row.wrap{ flex-wrap:wrap }
+    .muted{ color:var(--mute) }
+    .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--grid); border-radius:999px; font-size:12px }
+    .card{ border:1px solid var(--grid); border-radius:16px; background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); padding:14px }
+    .btn.neon{ background:linear-gradient(90deg,var(--neon),var(--accent)); color:#061019; border:0; font-weight:800 }
+    .btn.ghost{ border:1px solid var(--grid) }
+    .grid{ display:grid; gap:14px }
+    .grid-3{ display:grid; gap:14px; grid-template-columns:1fr }
+    @media(min-width:980px){ .grid-3{ grid-template-columns:repeat(3,1fr) } }
+    .kbd{ font-family:ui-monospace, Menlo, Consolas, monospace; font-size:12px; padding:2px 6px; border:1px solid var(--grid); border-radius:6px; }
   </style>
 </head>
 <body>
-  <!-- Background FX -->
-  <div class="sa-layer">
-    <canvas id="sa-matrix" aria-hidden="true"></canvas>
-    <div class="sa-scan" aria-hidden="true"></div>
+  <div class="layers">
+    <canvas id="halo" aria-hidden="true"></canvas>
+    <div class="scan" aria-hidden="true"></div>
   </div>
 
   <div data-include="partials/header.html"></div>
 
   <!-- HERO -->
-  <section class="container hero sa-section" style="margin-top:20px">
-    <span class="eyebrow">EVRT Social AI — Interactive Studio</span>
-    <h1 class="gradient-text">Draft. Predict. Schedule.<br/>On-brand and on-time.</h1>
-    <p class="sub">Draft on-brand content, predict the best minute per platform, build a schedule, and see pro-level previews—all in one motion. (Data here is simulated.)</p>
-    <div class="tabs" style="margin-top:10px">
-      <button class="tab active" data-tab="compose">1) Compose</button>
-      <button class="tab" data-tab="predict">2) Predict</button>
-      <button class="tab" data-tab="schedule">3) Schedule</button>
+  <section class="container hero section" style="margin-top:20px">
+    <span class="eyebrow muted">EVRT Social AI</span>
+    <h1 class="gradient-text">Draft. Predict. Schedule.<br/>See outcomes.</h1>
+    <p class="sub">On-brand drafts, best-minute per platform, one calendar, one source of truth.</p>
+    <div class="row wrap" style="margin-top:10px">
+      <a class="btn neon" data-cta="primary" href="portal.html">Start trial</a>
+      <a class="btn" href="pricing.html">See pricing</a>
+      <a class="btn ghost" href="#studio">Open demo</a>
     </div>
   </section>
 
-  <!-- PANELS -->
-  <section class="container section sa-section">
-    <!-- ========== COMPOSE ========== -->
-    <div id="panel-compose" class="panel active">
-      <div class="grid-2">
-        <!-- Left: controls -->
-        <div class="sa-card grid-overlay">
-          <h3>Compose</h3>
-          <div class="grid-3" style="margin-top:8px">
-            <input id="brand" class="input" placeholder="Brand (e.g., EVRT)"/>
-            <select id="tone" class="select">
-              <option>Professional</option><option>Playful</option><option>Bold</option>
-              <option>Inquisitive</option><option>Concise</option><option>Storyteller</option>
-            </select>
-            <input id="cta" class="input" placeholder="Call to action (e.g., Get started)"/>
-          </div>
-          <textarea id="idea" class="textarea" placeholder="What’s the post about? (e.g., How we cut CPA 31% with creative variants and predictive timing)"></textarea>
+  <!-- VALUE PILLARS -->
+  <section class="container section grid-3">
+    <div class="card"><strong>On-brand drafts</strong><p class="muted">Tone selection + guardrails, templates that your team can trust.</p></div>
+    <div class="card"><strong>Best-minute prediction</strong><p class="muted">Per-platform timing with exploration-exploitation so you learn fast.</p></div>
+    <div class="card"><strong>Schedule & analytics</strong><p class="muted">One calendar. Proof > promises. Clear readouts and anomaly flags.</p></div>
+  </section>
 
-          <div class="grid-3" style="margin-top:8px">
-            <label style="display:flex; align-items:center; gap:8px; border:1px solid var(--sa-grid); padding:10px; border-radius:10px;">
-              <input type="checkbox" id="plat-meta" checked/> Meta (FB/IG)
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; border:1px solid var(--sa-grid); padding:10px; border-radius:10px;">
-              <input type="checkbox" id="plat-tiktok" checked/> TikTok
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; border:1px solid var(--sa-grid); padding:10px; border-radius:10px;">
-              <input type="checkbox" id="plat-linkedin" checked/> LinkedIn
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; border:1px solid var(--sa-grid); padding:10px; border-radius:10px;">
-              <input type="checkbox" id="plat-x" checked/> X (Twitter)
-            </label>
-            <div class="pill"><span class="mini">Hashtags:</span> <span id="tags"></span></div>
-            <div class="pill"><span class="mini">Mentions:</span> <span id="mentions">@yourbrand</span></div>
+  <!-- STUDIO -->
+  <section id="studio" class="container section">
+    <div class="row wrap">
+      <span class="badge">DEMO</span>
+      <span class="muted">Press <span class="kbd">Ctrl</span>/<span class="kbd">⌘</span> + <span class="kbd">Enter</span> to preview</span>
+    </div>
+    <div class="card" style="margin-top:8px">
+      <div class="grid" style="grid-template-columns:1.1fr .9fr">
+        <div>
+          <label class="muted">Post prompt</label>
+          <textarea id="sText" class="control" placeholder="Announce our fall drop with a playful tone…"></textarea>
+          <div class="row wrap" style="margin-top:8px">
+            <button id="sRun" class="btn">Generate preview</button>
+            <a class="btn ghost" href="dashboard.html">See analytics</a>
           </div>
-
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px">
-            <button id="btn-variants" class="btn neon">Generate 3 variants</button>
-            <button id="btn-hashtags" class="btn ghost">Suggest hashtags</button>
-            <button id="btn-clear" class="btn">Reset</button>
-          </div>
-
-          <div id="variants" class="grid-3" style="margin-top:10px"></div>
         </div>
-
-        <!-- Right: Live previews -->
-        <div class="sa-card grid-overlay">
-          <h3>Live previews</h3>
-          <p class="mini">Character hints update per platform. Click any variant to load it here.</p>
-          <div class="grid-3" style="margin-top:8px">
-            <div class="preview">
-              <div class="p-head"><span>Meta</span><span class="limit"><span id="lim-meta">0</span>/2200</span></div>
-              <div class="p-body"><strong id="pv-meta-title">Your headline appears here</strong><div id="pv-meta-body" class="muted"></div></div>
-            </div>
-            <div class="preview">
-              <div class="p-head"><span>TikTok</span><span class="limit"><span id="lim-tt">0</span>/2200</span></div>
-              <div class="p-body"><strong id="pv-tt-title">Your hook appears here</strong><div id="pv-tt-body" class="muted"></div></div>
-            </div>
-            <div class="preview">
-              <div class="p-head"><span>LinkedIn</span><span class="limit"><span id="lim-li">0</span>/3000</span></div>
-              <div class="p-body"><strong id="pv-li-title">Lead with value</strong><div id="pv-li-body" class="muted"></div></div>
-            </div>
-            <div class="preview">
-              <div class="p-head"><span>X</span><span class="limit"><span id="lim-x">0</span>/280</span></div>
-              <div class="p-body"><strong id="pv-x-title">Punchy headline</strong><div id="pv-x-body" class="muted"></div></div>
-            </div>
+        <div>
+          <label class="muted">Preview</label>
+          <div id="sOut" class="card" style="min-height:140px"></div>
+          <div class="row wrap" style="margin-top:8px">
+            <a class="btn" href="apps.html">Explore the suite</a>
+            <a class="btn neon" data-cta="primary" href="portal.html">Start trial</a>
           </div>
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- ========== PREDICT ========== -->
-    <div id="panel-predict" class="panel">
-      <div class="heat-wrap">
-        <div class="sa-card grid-overlay">
-          <h3>Predictive timing heatmap</h3>
-          <p class="mini">Select a platform to see engagement intensity by hour. Click cells to add to “Best minutes”.</p>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin:8px 0">
-            <select id="heat-platform" class="select" style="max-width:260px">
-              <option>Meta</option><option>TikTok</option><option>LinkedIn</option><option>X</option>
-            </select>
-            <span class="notice">Simulated model • city-level</span>
-          </div>
-          <canvas id="heat" width="980" height="420"></canvas>
-          <div class="heat-legend" style="margin-top:8px">
-            <span class="swatch"></span><span class="mini">low</span>
-            <span class="swatch hot"></span><span class="mini">high</span>
-          </div>
+  <!-- CTA -->
+  <section class="container section">
+    <div class="card">
+      <div class="row wrap">
+        <div>
+          <strong>Ready to make the next move obvious?</strong>
+          <div class="muted">Start a trial or book a 15-min briefing. We’ll ship measurable lift.</div>
         </div>
-
-        <div class="sa-card grid-overlay">
-          <h3>Best minutes</h3>
-          <div id="bestlist" class="bestlist" style="margin-top:8px"></div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px">
-            <button id="btn-pick" class="btn neon">Pick top 10 automatically</button>
-            <button id="btn-clear-best" class="btn">Clear</button>
-          </div>
-          <p class="mini" style="margin-top:10px">Tip: platform + locale shifts patterns. We’ll let you add geography later.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ========== SCHEDULE ========== -->
-    <div id="panel-schedule" class="panel">
-      <div class="sched">
-        <div class="sa-card grid-overlay">
-          <h3>Build your schedule</h3>
-          <p class="mini">Choose a variant, select platform(s), and add time slots.</p>
-          <div class="grid-3" style="margin-top:6px">
-            <select id="sch-variant" class="select"></select>
-            <select id="sch-platforms" class="select" multiple size="4">
-              <option>Meta</option><option>TikTok</option><option>LinkedIn</option><option>X</option>
-            </select>
-            <div>
-              <select id="sch-day" class="select">
-                <option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option>
-              </select>
-              <input id="sch-time" class="input" type="time" value="09:15" style="margin-top:6px"/>
-            </div>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px">
-            <button id="btn-add-slot" class="btn neon">Add slot</button>
-            <button id="btn-auto-week" class="btn ghost">Auto-build week from best minutes</button>
-            <span id="sch-count" class="mini" style="align-self:center">0 slots</span>
-          </div>
-          <div id="slots" class="slots" style="margin-top:10px"></div>
-        </div>
-
-        <div class="sa-card grid-overlay">
-          <h3>Export</h3>
-          <p class="mini">Download a calendar file (ICS) and a JSON summary.</p>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px">
-            <button id="btn-ics" class="btn neon">Download .ics</button>
-            <button id="btn-json" class="btn">Download JSON</button>
-          </div>
-          <div class="terminal" style="margin-top:12px">
-            <div class="term-top">
-              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-              <strong style="margin-left:6px">/opt/evrt/social</strong>
-              <span class="muted" style="margin-left:auto">root@evrt:~$</span>
-            </div>
-            <div id="term" class="term-body" role="log" aria-live="polite"></div>
-          </div>
+        <div class="row wrap" style="gap:8px">
+          <a class="btn neon" data-cta="primary" href="portal.html">Start trial</a>
+          <a class="btn" href="contact.html">Book briefing</a>
         </div>
       </div>
     </div>
@@ -277,324 +113,51 @@
 
   <script defer src="assets/app.js"></script>
   <script>
-    /* ===== Matrix backdrop ===== */
-    (function matrix(){
-      const c = document.getElementById('sa-matrix'); const ctx = c.getContext('2d');
-      function resize(){ c.width = window.innerWidth; c.height = window.innerHeight; }
-      resize(); window.addEventListener('resize', resize);
-      const chars = 'アカサタナハ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$#@!*%&';
-      const cols = ()=>Math.floor(c.width / 14); let drops = Array(cols()).fill(0).map(()=>Math.random()*c.height/14);
-      ctx.font = '14px monospace';
-      (function step(){
-        ctx.fillStyle = 'rgba(10,14,20,0.08)'; ctx.fillRect(0,0,c.width,c.height);
-        ctx.fillStyle = '#6ee7ff'; ctx.shadowColor = '#6ee7ff88'; ctx.shadowBlur = 8;
-        for(let i=0;i<drops.length;i++){ const x = i*14, y = drops[i]*14; const ch = chars[Math.floor(Math.random()*chars.length)];
-          ctx.fillText(ch,x,y); if(y > c.height && Math.random()>0.975) drops[i]=0; drops[i]++; }
-        requestAnimationFrame(step);
+    (function haloFX(){
+      const c=document.getElementById('halo'), ctx=c.getContext('2d');
+      function resize(){ c.width=innerWidth; c.height=innerHeight; } resize(); addEventListener('resize', resize);
+      const orbs = Array.from({length:7}, ()=>({x:Math.random()*c.width, y:Math.random()*c.height*0.6, r:90+Math.random()*160, dx:(Math.random()-.5)*0.45, dy:(Math.random()-.5)*0.45, hue:180+Math.random()*90}));
+      (function tick(){ ctx.clearRect(0,0,c.width,c.height);
+        orbs.forEach(o=>{ o.x+=o.dx;o.y+=o.dy; if(o.x<-120||o.x>c.width+120) o.dx*=-1; if(o.y<-120||o.y>c.height*0.8) o.dy*=-1;
+          const g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r); g.addColorStop(0,`hsla(${o.hue},100%,60%,.12)`); g.addColorStop(1,'transparent');
+          ctx.fillStyle=g; ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,6.283); ctx.fill(); }); requestAnimationFrame(tick);
       })();
     })();
 
-    /* ===== Tabs ===== */
-    document.querySelectorAll('.tab').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-        document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
-      });
-    });
-
-    /* ===== Terminal helpers ===== */
-    const term = document.getElementById('term');
-    function println(s, cls=''){ const d=document.createElement('div'); d.className='term-line '+cls; d.textContent=s; term.appendChild(d); term.scrollTop=term.scrollHeight; }
-    function typeCmd(cmd, cb){
-      const row=document.createElement('div'); row.className='term-line'; term.appendChild(row); let i=0;
-      const iv=setInterval(()=>{ row.textContent='$ '+cmd.slice(0,++i)+(i%2?'_':''); term.scrollTop=term.scrollHeight;
-        if(i>=cmd.length){ clearInterval(iv); row.innerHTML='$ '+cmd+' <span class="term-caret"></span>'; cb&&cb(); } }, 18);
-    }
-
-    /* ===== Composer ===== */
-    const brand = document.getElementById('brand');
-    const tone  = document.getElementById('tone');
-    const cta   = document.getElementById('cta');
-    const idea  = document.getElementById('idea');
-    const tags  = document.getElementById('tags');
-    const variantsBox = document.getElementById('variants');
-    const limits = { meta:2200, tt:2200, li:3000, x:280 };
-
-    function transformTone(txt, t){
-      switch(t){
-        case 'Playful': return txt.replace(/\./g,' ✨.').replace(/maximize/ig,'supercharge');
-        case 'Bold': return txt.toUpperCase().replace(/!/g,'‼');
-        case 'Inquisitive': return 'What if ' + txt.replace(/^\w/, c=>c.toLowerCase()) + '?';
-        case 'Concise': return txt.slice(0,140) + (txt.length>140?'…':'');
-        case 'Storyteller': return 'Once we tried this: ' + txt + ' — here’s what happened.';
-        default: return txt;
-      }
-    }
-    function suggestHashtags(text){
-      const words = text.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>3);
-      const uniq = [...new Set(words)].slice(0,6).map(w=> '#'+w.replace(/\s+/g,''));
-      return uniq.length? uniq : ['#marketing','#socialai','#growth','#creatives','#evrt'];
-    }
-    function makeVariant(base){
-      const b = (brand.value||'EVRT'); const call = cta.value? (' '+cta.value):'';
-      const t = tone.value || 'Professional';
-      const body = transformTone(base, t);
-      return `【${b}】 ${body}${call ? ' — '+call : ''}`;
-    }
-    function renderVariants(list){
-      variantsBox.innerHTML = list.map((v,i)=>`
-        <div class="sa-card">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <strong>Variant ${i+1}</strong>
-            <button class="btn" data-use="${i}">Use</button>
-          </div>
-          <p class="muted" style="margin-top:6px">${v}</p>
-        </div>`).join('');
-      variantsBox.querySelectorAll('[data-use]').forEach(btn=>{
-        btn.onclick = ()=> loadPreview(list[+btn.dataset.use]);
-      });
-      // populate scheduler variant dropdown
-      const sel = document.getElementById('sch-variant'); sel.innerHTML='';
-      list.forEach((v,i)=>{ const o=document.createElement('option'); o.textContent=`Variant ${i+1}`; o.value=v; sel.appendChild(o); });
-    }
-    function loadPreview(text){
-      // Meta & TikTok share long copy
-      document.getElementById('pv-meta-title').textContent = (brand.value||'EVRT') + ' • Social AI';
-      document.getElementById('pv-meta-body').textContent  = text;
-      document.getElementById('pv-tt-title').textContent   = 'Hook: ' + (idea.value.split(' ')[0]||'Create') + ' faster';
-      document.getElementById('pv-tt-body').textContent    = text;
-      // LinkedIn richer
-      document.getElementById('pv-li-title').textContent   = (brand.value||'EVRT') + ' — Results, not vanity';
-      document.getElementById('pv-li-body').textContent    = text + ' #' + (suggestHashtags(text).slice(0,2).map(h=>h.replace('#','')).join(' #'));
-      // X concise
-      const xText = text.slice(0, limits.x-6) + (text.length>limits.x-6?'…':'');
-      document.getElementById('pv-x-title').textContent = xText;
-      document.getElementById('pv-x-body').textContent  = '';
-      updateCounts(text);
-      println('> Loaded variant into previews', 'term-success');
-    }
-    function updateCounts(text){
-      document.getElementById('lim-meta').textContent = Math.min(text.length, limits.meta);
-      document.getElementById('lim-tt').textContent   = Math.min(text.length, limits.tt);
-      document.getElementById('lim-li').textContent   = Math.min(text.length, limits.li);
-      document.getElementById('lim-x').textContent    = Math.min(text.length, limits.x);
-    }
-
-    document.getElementById('btn-variants').onclick = ()=>{
-      const base = idea.value.trim() || 'Predictive timing and creative variants that compound ROAS.';
-      const v = [ makeVariant(base),
-                  makeVariant(base.replace(/(\d+)%/,'$1.').replace('ROAS','return on ad spend')),
-                  makeVariant('We cut CPA with data-backed timing and content that doesn’t fatigue.') ];
-      renderVariants(v); loadPreview(v[0]);
-      typeCmd('evrt compose --variants 3', ()=> println('✓ Generated 3 variants', 'term-success'));
-    };
-    document.getElementById('btn-hashtags').onclick = ()=>{
-      const hs = suggestHashtags(idea.value || 'social ai growth marketing creatives evrt');
-      tags.innerHTML = hs.map(h=>`<span class="pill">${h}<button data-rm="${h}">×</button></span>`).join('');
-      tags.querySelectorAll('[data-rm]').forEach(b=> b.onclick=()=>{ b.parentElement.remove(); });
-      println('> Hashtags suggested: ' + hs.join(' '), 'term-warn');
-    };
-    document.getElementById('btn-clear').onclick = ()=>{
-      idea.value=''; brand.value=''; cta.value=''; variantsBox.innerHTML=''; tags.innerHTML='';
-      loadPreview(''); println('> Composer reset', 'term-warn');
-    };
-
-    // Live counts from preview
-    ['pv-meta-body','pv-tt-body','pv-li-body','pv-x-title'].forEach(id=>{
-      const el = document.getElementById(id); const mo = new MutationObserver(()=> updateCounts(el.textContent||''));
-      mo.observe(el, { childList:true, characterData:true, subtree:true });
-    });
-
-    /* ===== Predictive heatmap ===== */
-    const heat = document.getElementById('heat'); const hctx = heat.getContext('2d');
-    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-    const hours = [...Array(24)].map((_,i)=> i);
-    let best = [];
-    function seedRand(seed){ let x = Math.sin(seed) * 10000; return ()=> (x = Math.sin(x) * 10000) - Math.floor(x); }
-    function draw(platform='Meta'){
-      const r = seedRand(platform.length * 999);
-      const cellW = heat.width/ (hours.length+1), cellH = heat.height/ (days.length+1);
-      // bg
-      hctx.fillStyle = '#0f141c'; hctx.fillRect(0,0,heat.width,heat.height);
-      // labels
-      hctx.fillStyle = '#9fb3c8'; hctx.font = '12px Inter, system-ui, sans-serif';
-      hours.forEach((h,i)=> hctx.fillText(String(h).padStart(2,'0'), (i+1)*cellW+4, cellH-6));
-      days.forEach((d,i)=> hctx.fillText(d, 6, (i+2)*cellH-6));
-      // cells
-      for(let y=0;y<days.length;y++){
-        for(let x=0;x<hours.length;x++){
-          // synth intensity: platform bias + day/hour modulation
-          const base = (r()*0.5 + 0.5) * (1 + (['Meta','TikTok','LinkedIn','X'].indexOf(platform)+1)/5);
-          const dayMod = 0.6 + 0.5*Math.sin((y/6)*Math.PI);
-          const hrMod  = 0.8 + 0.6*Math.cos(((x-9)/24)*Math.PI*2);
-          const val = Math.min(1, Math.max(0, base*dayMod*hrMod));
-          const col = heatColor(val);
-          hctx.fillStyle = col; hctx.fillRect((x+1)*cellW+2, (y+1)*cellH+2, cellW-4, cellH-4);
-        }
-      }
-      // grid lines
-      hctx.strokeStyle = 'rgba(255,255,255,.06)'; hctx.lineWidth=1;
-      for(let i=0;i<=hours.length+1;i++){ hctx.beginPath(); hctx.moveTo(i*cellW, cellH); hctx.lineTo(i*cellW, heat.height); hctx.stroke(); }
-      for(let i=1;i<=days.length+1;i++){ hctx.beginPath(); hctx.moveTo(0, i*cellH); hctx.lineTo(heat.width, i*cellH); hctx.stroke(); }
-
-      // click detection
-      heat.onclick = (e)=>{
-        const rect = heat.getBoundingClientRect();
-        const x = Math.floor((e.clientX - rect.left)/cellW)-1;
-        const y = Math.floor((e.clientY - rect.top)/cellH)-1;
-        if(x>=0 && x<24 && y>=0 && y<7){
-          addBest({ day:y, hour:x, platform });
-        }
+    // Tiny preview sim
+    (function demo(){
+      const input = document.getElementById('sText');
+      const out = document.getElementById('sOut');
+      const run = ()=>{
+        const v = (input.value||'').trim();
+        const ideas = v ? [
+          'Caption A: “Your fall refresh, but smarter. 🍂⚡”',
+          'Caption B: “3 weeks to measurable lift — starting now.”',
+          'Caption C: “Stop scrolling: meet the ROI drop.”'
+        ] : [
+          'Give me a prompt and I’ll generate on-brand previews.',
+          'We’ll schedule at the best-minute per platform.',
+          'Proof > promises. See the readout in Dashboards.'
+        ];
+        out.innerHTML = '<ul class="muted" style="margin:0 0 0 16px">'+ideas.map(x=>`<li>${x}</li>`).join('')+'</ul>';
       };
-    }
-    function heatColor(t){ // 0..1
-      // green -> yellow -> red
-      const r = Math.floor(255 * Math.max(0, Math.min(1, (t-0.3)/0.7)));
-      const g = Math.floor(255 * Math.min(1, t*1.2));
-      const b = Math.floor(100 * (1-t));
-      return `rgba(${r},${g},${b},0.95)`;
-    }
-    function renderBest(){
-      const box = document.getElementById('bestlist');
-      if(!best.length){ box.innerHTML='<p class="mini">No selections yet. Click the heatmap or press “Pick top 10 automatically”.</p>'; return; }
-      box.innerHTML = best.map((b,i)=>`
-        <div class="row"><div><strong>${days[b.day]}</strong> ${String(b.hour).padStart(2,'0')}:15</div>
-        <div class="mini">${b.platform}</div>
-        <div><button class="btn" data-del="${i}">Remove</button></div></div>`).join('');
-      box.querySelectorAll('[data-del]').forEach(btn=> btn.onclick=()=>{ best.splice(+btn.dataset.del,1); renderBest(); });
-    }
-    function addBest(item){
-      if (!best.find(x=>x.day===item.day && x.hour===item.hour && x.platform===item.platform)){
-        best.push(item); renderBest();
-        println(`> Added best minute: ${days[item.day]} ${String(item.hour).padStart(2,'0')}:15 ${item.platform}`, 'term-success');
-      }
-    }
-    function pickTop10(){
-      best = [];
-      const platform = document.getElementById('heat-platform').value;
-      // pseudo top picks around 9–11am & 6–8pm weekdays + noon weekends
-      const picks = [
-        {day:0,hour:9},{day:0,hour:18},{day:1,hour:10},{day:1,hour:19},{day:2,hour:9},{day:2,hour:18},
-        {day:3,hour:11},{day:3,hour:19},{day:4,hour:10},{day:6,hour:12}
-      ];
-      picks.forEach(p=> addBest({ ...p, platform }));
-      renderBest();
-      typeCmd(`evrt predict --platform ${platform.toLowerCase()} --top 10`, ()=> println('✓ Top minutes selected', 'term-success'));
-    }
-    document.getElementById('heat-platform').onchange = e=> draw(e.target.value);
-    document.getElementById('btn-pick').onclick = pickTop10;
-    document.getElementById('btn-clear-best').onclick = ()=>{ best=[]; renderBest(); println('> Cleared best minutes', 'term-warn'); };
+      document.getElementById('sRun').addEventListener('click', run);
+      input.addEventListener('keydown', (e)=>{ if((e.ctrlKey||e.metaKey) && e.key==='Enter'){ run(); } });
+      run();
+    })();
 
-    /* ===== Scheduler ===== */
-    const slotsEl = document.getElementById('slots');
-    const schCount = document.getElementById('sch-count');
-    let slots = [];
-    function renderSlots(){
-      schCount.textContent = `${slots.length} slot${slots.length===1?'':'s'}`;
-      if(!slots.length){ slotsEl.innerHTML='<p class="mini">No slots yet. Add from form or auto-build from best minutes.</p>'; return; }
-      slotsEl.innerHTML = slots.map((s,i)=>`
-        <div class="slot"><div>
-          <strong>${s.platforms.join(', ')}</strong>
-          <div class="mini">${s.variant.slice(0, 64)}${s.variant.length>64?'…':''}</div>
-          <div class="mini">${s.day} ${s.time}</div>
-        </div>
-        <div><button class="btn" data-rm="${i}">Remove</button></div></div>`).join('');
-      slotsEl.querySelectorAll('[data-rm]').forEach(b=> b.onclick=()=>{ slots.splice(+b.dataset.rm,1); renderSlots(); });
-    }
-    function addSlot(manual){
-      const v = document.getElementById('sch-variant').value || '';
-      const day = document.getElementById('sch-day').value;
-      const time = document.getElementById('sch-time').value;
-      const plats = [...document.getElementById('sch-platforms').selectedOptions].map(o=>o.value);
-      if(!v || !plats.length){ alert('Pick a variant and at least one platform'); return; }
-      slots.push({ variant:v, day, time, platforms: plats, source: manual?'manual':'auto' });
-      renderSlots();
-      println(`> Scheduled ${plats.join(', ')} • ${day} ${time}`, 'term-success');
-    }
-    document.getElementById('btn-add-slot').onclick = ()=> addSlot(true);
-    document.getElementById('btn-auto-week').onclick = ()=>{
-      if (!best.length){ alert('Pick or generate some best minutes first.'); return; }
-      const v = document.getElementById('sch-variant').value || '';
-      if (!v){ alert('Generate variants in Compose, then pick one.'); return; }
-      slots = [];
-      const uniqueByKey = new Set();
-      best.slice(0,12).forEach(b=>{
-        const day = days[b.day]; const time = String(b.hour).padStart(2,'0')+':15';
-        const key = day+time+b.platform;
-        if(!uniqueByKey.has(key)){
-          slots.push({ variant: v, day, time, platforms: [b.platform], source:'auto' });
-          uniqueByKey.add(key);
-        }
+    // JSON-LD: Product
+    (function schema(){
+      const s=document.createElement('script'); s.type='application/ld+json';
+      s.textContent = JSON.stringify({
+        '@context':'https://schema.org',
+        '@type':'Product',
+        name:'EVRT Social AI',
+        description:'On-brand drafts, best-minute per platform, schedule, and see outcomes.',
+        brand:{'@type':'Brand','name':'EVRT'},
+        url: location.href
       });
-      renderSlots();
-      typeCmd('evrt schedule --auto week', ()=> println('✓ Auto-built week from best minutes', 'term-success'));
-    };
-
-    function download(name, text, type='text/plain'){
-      const a=document.createElement('a');
-      a.href=URL.createObjectURL(new Blob([text], {type})); a.download=name; a.click();
-    }
-
-    // ICS generation (next 4 weeks of events)
-    function dayIndex(d){ return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(d); } // note ICS uses actual dates
-    function nextDateForDow(dow){
-      const now = new Date(); const target = dayIndex(dow);
-      const diff = (target - now.getDay() + 7) % 7 || 7; // next occurrence (not today)
-      const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
-      return dt;
-    }
-    function buildICS(){
-      const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//EVRT//SocialAI//EN'];
-      const uid = ()=> Math.random().toString(36).slice(2)+'@evrt';
-      slots.forEach(s=>{
-        const [hh,mm] = s.time.split(':').map(Number);
-        const start = nextDateForDow(s.day);
-        for(let w=0; w<4; w++){
-          const dt = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 7*w, hh, mm);
-          const dtEnd = new Date(dt.getTime() + 45*60000);
-          const fmt = (d)=> d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z/,'Z');
-          lines.push('BEGIN:VEVENT');
-          lines.push('UID:'+uid());
-          lines.push('DTSTAMP:'+fmt(new Date()));
-          lines.push('DTSTART:'+fmt(dt));
-          lines.push('DTEND:'+fmt(dtEnd));
-          lines.push('SUMMARY:'+s.platforms.join(', ')+' • Social post');
-          lines.push('DESCRIPTION:'+s.variant.replace(/\n/g,'\\n'));
-          lines.push('END:VEVENT');
-        }
-      });
-      lines.push('END:VCALENDAR');
-      return lines.join('\r\n');
-    }
-
-    document.getElementById('btn-ics').onclick = ()=>{
-      if(!slots.length){ alert('No slots to export.'); return; }
-      const ics = buildICS(); download('evrt_social_schedule.ics', ics, 'text/calendar');
-      println('✓ Downloaded .ics', 'term-success');
-    };
-    document.getElementById('btn-json').onclick = ()=>{
-      const payload = { ts:new Date().toISOString(), variants:[...document.getElementById('sch-variant').options].map(o=>o.value), best, slots };
-      download('evrt_social_schedule.json', JSON.stringify(payload,null,2), 'application/json');
-      println('✓ Downloaded JSON', 'term-success');
-    };
-
-    /* ===== Kickoff defaults ===== */
-    (function kickoff(){
-      // Start with one set of variants so previews aren't empty
-      idea.value = 'How we cut CPA 31% with creative variants and predictive timing.';
-      brand.value = 'EVRT'; cta.value = 'Get started';
-      document.getElementById('btn-variants').click();
-      // Heatmap
-      draw('Meta'); renderBest();
-      // Terminal loop
-      const seq = [
-        ()=> typeCmd('evrt compose --variants 3', ()=> println('> Variants ready in 0.4s', 'term-success')),
-        ()=> typeCmd('evrt predict --platform meta --grid 7x24', ()=> println('> Peak window: 9:12–9:24am CT', 'term-success')),
-        ()=> typeCmd('evrt schedule --auto week', ()=> println('> Draft calendar built • 4 weeks', 'term-success')),
-      ];
-      (function loop(i=0){ seq[i](); setTimeout(()=> loop((i+1)%seq.length), 5200); })();
+      document.head.appendChild(s);
     })();
   </script>
 </body>
