@@ -1,29 +1,95 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";
-const REDIRECT = "https://connorjenkins-developer.github.io/evrt-site/app.html";
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EVRT — Portal</title>
+  <meta name="description" content="Sign in to the EVRT client portal." />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true"></div>
+  <div data-include="partials/header.html"></div>
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <section class="container hero">
+    <span class="eyebrow">Clients</span>
+    <h1 class="gradient-text">Client Portal Login</h1>
+    <p class="sub">Use your work email. We’ll email you a secure sign-in link.</p>
+  </section>
 
-(async ()=>{
-  // Already logged in? Go straight to app
-  const { data:{ session } } = await supabase.auth.getSession();
-  if (session) { window.location.href = "app.html"; return; }
-})();
+  <section class="container section">
+    <div class="card" data-reveal style="max-width:520px">
+      <form id="login" class="grid" style="gap:10px">
+        <input id="email" type="email" placeholder="you@company.com" required />
+        <button class="btn primary" type="submit">Send magic link</button>
+      </form>
+      <p id="msg" class="muted" style="margin-top:10px"></p>
+      <p id="err" class="muted" style="color:#f66;margin-top:6px"></p>
+    </div>
+  </section>
 
-document.getElementById('login').addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const email = document.getElementById('email').value.trim();
-  const msg = document.getElementById('msg');
-  msg.textContent = "Sending link…";
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: REDIRECT,
-      shouldCreateUser: true       // be explicit
-    }
-  });
-  msg.textContent = error ? ("Error: " + error.message) : "Check your email and click the link.";
-});
-</script>
+  <div data-include="partials/footer.html"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="assets/app.js"></script>
+  <script>
+    // ==================== CONFIG (REPLACE THESE) ====================
+    const SUPABASE_URL = "https://onhkipsguouxsraxsxfq.supabase.co";    // TODO
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uaGtpcHNndW91eHNyYXhzeGZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1MTM2MTgsImV4cCI6MjA3MjA4OTYxOH0.FaOVD9FfW8Cy7mgyDIsNoSL8LLliV-L4V--I5rbHlFs";           // TODO
+    const REDIRECT = "https://connorjenkins-developer.github.io/evrt-site/app.html";
+    // Make sure REDIRECT and this page are added in Supabase Auth → URL Configuration
+    // Site URL: https://connorjenkins-developer.github.io/evrt-site/
+    // Redirect allowlist: .../portal.html and .../app.html
+    // ===============================================================
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const $msg = document.getElementById('msg');
+    const $err = document.getElementById('err');
+
+    // If already logged in, go straight to the app.
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        window.location.href = "app.html";
+        return;
+      }
+      // Show any error returned by Supabase (e.g., invalid redirect)
+      const params = new URLSearchParams(window.location.search);
+      const errDesc = params.get("error_description");
+      if (errDesc) $err.textContent = errDesc;
+    })();
+
+    // Send magic link
+    document.getElementById('login').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      $err.textContent = "";
+      const email = document.getElementById('email').value.trim();
+      if (!email) return;
+
+      $msg.textContent = "Sending link…";
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: REDIRECT, // absolute URL avoids path mistakes on GitHub Pages
+          shouldCreateUser: true
+        }
+      });
+
+      if (error) {
+        $msg.textContent = "";
+        $err.textContent = "Error: " + error.message;
+      } else {
+        $msg.textContent = "Check your email and click the link to finish signing in.";
+      }
+    });
+
+    // If the user signs in from another tab and comes back, redirect.
+    supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN") window.location.href = "app.html";
+    });
+  </script>
+</body>
+</html>
