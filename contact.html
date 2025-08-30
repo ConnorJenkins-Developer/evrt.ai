@@ -1,41 +1,514 @@
-<!DOCTYPE html><html lang="en" data-theme="dark">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Let’s build your growth engine — EVRT</title>
-  <meta name="description" content="Tell us where you are and where you want to go."/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>EVRT — Contact</title>
+  <meta name="description" content="Get in touch with EVRT. Book a briefing, send a brief, or drop a secure note. Proof-driven growth with predictive systems and guardrails."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
-  <link rel="icon" href="assets/favicon.svg">
-  <meta property="og:title" content="Let’s build your growth engine — EVRT">
-  <meta property="og:description" content="Tell us where you are and where you want to go.">
-  <meta property="og:image" content="assets/og-image.svg">
   <link rel="stylesheet" href="assets/style.css"/>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="EVRT — Contact"/>
+  <meta property="og:description" content="Book a briefing, send a brief, or drop a secure note."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://connorjenkins-developer.github.io/evrt.ai/contact.html"/>
+  <meta property="og:image" content="https://connorjenkins-developer.github.io/evrt.ai/assets/evrt-og.png"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+
+  <style>
+    :root{
+      --ct-neon:#6ee7ff; --ct-accent:#63ffa5; --ct-amber:#ffd75a; --ct-danger:#ff4d6d;
+      --ct-bg:#0a0e14; --ct-card:#0f141c; --ct-grid:rgba(255,255,255,.06); --ct-mute:#8fa2b7;
+    }
+    body{ background: radial-gradient(1400px 900px at 75% -280px,#142034 0,#0a0e14 65%); }
+
+    /* Backdrop */
+    .layers{ position:fixed; inset:0; z-index:0; pointer-events:none }
+    #halo{ position:absolute; inset:0; opacity:.26 }
+    .scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.26; mix-blend-mode:overlay }
+    .matrix{ position:absolute; inset:auto 0 0 0; height:220px; opacity:.25; pointer-events:none; mask:linear-gradient(to top, rgba(0,0,0,.6), transparent)}
+
+    /* Layout */
+    .section{ position:relative; z-index:1 }
+    .eyebrow{ letter-spacing:.12em; text-transform:uppercase; color:var(--ct-mute) }
+    .muted{ color:var(--ct-mute) }
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:10px }
+    .row.wrap{ flex-wrap:wrap }
+    .grid{ display:grid; gap:14px }
+    .grid-2{ display:grid; gap:14px; grid-template-columns:1fr; }
+    @media(min-width:980px){ .grid-2{ grid-template-columns:1.15fr 1fr } }
+
+    .card{ position:relative; border:1px solid var(--ct-grid); border-radius:16px; background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); padding:14px; overflow:hidden }
+    .card:hover{ border-color:rgba(110,231,255,.45); box-shadow:0 14px 50px rgba(110,231,255,.10), 0 0 0 1px rgba(110,231,255,.25) inset }
+
+    .control{ border:1px solid var(--ct-grid); border-radius:12px; background:#0f141c; padding:10px 12px; color:inherit; width:100% }
+    textarea.control{ min-height:120px; resize:vertical }
+    .btn.neon{ background:linear-gradient(90deg,var(--ct-neon),var(--ct-accent)); color:#061019; border:0; font-weight:800 }
+    .btn.ghost{ border:1px solid var(--ct-grid) }
+    .tag{ font-size:11px; padding:2px 8px; border:1px solid var(--ct-grid); border-radius:999px; color:var(--ct-mute) }
+    .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--ct-grid); border-radius:999px; font-size:12px }
+
+    /* Wizard */
+    .steps{ display:flex; gap:8px; margin:8px 0 }
+    .step{ flex:1; height:6px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden }
+    .step > i{ display:block; height:100%; width:0; background:linear-gradient(90deg,var(--ct-neon),var(--ct-accent)) }
+    .pill{ display:inline-flex; gap:8px; flex-wrap:wrap }
+    .pill button{ border:1px solid var(--ct-grid); border-radius:999px; padding:8px 12px; background:#0f141c; cursor:pointer }
+    .pill button.active{ background:linear-gradient(90deg,var(--ct-neon),var(--ct-accent)); color:#061019; border:0; font-weight:800 }
+
+    /* Dropzone */
+    .drop{ border:1px dashed rgba(255,255,255,.25); border-radius:12px; padding:12px; background:#05080d; text-align:center }
+    .drop.drag{ border-color:#6ee7ff; box-shadow:0 0 0 1px #6ee7ff inset }
+    .files{ display:flex; flex-direction:column; gap:6px; margin-top:8px }
+    .file{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 8px; background:#0f141c; border:1px solid var(--ct-grid); border-radius:8px }
+
+    /* Console */
+    .crt{ font-family:ui-monospace, Menlo, Consolas, monospace; background:#05080d; border:1px solid rgba(110,231,255,.35); border-radius:12px; color:#9fd1ff; padding:12px; min-height:140px; max-height:240px; overflow:auto }
+    .blink{ animation:blink 1s steps(1) infinite } @keyframes blink{ 50%{ opacity:0 } }
+
+    /* Scheduler */
+    .slots{ display:grid; gap:8px; grid-template-columns:1fr 1fr }
+    @media(min-width:640px){ .slots{ grid-template-columns:repeat(3,1fr) } }
+    .slot{ border:1px solid var(--ct-grid); border-radius:12px; background:#0f141c; padding:10px; cursor:pointer; text-align:center }
+    .slot.active{ background:linear-gradient(180deg, rgba(110,231,255,.20), rgba(99,255,165,.20)); border-color:#6ee7ff }
+
+    /* Sticky CTA */
+    .sticky-cta{ position:sticky; bottom:12px; z-index:40; display:flex; justify-content:center }
+    .sticky-cta .bar{ width:min(1080px,92vw); backdrop-filter:blur(8px); background:#07121b; border:1px solid rgba(110,231,255,.35); border-radius:14px; padding:10px; display:flex; gap:10px; align-items:center }
+    .ping{ width:8px; height:8px; border-radius:50%; background:#63ffa5; box-shadow:0 0 0 6px rgba(99,255,165,.15) }
+  </style>
 </head>
 <body>
-  <div class="bg-orbs" aria-hidden="true"></div>
+  <!-- Backdrop -->
+  <div class="layers">
+    <canvas id="halo" aria-hidden="true"></canvas>
+    <div class="scan" aria-hidden="true"></div>
+    <canvas id="matrix" class="matrix" aria-hidden="true"></canvas>
+  </div>
+
   <div data-include="partials/header.html"></div>
 
-  <section class="container hero">
-    
-    <h1 class="gradient-text">Let’s build your growth engine</h1>
-    <p class="sub">Tell us where you are and where you want to go.</p>
-    <div class="hero-cta"></div>
+  <!-- HERO -->
+  <section class="container hero section" style="margin-top:20px">
+    <span class="eyebrow">Contact EVRT</span>
+    <h1 class="gradient-text">Brief us. Book us. Build with us.</h1>
+    <p class="sub">Pick your path: **send a brief**, **book a 15-min briefing (America/Chicago)**, or **email directly**. We reply fast and ship outcomes.</p>
+    <div class="row wrap" style="margin-top:10px">
+      <a id="emailBtn" class="btn neon" href="#">Email EVRT</a>
+      <button id="icsQuick" class="btn">Instant 15-min briefing (.ics)</button>
+      <a class="btn" href="portal.html">Client portal</a>
+    </div>
   </section>
 
-  
-<section class="container section">
-  <div class="card" style="max-width:720px;margin:auto" data-reveal>
-    <form onsubmit="alert('Thanks! We will reach out.'); return false;" style="display:grid; gap:12px;">
-      <input required placeholder="Name" style="padding:12px;border-radius:10px;border:1px solid var(--line);background:#0e121b;color:var(--text)">
-      <input required type="email" placeholder="Email" style="padding:12px;border-radius:10px;border:1px solid var(--line);background:#0e121b;color:var(--text)">
-      <textarea rows="5" placeholder="What are you trying to achieve?" style="padding:12px;border-radius:10px;border:1px solid var(--line);background:#0e121b;color:var(--text)"></textarea>
-      <button class="btn primary" type="submit">Send</button>
-    </form>
-  </div>
-</section>
+  <!-- CONTENT -->
+  <section class="container section grid-2">
+    <!-- LEFT: SMART FORM -->
+    <div class="card">
+      <div class="row">
+        <h3 style="margin:0">Smart Brief</h3>
+        <div class="tags"><span class="badge">SLA &lt; 24h</span><span class="badge">Secure by default</span></div>
+      </div>
 
+      <!-- Steps -->
+      <div class="steps"><div class="step"><i id="p1"></i></div><div class="step"><i id="p2"></i></div><div class="step"><i id="p3"></i></div><div class="step"><i id="p4"></i></div></div>
+
+      <!-- Wizard -->
+      <form id="brief" autocomplete="off" novalidate>
+        <input type="text" name="website" style="position:absolute; left:-5000px" tabindex="-1" aria-hidden="true"/> <!-- honey-pot -->
+
+        <!-- 1: Reason -->
+        <div class="page" data-step="1">
+          <label class="muted">What do you need?</label>
+          <div class="pill" style="margin-top:8px">
+            <button type="button" data-val="Consulting" class="pick active">Consulting</button>
+            <button type="button" data-val="Apps" class="pick">Apps</button>
+            <button type="button" data-val="Partnership" class="pick">Partnership</button>
+            <button type="button" data-val="Press" class="pick">Press</button>
+            <button type="button" data-val="Careers" class="pick">Careers</button>
+            <button type="button" data-val="Support" class="pick">Support</button>
+          </div>
+          <div class="row wrap" style="margin-top:10px">
+            <button class="btn neon next">Next</button>
+          </div>
+        </div>
+
+        <!-- 2: Basics -->
+        <div class="page" data-step="2" style="display:none">
+          <div class="grid" style="grid-template-columns:1fr 1fr">
+            <div>
+              <label class="muted">Your name</label>
+              <input class="control" id="name" placeholder="Jane Doe" required/>
+            </div>
+            <div>
+              <label class="muted">Company</label>
+              <input class="control" id="company" placeholder="Acme Inc."/>
+            </div>
+          </div>
+          <div class="grid" style="grid-template-columns:1fr 1fr; margin-top:8px">
+            <div>
+              <label class="muted">Work email</label>
+              <input class="control" id="email" placeholder="you@company.com" required/>
+            </div>
+            <div>
+              <label class="muted">Budget (est.)</label>
+              <select class="control" id="budget">
+                <option>$5k–$10k</option><option>$10k–$25k</option><option>$25k–$50k</option>
+                <option>$50k–$100k</option><option>$100k+</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid" style="grid-template-columns:1fr 1fr; margin-top:8px">
+            <div>
+              <label class="muted">Timeline</label>
+              <select class="control" id="timeline">
+                <option>ASAP (this month)</option><option>Next month</option><option>Next quarter</option><option>Exploring</option>
+              </select>
+            </div>
+            <div>
+              <label class="muted">Where did you hear about EVRT?</label>
+              <input class="control" id="ref" placeholder="Referral, LinkedIn, Web, etc."/>
+            </div>
+          </div>
+          <div class="row wrap" style="margin-top:10px">
+            <button class="btn next">Next</button>
+            <button class="btn ghost back" type="button">Back</button>
+          </div>
+        </div>
+
+        <!-- 3: Message + files -->
+        <div class="page" data-step="3" style="display:none">
+          <label class="muted">Your message</label>
+          <textarea class="control" id="msg" placeholder="Give us context, goals, and any constraints…" required></textarea>
+
+          <div class="drop" id="drop" style="margin-top:10px">
+            <div class="muted">Drag & drop files here or <label style="text-decoration:underline; cursor:pointer"><input type="file" id="files" multiple style="display:none"/>browse</label></div>
+            <div class="files" id="filesList"></div>
+          </div>
+
+          <div class="row wrap" style="margin-top:10px">
+            <button class="btn next">Next</button>
+            <button class="btn ghost back" type="button">Back</button>
+          </div>
+        </div>
+
+        <!-- 4: Review & Send -->
+        <div class="page" data-step="4" style="display:none">
+          <div class="card" style="padding:12px">
+            <strong>Review</strong>
+            <div class="muted" id="review" style="margin-top:6px">—</div>
+          </div>
+          <div class="row wrap" style="margin-top:10px">
+            <button id="sendMail" class="btn neon" type="submit">Open email with brief</button>
+            <button id="dlBrief" class="btn">Download brief (.md)</button>
+            <button class="btn ghost back" type="button">Back</button>
+          </div>
+          <p class="muted" style="margin-top:8px; font-size:12px">Attachments can’t be auto-added to mail client via browser. After it opens, add your files listed above.</p>
+        </div>
+      </form>
+    </div>
+
+    <!-- RIGHT: FAST ACTIONS / OPS -->
+    <div class="card">
+      <div class="row">
+        <h3 style="margin:0">Fast Actions</h3>
+        <div class="tags"><span class="badge">Timezone: America/Chicago</span><span class="badge">Median reply &lt; 24h</span></div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1fr; gap:12px; margin-top:8px">
+        <!-- Scheduler -->
+        <div class="card">
+          <div class="row"><strong>Book a 15-min Briefing</strong><div class="muted">Pick a slot → .ics</div></div>
+          <div id="slotDays" class="slots" style="margin-top:8px"></div>
+          <div id="slotTimes" class="slots" style="margin-top:8px"></div>
+          <div class="row wrap" style="margin-top:8px">
+            <button id="makeICS" class="btn" disabled>Download .ics</button>
+            <a id="gcalLink" class="btn ghost" href="#" target="_blank" rel="noopener" style="display:none">Add to Google Calendar</a>
+          </div>
+        </div>
+
+        <!-- vCard -->
+        <div class="card">
+          <div class="row"><strong>Add us to Contacts</strong><div class="muted">vCard</div></div>
+          <div class="row wrap" style="margin-top:8px">
+            <button id="dlVCF" class="btn">Download EVRT vCard</button>
+            <a class="btn" href="press.html">Press kit</a>
+          </div>
+        </div>
+
+        <!-- Ops Console -->
+        <div class="card">
+          <div class="row"><strong>Ops Console</strong><div class="muted">status feed (demo)</div></div>
+          <pre id="console" class="crt" style="margin-top:8px"></pre>
+          <div class="row wrap" style="margin-top:8px">
+            <button id="replay" class="btn">Replay</button>
+            <a class="btn" href="cybersecurity.html">See guardrails</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sticky CTA -->
+  <div class="sticky-cta">
+    <div class="bar">
+      <span class="badge"><span class="ping"></span> Proof > promises</span>
+      <div class="muted" style="flex:1">Kick off a sprint. We’ll ship lift you can screenshot.</div>
+      <a class="btn neon" href="consulting.html">Book consult</a>
+      <a class="btn" href="portal.html">Client portal</a>
+    </div>
+  </div>
 
   <div data-include="partials/footer.html"></div>
+
   <script defer src="assets/app.js"></script>
-</body></html>
+  <script>
+    /* ===== Backdrop FX: halo + matrix ===== */
+    (function haloFX(){
+      const c=document.getElementById('halo'), ctx=c.getContext('2d');
+      function resize(){ c.width=innerWidth; c.height=innerHeight; } resize(); addEventListener('resize', resize);
+      const orbs = Array.from({length:7}, ()=>({x:Math.random()*c.width, y:Math.random()*c.height*0.6, r: 90+Math.random()*160, dx:(Math.random()-.5)*0.45, dy:(Math.random()-.5)*0.45, hue: 180+Math.random()*90}));
+      (function tick(){ ctx.clearRect(0,0,c.width,c.height);
+        orbs.forEach(o=>{ o.x+=o.dx; o.y+=o.dy; if(o.x<-120||o.x>c.width+120) o.dx*=-1; if(o.y<-120||o.y>c.height*0.8) o.dy*=-1;
+          const g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
+          g.addColorStop(0,`hsla(${o.hue},100%,60%,.12)`); g.addColorStop(1,'transparent'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,6.283); ctx.fill(); });
+        requestAnimationFrame(tick);
+      })();
+    })();
+    (function matrixFX(){
+      const c=document.getElementById('matrix'), ctx=c.getContext('2d'); const chars='01●◼︎◻︎▮▯◆◇';
+      function resize(){ c.width=innerWidth; c.height=c.clientHeight; } resize(); addEventListener('resize', resize);
+      const cols = ()=> Math.floor(c.width/16); let y = Array(cols()).fill(0);
+      function draw(){
+        ctx.fillStyle='rgba(10,14,20,.2)'; ctx.fillRect(0,0,c.width,c.height);
+        ctx.fillStyle='#6ee7ff';
+        y.forEach((v,i)=>{ const txt=chars[Math.floor(Math.random()*chars.length)]; ctx.fillText(txt, i*16, v); y[i] = v>c.height+Math.random()*100 ? 0 : v+16; });
+        requestAnimationFrame(draw);
+      } draw();
+    })();
+
+    /* ===== Email wiring ===== */
+    const EMAIL = 'connorje3kins@gmail.com'; // direct contact
+    const emailSafe = ()=>'mailto:'+EMAIL+'?subject='+encodeURIComponent('EVRT — Inquiry')+'&body='+encodeURIComponent('Hi EVRT,%0D%0A%0D%0A');
+    document.getElementById('emailBtn').href = emailSafe();
+
+    /* ===== Wizard state ===== */
+    const state = {
+      reason: 'Consulting',
+      files: [],
+      slot: null
+    };
+    const el = s=>document.querySelector(s), els = s=>Array.from(document.querySelectorAll(s));
+
+    // steps progress
+    function progress(step){
+      for(let i=1;i<=4;i++){ el('#p'+i).style.width = (i<=step ? '100%' : '0'); }
+    }
+    progress(1);
+
+    // reason pills
+    els('.pick').forEach(b=>{
+      b.onclick=()=>{ els('.pick').forEach(x=>x.classList.remove('active')); b.classList.add('active'); state.reason=b.dataset.val; };
+    });
+
+    // nav
+    function page(n){
+      els('.page').forEach(p=> p.style.display = p.dataset.step==n? '' : 'none'); progress(n);
+      if(n==4) renderReview();
+    }
+    els('.next').forEach(n=> n.onclick=(e)=>{ e.preventDefault(); const step=+n.closest('.page').dataset.step; page(step+1); });
+    els('.back').forEach(b=> b.onclick=()=>{ const step=+b.closest('.page').dataset.step; page(step-1); });
+
+    // dropzone
+    const drop = el('#drop'), filesIn = el('#files'), filesList = el('#filesList');
+    function renderFiles(){ filesList.innerHTML = state.files.map((f,i)=>`<div class="file"><span class="muted">${f.name} • ${Math.round(f.size/1024)} KB</span><button class="btn ghost" data-del="${i}">Remove</button></div>`).join('');
+      els('[data-del]').forEach(b=> b.onclick=()=>{ state.files.splice(+b.dataset.del,1); renderFiles(); }); }
+    drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.classList.add('drag'); });
+    drop.addEventListener('dragleave', ()=> drop.classList.remove('drag'));
+    drop.addEventListener('drop', e=>{ e.preventDefault(); drop.classList.remove('drag'); [...e.dataTransfer.files].forEach(f=> state.files.push(f)); renderFiles(); });
+    filesIn.addEventListener('change', e=>{ [...e.target.files].forEach(f=> state.files.push(f)); renderFiles(); });
+
+    // review text + brief
+    function briefText(){
+      const name = el('#name').value.trim(); const company=el('#company').value.trim();
+      const email = el('#email').value.trim(); const budget=el('#budget').value; const timeline=el('#timeline').value; const ref=el('#ref').value.trim();
+      const message = el('#msg').value.trim();
+      const files = state.files.map(f=>`- ${f.name} (${Math.round(f.size/1024)} KB)`).join('\n') || '- (none)';
+      return [
+        `# EVRT — Brief`,
+        ``,
+        `**Reason:** ${state.reason}`,
+        `**Name:** ${name}`,
+        `**Company:** ${company||'-'}`,
+        `**Email:** ${email}`,
+        `**Budget:** ${budget}`,
+        `**Timeline:** ${timeline}`,
+        `**Source:** ${ref||'-'}`,
+        ``,
+        `## Message`,
+        message||'-',
+        ``,
+        `## Files to attach (manually in email)`,
+        files,
+        ``,
+        `> Generated via contact page • America/Chicago`
+      ].join('\n');
+    }
+    function renderReview(){ el('#review').textContent = briefText(); }
+
+    // submit: open mail client with body + subject
+    el('#brief').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const name = el('#name').value.trim(); const company=el('#company').value.trim();
+      const email = el('#email').value.trim(); const message = el('#msg').value.trim();
+      if(!name || !email || !message){ alert('Please complete required fields.'); return; }
+
+      const subject = `EVRT — ${state.reason} — ${company || name}`;
+      const body = briefText().replace(/\n/g,'%0D%0A');
+      const link = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${body}`;
+      if(link.length < 1800){ location.href=link; }
+      else { // fallback if body too long
+        navigator.clipboard.writeText(briefText());
+        alert('Your message was copied to clipboard. Paste it into your email to send to ' + EMAIL + '.');
+        location.href='mailto:'+EMAIL+'?subject='+encodeURIComponent(subject);
+      }
+    });
+
+    // download brief
+    el('#dlBrief').onclick = ()=>{ const blob=new Blob([briefText()],{type:'text/markdown'}); const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download='evrt-brief.md'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),4000); };
+
+    /* ===== Scheduler ===== */
+    const slotDays = el('#slotDays'), slotTimes=el('#slotTimes'), makeICS=el('#makeICS'), gcal=el('#gcalLink');
+    function fmt(d){ return d.toLocaleDateString(undefined,{month:'short', day:'numeric', weekday:'short'}); }
+    function fmtTime(h){ const d=new Date(); d.setHours(h,0,0,0); return d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
+    function nextBusinessDays(n=9){
+      const out=[]; let d=new Date(); for(let i=0;i<30 && out.length<n;i++){ d=new Date(Date.now()+i*86400000); const w=d.getDay(); if(w!==0 && w!==6) out.push(new Date(d)); } return out;
+    }
+    function renderDays(){
+      slotDays.innerHTML=''; nextBusinessDays().forEach((d,i)=>{
+        const b=document.createElement('div'); b.className='slot'; b.textContent=fmt(d); b.onclick=()=>{ els('#slotDays .slot').forEach(x=>x.classList.remove('active')); b.classList.add('active'); state.slot={date:d, time:null}; renderTimes(); };
+        if(i===0){ b.classList.add('active'); state.slot={date:d, time:null}; } slotDays.appendChild(b);
+      });
+      renderTimes();
+    }
+    function renderTimes(){
+      slotTimes.innerHTML=''; const base=[9,10,11,13,14,15,16]; // CT hours
+      base.forEach(h=>{
+        const b=document.createElement('div'); b.className='slot'; b.textContent=fmtTime(h)+' CT'; b.onclick=()=>{ els('#slotTimes .slot').forEach(x=>x.classList.remove('active')); b.classList.add('active'); state.slot.time=h; makeICS.disabled=false; gcal.style.display=''; wireCalendarLink(); };
+        slotTimes.appendChild(b);
+      });
+      makeICS.disabled = state.slot?.time==null;
+    }
+    function pad(n){ return n<10? '0'+n : ''+n; }
+    function toICSDate(dt){ // as UTC Z
+      const z = new Date(dt.getTime()); const y=z.getUTCFullYear(), m=pad(z.getUTCMonth()+1), d=pad(z.getUTCDate()); const h=pad(z.getUTCHours()), mi=pad(z.getUTCMinutes());
+      return `${y}${m}${d}T${h}${mi}00Z`;
+    }
+    function selectedDate(){
+      const d = state.slot.date; const h=state.slot.time;
+      const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, 0, 0, 0); // local
+      return dt;
+    }
+    function buildICS(){
+      if(!state.slot || state.slot.time==null) return '';
+      const start = selectedDate(); const end = new Date(start.getTime()+15*60000);
+      const uid = 'evrt-'+Date.now()+'@evrt.ai';
+      const ics = [
+        'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//EVRT//Briefing//EN',
+        'BEGIN:VEVENT',
+        'SUMMARY:EVRT 15-min Briefing',
+        'DESCRIPTION:Discovery call with EVRT. Reply with agenda.',
+        'LOCATION:Google Meet (link to follow)',
+        'STATUS:CONFIRMED',
+        `DTSTART:${toICSDate(start)}`,
+        `DTEND:${toICSDate(end)}`,
+        `DTSTAMP:${toICSDate(new Date())}`,
+        `UID:${uid}`,
+        'END:VEVENT','END:VCALENDAR'
+      ].join('\n');
+      return ics;
+    }
+    function wireCalendarLink(){
+      const s=selectedDate(), e=new Date(s.getTime()+15*60000);
+      const text = encodeURIComponent('EVRT 15-min Briefing');
+      const details = encodeURIComponent('Discovery call with EVRT. Agenda to follow.');
+      const dates = `${s.toISOString().replace(/[-:]/g,'').split('.')[0]}/${e.toISOString().replace(/[-:]/g,'').split('.')[0]}`;
+      const url=`https://www.google.com/calendar/render?action=TEMPLATE&text=${text}&details=${details}&dates=${dates}`;
+      gcal.href=url;
+    }
+    renderDays();
+    makeICS.onclick = ()=>{
+      const ics = buildICS(); const blob=new Blob([ics],{type:'text/calendar'}); const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download='evrt-briefing.ics'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+    };
+    document.getElementById('icsQuick').onclick = ()=> makeICS.click();
+
+    /* ===== vCard ===== */
+    document.getElementById('dlVCF').onclick = ()=>{
+      const vcf = [
+        'BEGIN:VCARD','VERSION:3.0',
+        'FN:EVRT',
+        'ORG:EVRT',
+        'TITLE:Press & Briefings',
+        'EMAIL;type=INTERNET;type=WORK;type=pref:'+EMAIL,
+        'URL:https://connorjenkins-developer.github.io/evrt.ai/',
+        'NOTE:Proof-driven growth. Predictive systems. Guardrails.',
+        'END:VCARD'
+      ].join('\n');
+      const blob=new Blob([vcf],{type:'text/vcard'}); const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download='EVRT.vcf'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+    };
+
+    /* ===== Ops console ===== */
+    (function consoleFX(){
+      const c=document.getElementById('console');
+      const lines = [
+        'boot: evrt/ops console v1.0',
+        'check: guardrails • ok    telemetry • ok    anomalies • none',
+        'hook : inbox watcher • ready  (America/Chicago)',
+        'info : new brief → route to founder • SL A < 24h',
+        'note : if urgent, write "URGENT" in subject'
+      ];
+      let i=0,j=0; c.textContent='';
+      function type(){
+        if(i>=lines.length){ c.innerHTML += '\n<span class="blink">▌</span>'; return; }
+        const line=lines[i];
+        if(j<=line.length){ c.textContent = c.textContent.replace(/\n?▌?$/,'') + line.slice(0,j) + '\n▌'; j++; setTimeout(type, 12+Math.random()*28); }
+        else { i++; j=0; setTimeout(type, 380); }
+      } type();
+      document.getElementById('replay').onclick = ()=>{ i=0; j=0; c.textContent=''; type(); };
+    })();
+
+    /* ===== Review composer & email button ===== */
+    function previewMail(){
+      const subject = 'EVRT — Inquiry';
+      const body = encodeURIComponent('Hi EVRT,%0D%0A%0D%0A');
+      el('#emailBtn').href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${body}`;
+    }
+    previewMail();
+
+    /* ===== JSON-LD (ContactPage) ===== */
+    (function schema(){
+      const s=document.createElement('script'); s.type='application/ld+json';
+      s.textContent = JSON.stringify({
+        '@context':'https://schema.org',
+        '@type':'ContactPage',
+        name:'EVRT Contact',
+        url: location.href,
+        contactPoint: [{
+          '@type':'ContactPoint',
+          contactType:'sales',
+          email: EMAIL,
+          areaServed:'US',
+          availableLanguage:['English'],
+          hoursAvailable:[{'@type':'OpeningHoursSpecification','dayOfWeek':['Monday','Tuesday','Wednesday','Thursday','Friday'],'opens':'09:00','closes':'17:00'}]
+        }]
+      });
+      document.head.appendChild(s);
+    })();
+  </script>
+</body>
+</html>
