@@ -12,12 +12,11 @@
       <li class="evrt-has-sub">
         <button class="evrt-toplink" aria-expanded="false">Platform</button>
         <div class="evrt-dropdown evrt-columns-2">
-          <a href="evrt-social-ai.html">EVRT Social AI (Overview)</a>
-          <a href="adlab.html">Ad Demo Lab</a>
-          <a href="poststudio.html">Posting Studio</a>
-          <a href="composer.html">AI Composer</a>
-          <a href="predictive.html">Predictive Timing</a>
-          <a href="analytics.html">Closed-Loop Analytics</a>
+          <a href="social-ai.html">EVRT Social AI (Overview)</a>
+          <a href="adlab.html">Ad Demo Lab (Live)</a>
+          <a href="ad-studio.html">Ad Studio</a>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="apps.html">All Apps</a>
         </div>
       </li>
 
@@ -26,9 +25,8 @@
         <button class="evrt-toplink" aria-expanded="false">Solutions</button>
         <div class="evrt-dropdown">
           <a href="consulting.html">Consulting</a>
-          <a href="app-development.html">App Development</a>
-          <a href="security.html">Security</a>
-          <a href="data-insights.html">Data &amp; Insights</a>
+          <a href="cybersecurity.html">Cybersecurity</a>
+          <a href="industries.html">Industries</a>
         </div>
       </li>
 
@@ -37,8 +35,8 @@
         <button class="evrt-toplink" aria-expanded="false">Resources</button>
         <div class="evrt-dropdown">
           <a href="projects.html">Projects / Case Studies</a>
-          <a href="insights.html">Insights</a>
-          <a href="playbooks.html">Playbooks &amp; Templates</a>
+          <a href="blog.html">Insights (Blog)</a>
+          <a href="press.html">Press</a>
         </div>
       </li>
 
@@ -50,6 +48,8 @@
           <a href="pricing.html">Pricing</a>
           <a href="contact.html">Contact</a>
           <a href="portal.html">Client Portal</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="careers.html">Careers</a>
         </div>
       </li>
     </ul>
@@ -142,8 +142,7 @@
 
       // Toggle submenus on mobile
       document.querySelectorAll('.evrt-has-sub .evrt-toplink').forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          // Only intercept on mobile
+        btn.addEventListener('click', ()=>{
           if (window.matchMedia('(max-width:920px)').matches){
             const li = btn.closest('.evrt-has-sub');
             const open = li.classList.toggle('evrt-open');
