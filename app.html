@@ -9,6 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    .preview-badge{position:fixed;top:10px;right:10px;padding:6px 10px;border-radius:999px;font-weight:600;background:#ffd54d;color:#222;z-index:9999}
+    .muted-danger{color:#f66}
+  </style>
 </head>
 <body>
   <div class="bg-orbs" aria-hidden="true"></div>
@@ -51,6 +55,7 @@
             <input id="file-input" type="file" style="display:none" />
             Upload file
           </label>
+          <p id="upload-hint" class="muted" style="margin-top:6px"></p>
         </div>
       </div>
     </div>
@@ -67,27 +72,16 @@
 
   <div data-include="partials/footer.html"></div>
 
+  <!-- Supabase lib still loaded for later, but preview mode won't use it -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="assets/app.js"></script>
   <script>
-  // ====== CONFIG (replace these) ======
-  const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co"; // TODO
-  const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";        // TODO
-  // ====================================
+  // ====== CONFIG (only used when NOT in preview) ======
+  const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co"; // replace later
+  const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";        // replace later
+  // ====================================================
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  // NEW: consume magic-link tokens in the URL hash so we don't bounce back to portal
-  async function bootstrapSessionFromHash() {
-    const hash = new URLSearchParams(window.location.hash.slice(1));
-    const access_token = hash.get("access_token");
-    const refresh_token = hash.get("refresh_token");
-    if (access_token && refresh_token) {
-      const { error } = await supabase.auth.setSession({ access_token, refresh_token });
-      // Clean the long token hash from the URL
-      if (!error) history.replaceState({}, document.title, window.location.pathname);
-    }
-  }
+  const PREVIEW = new URLSearchParams(location.search).has('preview');
 
   const ui = {
     app: document.getElementById('app'),
@@ -95,10 +89,87 @@
     accountName: document.getElementById('account-name'),
     projects: document.getElementById('projects'),
     docs: document.getElementById('documents'),
-    msgs: document.getElementById('messages')
+    msgs: document.getElementById('messages'),
+    signout: document.getElementById('signout'),
+    manage: document.getElementById('manage-link'),
+    uploadHint: document.getElementById('upload-hint')
   };
 
+  // ---------- PREVIEW MODE (no auth, no backend) ----------
+  async function renderPreview(){
+    // Banner
+    const badge = document.createElement('div');
+    badge.className = 'preview-badge';
+    badge.textContent = 'PREVIEW MODE';
+    document.body.appendChild(badge);
+
+    // Fake identity/account
+    ui.userEmail.textContent = 'demo@client.com';
+    ui.accountName.textContent = 'Demo Co.';
+    ui.app.style.display = '';
+
+    // Hide auth-only controls
+    ui.signout.style.display = 'none';
+    ui.manage.style.display = 'none';
+    ui.uploadHint.textContent = 'Uploads are disabled in preview.';
+
+    // Sample projects
+    const sampleProjects = [
+      { name: 'Kickoff', status: 'active' },
+      { name: 'Pilot Build', status: 'in progress' },
+      { name: 'Scale Program Q3', status: 'planning' }
+    ];
+    ui.projects.innerHTML = sampleProjects
+      .map(p => `<div class="row"><strong>${p.name}</strong><span class="muted">${p.status}</span></div>`)
+      .join('');
+
+    // Sample documents
+    const today = new Date();
+    const sampleDocs = [
+      { name: 'Discovery Report.pdf', date: new Date(today - 1000*60*60*24*2) },
+      { name: 'KPI Baseline.xlsx', date: new Date(today - 1000*60*60*24*5) },
+      { name: 'Creative Brief v1.docx', date: new Date(today - 1000*60*60*24*8) }
+    ];
+    ui.docs.innerHTML = sampleDocs
+      .map(d => `<div class="row"><a href="#">${d.name}</a><span class="muted">${d.date.toLocaleDateString()}</span></div>`)
+      .join('');
+
+    // Sample messages
+    const sampleMsgs = [
+      { who: 'Connor (EVRT)', at: new Date(today - 1000*60*30), body: 'Welcome! We\'ll use this thread for weekly updates.' },
+      { who: 'Client PM', at: new Date(today - 1000*60*10), body: 'Got it. We uploaded last month’s exports.' },
+      { who: 'Connor (EVRT)', at: new Date(today - 1000*60*5),  body: 'Perfect—baseline dashboard coming today.' }
+    ];
+    ui.msgs.innerHTML = sampleMsgs
+      .map(m => `<p><strong>${m.who}</strong> <span class="muted">${m.at.toLocaleString()}</span><br>${m.body}</p>`)
+      .join('');
+
+    // Disable forms in preview
+    document.getElementById('new-project').addEventListener('submit', (e)=>{
+      e.preventDefault(); alert('Preview mode: add project is disabled.');
+    });
+    document.getElementById('file-input').addEventListener('change', (e)=>{
+      e.preventDefault(); alert('Preview mode: uploads are disabled.');
+      e.target.value = '';
+    });
+    document.getElementById('msg-form').addEventListener('submit', (e)=>{
+      e.preventDefault(); alert('Preview mode: sending messages is disabled.');
+    });
+  }
+
+  // ---------- LIVE MODE (auth + backend) ----------
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   let session, user, accountId, accountName;
+
+  async function bootstrapSessionFromHash() {
+    const hash = new URLSearchParams(window.location.hash.slice(1));
+    const access_token = hash.get("access_token");
+    const refresh_token = hash.get("refresh_token");
+    if (access_token && refresh_token) {
+      const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+      if (!error) history.replaceState({}, document.title, window.location.pathname);
+    }
+  }
 
   async function requireSession(){
     const { data } = await supabase.auth.getSession();
@@ -113,25 +184,18 @@
   }
 
   async function loadAccount(){
-    // Pick first membership for now
     const { data: ms, error } = await supabase
       .from('memberships')
       .select('account_id, role')
       .eq('user_id', user.id);
-
-    if (error || !ms?.length) {
-      alert('No account access. Ask EVRT to invite you.');
-      return false;
-    }
+    if (error || !ms?.length) { alert('No account access. Ask EVRT to invite you.'); return false; }
     accountId = ms[0].account_id;
 
-    // Fetch account name
     const { data: acct } = await supabase
       .from('accounts')
       .select('name')
       .eq('id', accountId)
       .maybeSingle();
-
     accountName = acct?.name || accountId;
     ui.accountName.textContent = accountName;
     return true;
@@ -143,8 +207,7 @@
       .select('id,name,status,updated_at')
       .eq('account_id', accountId)
       .order('updated_at', { ascending:false });
-
-    if (error) { ui.projects.innerHTML = `<p class="muted">${error.message}</p>`; return; }
+    if (error) { ui.projects.innerHTML = `<p class="muted-danger">${error.message}</p>`; return; }
     ui.projects.innerHTML =
       (data||[]).map(p=>`<div class="row"><strong>${p.name}</strong><span class="muted">${p.status||''}</span></div>`).join('')
       || '<p class="muted">No projects yet.</p>';
@@ -156,9 +219,7 @@
       .select('id,name,storage_path,created_at')
       .eq('account_id', accountId)
       .order('created_at', { ascending:false });
-
-    if (error) { ui.docs.innerHTML = `<p class="muted">${error.message}</p>`; return; }
-
+    if (error) { ui.docs.innerHTML = `<p class="muted-danger">${error.message}</p>`; return; }
     const items = await Promise.all((data||[]).map(async d=>{
       try {
         const { data: urlData } = await supabase.storage
@@ -169,7 +230,6 @@
         return `<div class="row">${d.name}</div>`;
       }
     }));
-
     ui.docs.innerHTML = items.join('') || '<p class="muted">No documents yet.</p>';
   }
 
@@ -180,33 +240,33 @@
       .eq('account_id', accountId)
       .order('created_at', { ascending:false })
       .limit(100);
-
-    if (error) { ui.msgs.innerHTML = `<p class="muted">${error.message}</p>`; return; }
+    if (error) { ui.msgs.innerHTML = `<p class="muted-danger">${error.message}</p>`; return; }
     ui.msgs.innerHTML = (data||[]).map(m=>`
       <p><strong>${m.author_name||'User'}</strong>
       <span class="muted">${new Date(m.created_at).toLocaleString()}</span><br>${m.body}</p>
     `).join('');
   }
 
-  // Events
+  // Events (live mode)
   document.getElementById('signout').addEventListener('click', async ()=>{
+    if (PREVIEW) return; // no-op in preview
     await supabase.auth.signOut();
     window.location.href = 'portal.html';
   });
 
   document.getElementById('new-project').addEventListener('submit', async (e)=>{
+    if (PREVIEW) { e.preventDefault(); alert('Preview mode: add project is disabled.'); return; }
     e.preventDefault();
     const name = document.getElementById('pname').value.trim();
     if (!name) return;
-    const { error } = await supabase
-      .from('projects')
-      .insert({ account_id: accountId, name, status: 'active' });
+    const { error } = await supabase.from('projects').insert({ account_id: accountId, name, status: 'active' });
     if (!error) { document.getElementById('pname').value = ''; listProjects(); }
   });
 
   document.getElementById('file-input').addEventListener('change', async (e)=>{
+    if (PREVIEW) { e.preventDefault(); alert('Preview mode: uploads are disabled.'); e.target.value=''; return; }
     const f = e.target.files[0]; if (!f) return;
-    const path = `${accountId}/${Date.now()}_${f.name}`;  // prefix by account
+    const path = `${accountId}/${Date.now()}_${f.name}`;
     const { error: upErr } = await supabase.storage.from('client-docs').upload(path, f, { upsert:false });
     if (upErr) { alert(upErr.message); return; }
     await supabase.from('documents').insert({ account_id: accountId, name: f.name, storage_path: path });
@@ -215,30 +275,35 @@
   });
 
   document.getElementById('msg-form').addEventListener('submit', async (e)=>{
+    if (PREVIEW) { e.preventDefault(); alert('Preview mode: sending messages is disabled.'); return; }
     e.preventDefault();
     const t = document.getElementById('msg-text');
     const body = t.value.trim(); if(!body) return;
-    const { error } = await supabase
-      .from('messages')
-      .insert({ account_id: accountId, author_id: user.id, author_name: user.email, body });
-    if (!error) { t.value=''; }
+    const { error } = await supabase.from('messages').insert({ account_id: accountId, author_name: (user?.email||'User'), body });
+    if (!error) { t.value=''; loadMessages(); }
   });
 
-  // Realtime for account messages
+  // Realtime (live mode only)
   let channel;
   function joinRealtime(){
+    if (PREVIEW) return;
     if (channel) supabase.removeChannel(channel);
     channel = supabase.channel('msgs-' + accountId)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `account_id=eq.${accountId}` }, loadMessages)
       .subscribe();
   }
 
-  // Init (handles magic-link tokens first so we don't auto-redirect)
+  // ---------- INIT ----------
   (async ()=>{
-    await bootstrapSessionFromHash();          // 1) set session from #access_token if present
-    const ok = await requireSession();         // 2) require a session or go to portal
+    if (PREVIEW) {
+      await renderPreview();
+      return;
+    }
+    // Live mode: normal auth flow
+    await bootstrapSessionFromHash();
+    const ok = await requireSession();
     if (!ok) return;
-    const haveAcct = await loadAccount();      // 3) load current account
+    const haveAcct = await loadAccount();
     if (!haveAcct) return;
     ui.app.style.display = '';
     await listProjects();
