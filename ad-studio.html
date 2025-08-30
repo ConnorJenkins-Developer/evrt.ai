@@ -3,565 +3,679 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>EVRT — Ad Preview Studio</title>
-  <meta name="description" content="Design ad mockups for Facebook, Instagram, and TikTok. Upload an image, tune copy, generate variants, preview instantly, and export as PNG."/>
+  <title>EVRT — Ad Studio</title>
+  <meta name="description" content="Build audiences, craft creatives, simulate performance, and export a media plan. Cinematic console + predictive UX."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="assets/style.css"/>
 
-  <!-- Page-scoped styles -->
   <style>
-    /* layout */
-    .studio-wrap { padding: 14px 0 28px; }
-    .studio-grid { display:grid; gap:20px; }
-    @media (min-width: 980px){
-      .studio-grid { grid-template-columns: 360px 1fr; align-items:start; }
+    :root{
+      --as-neon:#6ee7ff; --as-accent:#63ffa5; --as-amber:#ffd75a; --as-danger:#ff4d6d;
+      --as-bg:#0a0e14; --as-card:#0f141c; --as-grid:rgba(255,255,255,.06); --as-mute:#8fa2b7;
+    }
+    body{ background: radial-gradient(1400px 900px at 80% -260px,#142034 0,#0a0e14 65%); }
+    /* Backdrop */
+    .as-layers{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+    #as-matrix{ position:absolute; inset:0; opacity:.22; }
+    .as-scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.25; mix-blend-mode:overlay; }
+
+    .as-section{ position:relative; z-index:1; }
+    .eyebrow{ letter-spacing:.12em; text-transform:uppercase; color:var(--as-mute); }
+
+    /* Tabs */
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; }
+    .tab{ padding:8px 12px; border-radius:12px; border:1px solid var(--as-grid); cursor:pointer; user-select:none; }
+    .tab.active{ background:linear-gradient(90deg,var(--as-neon),var(--as-accent)); color:#061019; border:0; font-weight:800; }
+    .panel{ display:none; } .panel.active{ display:block; }
+
+    /* Cards & inputs */
+    .as-card{ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid var(--as-grid); border-radius:14px; padding:14px; }
+    .as-card:hover{ border-color:rgba(110,231,255,.45); box-shadow:0 12px 40px rgba(110,231,255,.08), 0 0 0 1px rgba(110,231,255,.25) inset; }
+    .mini{ color:var(--as-mute); font-size:12px; }
+    .input,.select,.textarea{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--as-grid); background:#0f141c; color:inherit; }
+    .textarea{ min-height:100px; resize:vertical; }
+    .btn.neon{ background:linear-gradient(90deg,var(--as-neon),var(--as-accent)); color:#061019; border:0; font-weight:800; }
+    .btn.ghost{ border:1px solid var(--as-grid); }
+    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .row3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+    .grid-2{ display:grid; gap:16px; grid-template-columns:1fr; }
+    .grid-3{ display:grid; gap:16px; grid-template-columns:1fr; }
+    @media(min-width:1000px){ .grid-2{ grid-template-columns: 1.1fr 1fr; } }
+    @media(min-width:1100px){ .grid-3{ grid-template-columns: 1fr 1fr 1fr; } }
+
+    /* Chips */
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .chip{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--as-grid); }
+    .chip button{ background:transparent;border:0;color:var(--as-mute);cursor:pointer }
+
+    /* Audience est */
+    .gauge{ height:12px; border-radius:10px; border:1px solid var(--as-grid); background:#0f141c; overflow:hidden; }
+    .gauge > div{ height:100%; width:0%; background:linear-gradient(90deg,#63ffa5,#ffd75a,#ff4d6d); transition:width .5s ease; }
+
+    /* Creative preview */
+    .preview{ border:1px solid rgba(255,255,255,.1); border-radius:12px; background:#0d131c; padding:12px; }
+    .p-head{ display:flex; align-items:center; justify-content:space-between; color:var(--as-mute); font-size:12px; margin-bottom:6px; }
+    .p-img{ height:160px; border-radius:10px; background:#0b0e13; display:grid; place-items:center; color:#8fb; border:1px dashed rgba(255,255,255,.12); }
+    .p-body strong{ display:block; margin-top:6px; }
+    .score{ font-size:36px; font-weight:900; }
+    .meter{ height:10px; border-radius:999px; border:1px solid var(--as-grid); background:#0f141c; overflow:hidden; }
+    .meter > div{ width:0%; height:100%; background:linear-gradient(90deg,#63ffa5,#ffd75a,#ff4d6d); transition:width .4s }
+
+    /* Plan sliders & chart */
+    .split{ display:grid; gap:10px; }
+    .split .item{ display:grid; grid-template-columns:auto 1fr 60px; gap:8px; align-items:center; }
+    .split input[type=range]{ width:100% }
+    canvas#chart{ width:100%; height:220px; border:1px solid var(--as-grid); border-radius:12px; background:#0f141c; }
+
+    /* Terminal */
+    .terminal{ background:#05080d;border:1px solid rgba(110,231,255,.25); box-shadow:0 0 40px rgba(110,231,255,.08) inset, 0 12px 40px rgba(0,0,0,.35); border-radius:12px; overflow:hidden; color:#bfefff; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .term-top{ display:flex; align-items:center; gap:8px; padding:8px 12px; background:#07121b; border-bottom:1px solid rgba(255,255,255,.06); }
+    .dot{ width:10px; height:10px; border-radius:999px; }
+    .dot.r{ background:#ff5f56 } .dot.y{ background:#ffbd2e } .dot.g{ background:#27c93f }
+    .term-body{ height:260px; overflow:auto; padding:12px; }
+    .term-line{ white-space:pre-wrap } .term-success{ color:#63ffa5 } .term-warn{ color:#ffd75a } .term-err{ color:#ff8299 }
+    .term-caret{ display:inline-block; width:9px; height:1.05em; background:#bfefff; vertical-align:-2px; animation:blink 1s steps(1) infinite }
+    @keyframes blink{ 50%{ opacity:0 } }
+
+    /* Overlay grid decoration */
+    .grid-overlay{ position:relative; }
+    .grid-overlay::before{
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px,
+        linear-gradient(0deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px;
+      mask: linear-gradient(to bottom, transparent, rgba(0,0,0,.3) 20%, rgba(0,0,0,.3) 80%, transparent);
+      opacity:.25; border-radius:16px;
     }
 
-    /* cards / sections */
-    .tool { border:1px solid var(--line); background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02)); border-radius:16px; padding:16px; }
-    .tool h3 { margin:.1rem 0 .6rem; }
-    .muted { color: var(--muted); }
-
-    .seg { display:inline-flex; gap:6px; border:1px solid var(--line); background:#0e121b; padding:4px; border-radius:999px; }
-    .seg button { border:0; background:transparent; color:var(--text); padding:.45rem .8rem; border-radius:999px; font-weight:700; cursor:pointer; }
-    .seg button.active { background:linear-gradient(90deg,hsl(var(--accent)/.35),hsl(var(--accent-2)/.35)); }
-
-    .row { display:grid; gap:10px; }
-    .row.two { grid-template-columns: 1fr 1fr; }
-    .row.three { grid-template-columns: 1fr 1fr 1fr; }
-    @media (max-width:740px){ .row.two, .row.three { grid-template-columns:1fr; } }
-
-    .fld { display:flex; flex-direction:column; gap:6px; }
-    .fld label { font-weight:700; font-size:.95rem; }
-    .fld input[type="text"], .fld input[type="url"], .fld textarea {
-      padding:12px; border-radius:12px; border:1px solid var(--line); background:#0f141d; color:var(--text);
+    @media(max-width:920px){
+      .row2, .row3{ grid-template-columns:1fr; }
+      .grid-2{ grid-template-columns:1fr; }
+      .grid-3{ grid-template-columns:1fr; }
     }
-    .hint { font-size:.9rem; color:var(--muted); display:flex; justify-content:space-between; gap:8px; }
-    .hint .count { font-variant-numeric: tabular-nums; }
-
-    .btnbar { display:flex; gap:10px; flex-wrap:wrap; }
-    .btn.primary { background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2))); border-color:transparent; color:#fff; }
-    .chip { display:inline-flex; align-items:center; gap:.45rem; padding:.35rem .6rem; border-radius:999px; border:1px solid var(--line); background:#0e121b; }
-    .metric { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:10px; margin-top:10px; }
-    .metric .m { border:1px dashed var(--line); border-radius:12px; padding:10px; text-align:center; }
-    .metric .m .v { font-size:1.2rem; font-weight:800; }
-
-    /* previews area */
-    .preview-rail { display:grid; gap:16px; }
-    @media (min-width: 1100px){ .preview-rail { grid-template-columns: repeat(2,minmax(0,1fr)); } }
-    .ad-shell { border:1px solid var(--line); background:#0c111a; border-radius:16px; padding:14px; box-shadow:var(--shadow-lg); }
-    .ad-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .ad-brand { display:flex; align-items:center; gap:10px; font-weight:800; }
-    .ad-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,hsl(var(--accent)),hsl(var(--accent-2))); }
-    .ad-copy { margin:.5rem 0 0; white-space:pre-wrap; }
-    .ad-media { height:220px; border-radius:12px; margin-top:10px;
-      background: radial-gradient(100% 120% at 10% 10%, hsl(var(--accent)/.45), transparent),
-                  radial-gradient(120% 120% at 90% 20%, hsl(var(--accent-2)/.35), transparent),
-                  radial-gradient(120% 120% at 40% 80%, hsl(320 90% 55%/.30), transparent);
-      background-size:cover; background-position:center; overflow:hidden; display:block;
-    }
-    .ad-footer { display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
-    .ad-cta { padding:.5rem .8rem; border-radius:999px; border:1px solid var(--line);
-      background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2))); color:#fff; font-weight:800; }
-    .ad-url { color: var(--muted); }
-    .clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .clamp-4 { display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
-
-    /* platform aspect tweaks */
-    .shell[data-p="facebook"] .ad-media { height: 220px; }
-    .shell[data-p="instagram"] .ad-media { height: 300px; border-radius:16px; }
-    .shell[data-p="tiktok"] .ad-media { height: 420px; border-radius:12px; }
-
-    /* drop area */
-    .drop {
-      border:1px dashed var(--line); border-radius:12px; padding:14px; text-align:center;
-      background:#0d121b;
-    }
-    .drop.drag { outline: 2px solid hsl(var(--accent)); outline-offset:2px; }
   </style>
 </head>
 <body>
-  <div class="bg-orbs" aria-hidden="true"></div>
+  <!-- Background FX -->
+  <div class="as-layers">
+    <canvas id="as-matrix" aria-hidden="true"></canvas>
+    <div class="as-scan" aria-hidden="true"></div>
+  </div>
+
   <div data-include="partials/header.html"></div>
 
-  <section class="container hero">
-    <span class="eyebrow">Studio</span>
-    <h1 class="gradient-text">Ad Preview Studio</h1>
-    <p class="sub">Design FB/IG/TikTok mockups. Update fields → previews refresh instantly. Export PNG, share a link, or jump into Social&nbsp;AI.</p>
-    <div class="hero-cta">
-      <a class="btn primary" href="index.html#demo">Open live Social&nbsp;AI demo</a>
-      <a class="btn" href="pricing.html">Try Pro</a>
+  <!-- HERO -->
+  <section class="container hero as-section" style="margin-top:20px">
+    <span class="eyebrow">EVRT Ad Studio</span>
+    <h1 class="gradient-text">Audience → Creative → Plan.<br/>Predict before you spend.</h1>
+    <p class="sub">Craft a high-signal audience, generate on-brand creatives, split budget with predictions, and export a ready-to-run media plan. (Simulated data.)</p>
+    <div class="tabs" style="margin-top:10px">
+      <button class="tab active" data-tab="aud">1) Audience</button>
+      <button class="tab" data-tab="cre">2) Creative</button>
+      <button class="tab" data-tab="plan">3) Plan & Predict</button>
+      <button class="tab" data-tab="rev">4) Review & Export</button>
     </div>
   </section>
 
-  <section class="container studio-wrap">
-    <div class="studio-grid">
-      <!-- Controls -->
-      <aside class="tool" id="controls">
-        <div class="seg" role="tablist" aria-label="Platform">
-          <button class="active" data-p="facebook" role="tab" aria-selected="true">Facebook</button>
-          <button data-p="instagram" role="tab" aria-selected="false">Instagram</button>
-          <button data-p="tiktok" role="tab" aria-selected="false">TikTok</button>
-        </div>
-
-        <h3 style="margin:12px 0 6px">Creative controls</h3>
-        <p class="muted" style="margin-top:0">Brand, handle, copy, CTA, and media.</p>
-
-        <div class="row two">
-          <div class="fld"><label for="brand">Brand name</label>
-            <input id="brand" type="text" data-field="brand" placeholder="EVRT" maxlength="24">
-            <div class="hint"><span>Shown as page/account</span><span class="count" data-count="brand"></span></div>
-          </div>
-          <div class="fld"><label for="handle">Handle</label>
-            <input id="handle" type="text" data-field="handle" placeholder="@evrt.ai" maxlength="32">
-            <div class="hint"><span>Optional (IG/TikTok)</span><span class="count" data-count="handle"></span></div>
-          </div>
-        </div>
-
-        <div class="fld"><label for="headline">Headline</label>
-          <input id="headline" type="text" data-field="headline" placeholder="Draft once → schedule everywhere with predictive timing" maxlength="110">
-          <div class="hint"><span>Keep it scannable</span><span class="count" data-count="headline"></span></div>
-        </div>
-
-        <div class="fld"><label for="body">Body / caption</label>
-          <textarea id="body" rows="5" data-field="body" placeholder="Create on-brand posts, predict the best minute per platform, and measure lift with closed-loop analytics." maxlength="400"></textarea>
-          <div class="hint"><span>Longer copy for FB; concise for TikTok</span><span class="count" data-count="body"></span></div>
-        </div>
-
-        <div class="row two">
-          <div class="fld"><label for="cta">CTA</label>
-            <input id="cta" type="text" data-field="cta" placeholder="Start trial" maxlength="18">
-            <div class="hint"><span></span><span class="count" data-count="cta"></span></div>
-          </div>
-          <div class="fld"><label for="url">Link</label>
-            <input id="url" type="url" data-field="url" placeholder="https://evrt.ai" maxlength="120">
-            <div class="hint"><span>Shown as display URL</span><span class="count" data-count="url"></span></div>
-          </div>
-        </div>
-
-        <div class="fld">
-          <label>Image / video poster</label>
-          <div class="drop" id="drop">
-            <input id="file" type="file" accept="image/*,video/*" style="display:none">
-            <p class="muted" style="margin:0 0 8px">Drop an image here or <a href="#" id="filePick">choose a file</a>.</p>
-            <div class="btnbar">
-              <button class="btn" id="clearMedia">Remove</button>
-              <button class="btn" id="exportPng">Export PNG</button>
-              <button class="btn" id="shareLink">Share setup</button>
-            </div>
-          </div>
-        </div>
-
-        <h3 style="margin:14px 0 6px">Signal sliders</h3>
-        <div class="row three">
-          <div class="fld"><label>Clarity</label>
-            <input type="range" min="0" max="100" value="70" step="1" data-field="clarity">
-          </div>
-          <div class="fld"><label>Energy</label>
-            <input type="range" min="0" max="100" value="65" step="1" data-field="energy">
-          </div>
-          <div class="fld"><label>Depth</label>
-            <input type="range" min="0" max="100" value="55" step="1" data-field="depth">
-          </div>
-        </div>
-        <div class="metric">
-          <div class="m"><div class="v" id="mReach">—</div><div class="muted">Expected reach</div></div>
-          <div class="m"><div class="v" id="mCTR">—</div><div class="muted">CTR</div></div>
-          <div class="m"><div class="v" id="mConf">—</div><div class="muted">Confidence</div></div>
-        </div>
-
-        <h3 style="margin:14px 0 6px">Idea helpers</h3>
-        <div class="btnbar">
-          <button class="btn" id="genVariants">Generate headline variants</button>
-          <button class="btn" id="bestMinute">Predict best minute</button>
-        </div>
-        <div id="variantBox" class="row" style="margin-top:10px"></div>
-        <div id="minuteBox" class="row" style="margin-top:10px"></div>
-      </aside>
-
-      <!-- Live previews -->
-      <main class="preview-rail">
-        <div class="ad-shell shell tool" data-p="facebook">
-          <div class="chip">Facebook preview</div>
-          <article class="ad ad-shell__inner ad-shell--fb ad-shell tool" aria-label="Facebook ad">
-            <div class="ad-head">
-              <div class="ad-brand">
-                <span class="ad-avatar" aria-hidden="true"></span>
-                <div><div id="pBrandFB">EVRT</div><div class="muted" id="pTagFB">Sponsored · 1h</div></div>
+  <!-- PANELS -->
+  <section class="container section as-section">
+    <!-- ========== AUDIENCE ========== -->
+    <div id="panel-aud" class="panel active">
+      <div class="grid-2">
+        <div class="as-card grid-overlay">
+          <h3>Demographics & Targeting</h3>
+          <div class="row3" style="margin-top:6px">
+            <div>
+              <label class="mini">Age range</label>
+              <div class="row2">
+                <input id="ageMin" class="input" type="number" min="13" max="65" value="24"/>
+                <input id="ageMax" class="input" type="number" min="13" max="65" value="45"/>
               </div>
-              <span class="chip" id="pCtaFB">Start trial</span>
             </div>
-            <p class="ad-copy clamp-4" id="pCopyFB">Draft once → schedule everywhere with predictive timing.</p>
-            <div class="ad-media" id="pMediaFB"></div>
-            <div class="ad-footer"><span class="ad-url" id="pUrlFB">evrt.ai</span><span class="ad-cta">Learn more</span></div>
-          </article>
+            <div>
+              <label class="mini">Gender</label>
+              <div class="row2">
+                <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--as-grid);padding:10px;border-radius:10px"><input type="checkbox" id="g-m" checked/> Male</label>
+                <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--as-grid);padding:10px;border-radius:10px"><input type="checkbox" id="g-f" checked/> Female</label>
+              </div>
+            </div>
+            <div>
+              <label class="mini">Frequency cap</label>
+              <div class="row2">
+                <input id="freq" class="input" type="number" min="1" max="12" value="3"/>
+                <span class="mini" style="align-self:center">impressions / day</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row2" style="margin-top:10px">
+            <div>
+              <label class="mini">Geo — add countries, states, or cities</label>
+              <input id="geoInput" class="input" placeholder="e.g., United States, Texas, Chicago"/>
+              <div id="geoChips" class="chips"></div>
+              <div class="mini" style="margin-top:6px">Tip: keep it tight. Over-broad geos inflate CPA.</div>
+            </div>
+            <div>
+              <label class="mini">Interests</label>
+              <input id="intInput" class="input" placeholder="e.g., e-commerce, fintech, ai tools"/>
+              <div id="intChips" class="chips"></div>
+              <label class="mini" style="margin-top:8px">Keywords (Google)</label>
+              <input id="kwInput" class="input" placeholder="e.g., marketing automation, social ai"/>
+              <div id="kwChips" class="chips"></div>
+            </div>
+          </div>
+
+          <div class="row2" style="margin-top:10px">
+            <div>
+              <label class="mini">Placements</label>
+              <div class="row3">
+                <label style="display:flex;gap:8px;align-items:center;border:1px solid var(--as-grid);padding:10px;border-radius:10px"><input type="checkbox" id="p-feed" checked/> Feed</label>
+                <label style="display:flex;gap:8px;align-items:center;border:1px solid var(--as-grid);padding:10px;border-radius:10px"><input type="checkbox" id="p-stories" checked/> Stories/Reels</label>
+                <label style="display:flex;gap:8px;align-items:center;border:1px solid var(--as-grid);padding:10px;border-radius:10px"><input type="checkbox" id="p-search" checked/> Search/YouTube</label>
+              </div>
+            </div>
+            <div>
+              <label class="mini">Audience size estimate</label>
+              <div class="gauge"><div id="audGauge"></div></div>
+              <div class="mini"><strong id="audSize">—</strong> people (simulated)</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <button id="btn-aud-opt" class="btn neon">Optimize targeting</button>
+            <button id="btn-aud-clear" class="btn">Reset audience</button>
+            <span class="mini" id="audHint" style="align-self:center"></span>
+          </div>
         </div>
 
-        <div class="ad-shell shell tool" data-p="instagram">
-          <div class="chip">Instagram preview</div>
-          <article class="ad-shell__inner ad-shell--ig ad-shell tool" aria-label="Instagram ad">
-            <div class="ad-head">
-              <div class="ad-brand">
-                <span class="ad-avatar" aria-hidden="true"></span>
-                <div><div id="pBrandIG">EVRT</div><div class="muted" id="pTagIG">@evrt.ai</div></div>
-              </div>
-              <span class="chip" id="pCtaIG">Shop now</span>
+        <div class="terminal grid-overlay">
+          <div class="term-top"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <strong style="margin-left:6px">/opt/evrt/adstudio</strong><span class="muted" style="margin-left:auto">root@evrt:~$</span>
+          </div>
+          <div id="term-aud" class="term-body" role="log" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== CREATIVE ========== -->
+    <div id="panel-cre" class="panel">
+      <div class="grid-2">
+        <div class="as-card grid-overlay">
+          <h3>Creative Lab</h3>
+          <div class="row3" style="margin-top:6px">
+            <input id="brand" class="input" placeholder="Brand (e.g., EVRT)"/>
+            <input id="brandColor" class="input" type="color" value="#6ee7ff" title="Brand accent"/>
+            <select id="cta" class="select">
+              <option>Learn more</option><option>Get started</option><option>Book a demo</option><option>Shop now</option>
+            </select>
+          </div>
+          <div class="row2" style="margin-top:8px">
+            <input id="headline" class="input" placeholder="Headline"/>
+            <input id="sub" class="input" placeholder="Primary text / hook"/>
+          </div>
+          <div class="row2" style="margin-top:8px">
+            <label class="input" style="display:flex;align-items:center;gap:10px;cursor:pointer">
+              <input id="img" type="file" accept="image/*" style="display:none"/>
+              <span>Upload creative (optional)</span><span class="mini">PNG/JPG</span>
+            </label>
+            <div class="row2">
+              <button id="btn-suggest" class="btn ghost">Suggest headlines</button>
+              <button id="btn-score" class="btn neon">Score creative</button>
             </div>
-            <p class="ad-copy clamp-2" id="pCopyIG">Create on-brand posts, publish at the best minute, measure lift.</p>
-            <div class="ad-media" id="pMediaIG"></div>
-            <div class="ad-footer"><span class="ad-url" id="pUrlIG">evrt.ai</span><span class="ad-cta">Learn more</span></div>
-          </article>
+          </div>
+
+          <div class="grid-3" style="margin-top:10px">
+            <div class="preview">
+              <div class="p-head"><span>Meta Feed</span><span class="mini">Preview</span></div>
+              <div id="prev-meta" class="p-img">No image</div>
+              <div class="p-body"><strong id="prev-meta-h">Your headline</strong><div class="muted" id="prev-meta-s">Hook text appears here.</div></div>
+            </div>
+            <div class="preview">
+              <div class="p-head"><span>TikTok</span><span class="mini">Preview</span></div>
+              <div id="prev-tt" class="p-img">No image</div>
+              <div class="p-body"><strong id="prev-tt-h">Quick hook</strong><div class="muted" id="prev-tt-s">One-liner to stop scroll.</div></div>
+            </div>
+            <div class="preview">
+              <div class="p-head"><span>LinkedIn</span><span class="mini">Preview</span></div>
+              <div id="prev-li" class="p-img">No image</div>
+              <div class="p-body"><strong id="prev-li-h">Value-first headline</strong><div class="muted" id="prev-li-s">Explain the why.</div></div>
+            </div>
+          </div>
+
+          <div class="row3" style="margin-top:10px">
+            <div class="as-card">
+              <div class="mini">Creative score</div>
+              <div class="score" id="score">—</div>
+              <div class="meter" style="margin-top:6px"><div id="scoreBar"></div></div>
+              <ul id="scoreWhy" class="cta-sugg" style="margin-top:8px"></ul>
+            </div>
+            <div class="as-card">
+              <div class="mini">Compliance checks</div>
+              <ul id="checks" class="cta-sugg" style="margin-top:8px"></ul>
+            </div>
+            <div class="as-card">
+              <div class="mini">Fatigue risk</div>
+              <div class="meter" style="margin:6px 0 8px"><div id="fatigueBar"></div></div>
+              <div class="mini">Tip: Swap variants every 5–7 days or after 1.8M impressions.</div>
+            </div>
+          </div>
         </div>
 
-        <div class="ad-shell shell tool" data-p="tiktok">
-          <div class="chip">TikTok preview</div>
-          <article class="ad-shell__inner ad-shell--tt ad-shell tool" aria-label="TikTok ad">
-            <div class="ad-head">
-              <div class="ad-brand">
-                <span class="ad-avatar" aria-hidden="true"></span>
-                <div><div id="pBrandTT">EVRT · Official</div><div class="muted" id="pTagTT">Promoted</div></div>
-              </div>
-              <span class="chip" id="pCtaTT">Learn more</span>
-            </div>
-            <p class="ad-copy clamp-2" id="pCopyTT">On-brand content + best-minute timing. Close the loop on lift.</p>
-            <div class="ad-media" id="pMediaTT"></div>
-            <div class="ad-footer"><span class="ad-url" id="pUrlTT">@evrt.ai</span><span class="ad-cta">Learn more</span></div>
-          </article>
+        <div class="terminal grid-overlay">
+          <div class="term-top"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <strong style="margin-left:6px">/opt/evrt/adstudio</strong><span class="muted" style="margin-left:auto">root@evrt:~$</span>
+          </div>
+          <div id="term-cre" class="term-body"></div>
         </div>
-      </main>
+      </div>
+    </div>
+
+    <!-- ========== PLAN & PREDICT ========== -->
+    <div id="panel-plan" class="panel">
+      <div class="grid-2">
+        <div class="as-card grid-overlay">
+          <h3>Media Plan</h3>
+          <div class="row3" style="margin-top:6px">
+            <div><label class="mini">Budget (USD)</label><input id="budget" class="input" type="number" value="2500" min="100"/></div>
+            <div><label class="mini">Flight length (days)</label><input id="days" class="input" type="number" value="14" min="1"/></div>
+            <div><label class="mini">Objective</label>
+              <select id="objective" class="select"><option>Conversions</option><option>Leads</option><option>Traffic</option><option>Awareness</option></select>
+            </div>
+          </div>
+
+          <div class="split" style="margin-top:10px">
+            <div class="item"><strong>Meta</strong><input type="range" min="0" max="100" value="40" data-plat="Meta"/><input class="input" data-plat-val="Meta" value="40"/></div>
+            <div class="item"><strong>TikTok</strong><input type="range" min="0" max="100" value="25" data-plat="TikTok"/><input class="input" data-plat-val="TikTok" value="25"/></div>
+            <div class="item"><strong>Google</strong><input type="range" min="0" max="100" value="20" data-plat="Google"/><input class="input" data-plat-val="Google" value="20"/></div>
+            <div class="item"><strong>LinkedIn</strong><input type="range" min="0" max="100" value="10" data-plat="LinkedIn"/><input class="input" data-plat-val="LinkedIn" value="10"/></div>
+            <div class="item"><strong>X</strong><input type="range" min="0" max="100" value="5" data-plat="X"/><input class="input" data-plat-val="X" value="5"/></div>
+            <div class="mini">Hint: totals auto-normalize to 100%.</div>
+          </div>
+
+          <div class="row2" style="margin-top:10px">
+            <div>
+              <canvas id="chart" width="600" height="220" aria-label="Budget split chart"></canvas>
+            </div>
+            <div class="as-card">
+              <div class="mini">Predictions (simulated)</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+                <div><div class="mini">CTR</div><strong id="ctr">—%</strong></div>
+                <div><div class="mini">CVR</div><strong id="cvr">—%</strong></div>
+                <div><div class="mini">CPA</div><strong>$<span id="cpa">—</span></strong></div>
+                <div><div class="mini">ROAS</div><strong id="roas">—×</strong></div>
+              </div>
+              <div class="meter" style="margin:8px 0 0"><div id="roasBar"></div></div>
+              <div class="mini" id="bestWin" style="margin-top:8px">Best windows: —</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+                <button id="btn-auto" class="btn ghost">Auto-optimize split</button>
+                <button id="btn-sim" class="btn neon">Run simulation</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="terminal grid-overlay">
+          <div class="term-top"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <strong style="margin-left:6px">/opt/evrt/adstudio</strong><span class="muted" style="margin-left:auto">root@evrt:~$</span>
+          </div>
+          <div id="term-plan" class="term-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== REVIEW & EXPORT ========== -->
+    <div id="panel-rev" class="panel">
+      <div class="grid-2">
+        <div class="as-card grid-overlay">
+          <h3>Review</h3>
+          <div class="row2">
+            <div class="as-card">
+              <div class="mini">Validation</div>
+              <ul id="val" class="cta-sugg" style="margin-top:6px"></ul>
+            </div>
+            <div class="as-card">
+              <div class="mini">Next best actions</div>
+              <ul id="nba" class="cta-sugg" style="margin-top:6px"></ul>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <button id="btn-json" class="btn neon">Export campaign JSON</button>
+            <button id="btn-csv" class="btn">Export media plan CSV</button>
+            <a class="btn ghost" href="adlab.html">Open Ad Demo Lab</a>
+          </div>
+        </div>
+
+        <div class="terminal grid-overlay">
+          <div class="term-top"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <strong style="margin-left:6px">/opt/evrt/adstudio</strong><span class="muted" style="margin-left:auto">root@evrt:~$</span>
+          </div>
+          <div id="term-rev" class="term-body"></div>
+        </div>
+      </div>
     </div>
   </section>
 
   <div data-include="partials/footer.html"></div>
 
-  <!-- Hidden canvas for PNG export -->
-  <canvas id="exportCanvas" width="1200" height="628" style="display:none"></canvas>
-
+  <script defer src="assets/app.js"></script>
   <script>
-    // ---------- helpers
-    const $ = sel => document.querySelector(sel);
-    const $$ = sel => [...document.querySelectorAll(sel)];
-    const SKEY = 'evrt_ad_studio_v1';
-
-    function safe(str=''){ return (str || '').toString(); }
-    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
-    function hostFromUrl(u) {
-      try { return new URL(u).host.replace(/^www\./,''); } catch { return safe(u).replace(/^https?:\/\//,''); }
-    }
-
-    // ---------- state
-    const state = {
-      platform: 'facebook',
-      brand: 'EVRT',
-      handle: '@evrt.ai',
-      headline: 'Draft once → schedule everywhere with predictive timing',
-      body: 'Create on-brand posts, predict the best minute per platform, and measure lift with closed-loop analytics.',
-      cta: 'Start trial',
-      url: 'https://evrt.ai',
-      media: '', // dataURL
-      clarity: 70, energy: 65, depth: 55
-    };
-
-    // load from localStorage or hash
-    (function hydrate(){
-      try{
-        const hash = location.hash.startsWith('#s=') ? location.hash.slice(3) : '';
-        if (hash){
-          const decoded = JSON.parse(atob(decodeURIComponent(hash)));
-          Object.assign(state, decoded || {});
-        } else {
-          const saved = localStorage.getItem(SKEY);
-          if (saved) Object.assign(state, JSON.parse(saved));
-        }
-      }catch(e){}
+    /* ===== Matrix backdrop ===== */
+    (function matrix(){
+      const c = document.getElementById('as-matrix'); const ctx = c.getContext('2d');
+      function resize(){ c.width = innerWidth; c.height = innerHeight; }
+      resize(); addEventListener('resize', resize);
+      const chars = 'アカサタナハ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$#@!*%&';
+      const cols = ()=>Math.floor(c.width / 14); let drops = Array(cols()).fill(0).map(()=>Math.random()*c.height/14);
+      ctx.font = '14px monospace';
+      (function step(){
+        ctx.fillStyle = 'rgba(10,14,20,0.08)'; ctx.fillRect(0,0,c.width,c.height);
+        ctx.fillStyle = '#6ee7ff'; ctx.shadowColor = '#6ee7ff88'; ctx.shadowBlur = 8;
+        for(let i=0;i<drops.length;i++){ const x=i*14, y=drops[i]*14; const ch=chars[Math.floor(Math.random()*chars.length)];
+          ctx.fillText(ch,x,y); if(y>c.height && Math.random()>0.975) drops[i]=0; drops[i]++; }
+        requestAnimationFrame(step);
+      })();
     })();
 
-    // save
-    function persist(){
-      try{ localStorage.setItem(SKEY, JSON.stringify(state)); }catch(e){}
-    }
-
-    // ---------- controls binding
-    function bindField(id, key){
-      const el = document.getElementById(id);
-      const counter = document.querySelector(`[data-count="${key}"]`);
-      const max = el.maxLength > 0 ? el.maxLength : null;
-      el.value = safe(state[key]);
-      if (counter) counter.textContent = max ? `${el.value.length}/${max}` : `${el.value.length}`;
-      el.addEventListener('input', ()=>{
-        state[key] = el.value;
-        if (counter) counter.textContent = max ? `${el.value.length}/${max}` : `${el.value.length}`;
-        render();
-        persist();
-      });
-    }
-
-    ['brand','handle','headline','body','cta','url'].forEach(k=> bindField(k, k));
-    $$('input[type="range"][data-field]').forEach(r=>{
-      const k = r.dataset.field; r.value = state[k];
-      r.addEventListener('input', ()=>{ state[k] = +r.value; renderMetrics(); persist(); });
-    });
-
-    // platform tabs
-    $$('.seg [data-p]').forEach(btn=>{
+    /* ===== Tabs ===== */
+    document.querySelectorAll('.tab').forEach(btn=>{
       btn.addEventListener('click', ()=>{
-        $$('.seg [data-p]').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
         btn.classList.add('active');
-        state.platform = btn.dataset.p;
-        render();
-        persist();
-        if (window.innerWidth < 980){
-          const panel = document.querySelector(`.shell[data-p="${state.platform}"]`);
-          panel?.scrollIntoView({behavior:'smooth', block:'center'});
-        }
+        document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
       });
-      if (btn.dataset.p === state.platform) btn.classList.add('active');
     });
 
-    // media upload
-    const file = $('#file'), pick = $('#filePick'), drop = $('#drop'), clear = $('#clearMedia');
-    pick.addEventListener('click', e => { e.preventDefault(); file.click(); });
-    file.addEventListener('change', handleFiles);
-
-    ;['dragenter','dragover'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('drag'); }));
-    ;['dragleave','drop'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('drag'); }));
-    drop.addEventListener('drop', e=> { const f = e.dataTransfer.files?.[0]; if (f) loadFile(f); });
-
-    function handleFiles(){ const f = file.files?.[0]; if (f) loadFile(f); }
-    function loadFile(f){
-      const reader = new FileReader();
-      if (f.type.startsWith('image/')){
-        reader.onload = ()=>{ state.media = reader.result; render(); persist(); };
-        reader.readAsDataURL(f);
-      } else {
-        state.media = '';
-        render(); persist();
+    /* ===== Terminals ===== */
+    function makeTerm(el){ 
+      const term = document.getElementById(el);
+      function println(s, cls=''){ const d=document.createElement('div'); d.className='term-line '+cls; d.textContent=s; term.appendChild(d); term.scrollTop=term.scrollHeight; }
+      function typeCmd(cmd, cb){
+        const row=document.createElement('div'); row.className='term-line'; term.appendChild(row); let i=0;
+        const iv=setInterval(()=>{ row.textContent='$ '+cmd.slice(0,++i)+(i%2?'_':''); term.scrollTop=term.scrollHeight;
+          if(i>=cmd.length){ clearInterval(iv); row.innerHTML='$ '+cmd+' <span class="term-caret"></span>'; cb&&cb(); } }, 18);
       }
+      return { println, typeCmd };
     }
-    clear.addEventListener('click', ()=>{ state.media = ''; file.value=''; render(); persist(); });
+    const TA = makeTerm('term-aud'), TC = makeTerm('term-cre'), TP = makeTerm('term-plan'), TR = makeTerm('term-rev');
 
-    // variants generator
-    const POWER = ['predictive timing','closed-loop analytics','creative scoring','best-minute windows','on-brand automation'];
-    function headlineVariants(h){
-      const base = safe(h).replace(/\s+/g,' ').trim();
-      const short = base.length > 72 ? base.slice(0,69)+'…' : base;
-      const verb = 'Unlock';
-      return [
-        short,
-        `Draft once → publish where it wins (${POWER[Math.floor(Math.random()*POWER.length)]})`,
-        `${verb} lift with ${POWER[Math.floor(Math.random()*POWER.length)]}`,
-        `From draft to results — ${POWER[Math.floor(Math.random()*POWER.length)]}`
+    /* ===== Chips ===== */
+    function chipify(inputEl, chipsEl, hint){
+      const set = new Set();
+      function render(){
+        chipsEl.innerHTML = [...set].map(v=>`<span class="chip">${v}<button data-rm="${v}">×</button></span>`).join('');
+        chipsEl.querySelectorAll('[data-rm]').forEach(b=> b.onclick=()=>{ set.delete(b.dataset.rm); render(); updateAudience(); });
+        hint && (hint.textContent = set.size ? '' : hint.dataset.placeholder||'');
+      }
+      inputEl.addEventListener('keydown', (e)=>{
+        if(e.key==='Enter' || e.key===','){
+          e.preventDefault();
+          const v = inputEl.value.trim().replace(/,\s*$/,'');
+          if(v){ set.add(v); inputEl.value=''; render(); updateAudience(); }
+        }
+      });
+      return { get:()=>[...set], add:(v)=>{ set.add(v); render(); updateAudience(); }, clear:()=>{ set.clear(); render(); updateAudience(); } };
+    }
+
+    const geo = chipify(document.getElementById('geoInput'), document.getElementById('geoChips'), document.getElementById('audHint'));
+    const ints = chipify(document.getElementById('intInput'), document.getElementById('intChips'));
+    const kws  = chipify(document.getElementById('kwInput'),  document.getElementById('kwChips'));
+
+    /* ===== Audience estimate ===== */
+    const audGauge = document.getElementById('audGauge'), audSize = document.getElementById('audSize');
+    function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+    function estimateAudience(){
+      const ageMin = +ageMinEl.value, ageMax = +ageMaxEl.value;
+      const ageSpan = clamp(ageMax-ageMin, 5, 52);
+      const g = (gM.checked?1:0) + (gF.checked?1:0) || 1;
+      const geoFactor = Math.min(3, geo.get().length || 1);
+      const intFactor = 0.7 + (ints.get().length * 0.18);
+      const kwFactor  = 0.7 + (kws.get().length  * 0.20);
+      const place = (pFeed.checked?1:0) + (pStories.checked?1:0) + (pSearch.checked?1:0);
+      let est = 100000 * (ageSpan/20) * g * geoFactor * intFactor * kwFactor * (place*0.7);
+      est = Math.round(clamp(est, 28000, 8_500_000));
+      return est;
+    }
+    function updateAudience(){
+      const est = estimateAudience();
+      audSize.textContent = est.toLocaleString();
+      audGauge.style.width = (100 * Math.min(1, est/1_500_000)).toFixed(0) + '%';
+      TA.println('> audience estimate: ~' + est.toLocaleString(), 'term-success');
+    }
+    const ageMinEl = document.getElementById('ageMin'), ageMaxEl = document.getElementById('ageMax');
+    const gM = document.getElementById('g-m'), gF = document.getElementById('g-f');
+    const pFeed = document.getElementById('p-feed'), pStories = document.getElementById('p-stories'), pSearch = document.getElementById('p-search');
+    [ageMinEl,ageMaxEl,gM,gF,pFeed,pStories,pSearch,document.getElementById('freq')].forEach(el=> el.addEventListener('change', updateAudience));
+    document.getElementById('btn-aud-opt').onclick = ()=>{
+      // heuristic: if many interests, suggest trim; if geo empty, add US
+      if(geo.get().length===0){ geo.add('United States'); }
+      if(ints.get().length>6){ TA.println('! too many interests; trimming to top 6', 'term-warn'); while(ints.get().length>6){ ints.get().pop(); ints.clear(); } }
+      updateAudience();
+      TA.typeCmd('evrt audience --optimize', ()=> TA.println('✓ targeting optimized', 'term-success'));
+    };
+    document.getElementById('btn-aud-clear').onclick = ()=>{ geo.clear(); ints.clear(); kws.clear(); ageMinEl.value=24; ageMaxEl.value=45; gM.checked=gF.checked=true; pFeed.checked=pStories.checked=pSearch.checked=true; updateAudience(); };
+
+    // seed smart defaults
+    geo.add('United States'); ints.add('marketing'); ints.add('ai tools'); kws.add('marketing automation'); updateAudience();
+
+    /* ===== Creative Lab ===== */
+    const prevs = {
+      meta: { img: 'prev-meta', h:'prev-meta-h', s:'prev-meta-s' },
+      tt:   { img: 'prev-tt',   h:'prev-tt-h',   s:'prev-tt-s' },
+      li:   { img: 'prev-li',   h:'prev-li-h',   s:'prev-li-s' }
+    };
+    function updatePreviews(){
+      const h = headline.value || 'Cut CPA. Grow faster.';
+      const s = sub.value || 'Predictive timing + creative variants. ' + (cta.value||'Learn more');
+      document.getElementById(prevs.meta.h).textContent = h; document.getElementById(prevs.meta.s).textContent = s;
+      document.getElementById(prevs.tt.h).textContent   = h.slice(0,40) + (h.length>40?'…':''); document.getElementById(prevs.tt.s).textContent = s;
+      document.getElementById(prevs.li.h).textContent   = '【' + (brand.value||'EVRT') + '】 ' + h; document.getElementById(prevs.li.s).textContent = s;
+      TC.println('> updated previews', 'term-success');
+    }
+    const brand = document.getElementById('brand'), brandColor = document.getElementById('brandColor'), headline = document.getElementById('headline'), sub = document.getElementById('sub'), cta = document.getElementById('cta');
+    [brand,headline,sub,cta].forEach(el=> el.addEventListener('input', updatePreviews));
+
+    document.getElementById('img').addEventListener('change', (e)=>{
+      const f = e.target.files[0]; if(!f) return;
+      const url = URL.createObjectURL(f);
+      Object.values(prevs).forEach(p=>{
+        const box = document.getElementById(p.img);
+        box.style.background = `center/cover no-repeat url("${url}")`;
+        box.textContent = '';
+        box.style.border = '1px solid rgba(255,255,255,.08)';
+      });
+      TC.typeCmd('evrt creative attach --image', ()=> TC.println('✓ image attached (preview only)', 'term-success'));
+    });
+
+    document.getElementById('btn-suggest').onclick = ()=>{
+      const base = brand.value||'EVRT';
+      const ideas = [
+        `${base}: Predict CTR before you spend`,
+        `Stop guessing. ${base} learns your winners`,
+        `From concept → conversion with ${base}`,
+        `${base}: 3× ROI vibes (for real)`,
+        `Cut CPA 31% with ${base}`
       ];
-    }
-    $('#genVariants').addEventListener('click', ()=>{
-      const box = $('#variantBox'); box.innerHTML='';
-      headlineVariants(state.headline).forEach(v=>{
-        const b = document.createElement('button'); b.className='btn'; b.textContent=v;
-        b.addEventListener('click', ()=>{ state.headline = v; $('#headline').value=v; render(); persist(); });
-        box.appendChild(b);
+      headline.value = ideas[Math.floor(Math.random()*ideas.length)];
+      sub.value = 'Creative variants + predictive timing + closed-loop analytics.';
+      updatePreviews();
+      TC.typeCmd('evrt creative suggest --headlines', ()=> TC.println('✓ 5 candidates generated', 'term-success'));
+    };
+
+    function scoreCreative(){
+      const h = headline.value||'', s = sub.value||'', hasNum = /\d/.test(h+s), hasVerb = /(cut|boost|grow|predict|scale|learn|get|book)/i.test(h+s), hasBrand = (brand.value||'').length>0, hasCTA = (cta.value||'').length>0;
+      let score = 50; const why=[];
+      function add(v,msg){ score += v; why.push((v>0?'+':'')+v+' '+msg); }
+      add(hasNum?8:-4, hasNum?'Numbers add credibility':'Consider a number (e.g., % lift)');
+      add(hasVerb?10:-6, hasVerb?'Strong action verb':'Add a strong action verb');
+      add(hasBrand?6:-6, hasBrand?'Brand reinforced':'Include brand for recall');
+      add(hasCTA?8:-8, hasCTA?'Clear CTA':'Add a clear CTA');
+      if(h.length>38 && h.length<70) add(6,'Headline length is sweet-spot'); else add(-4,'Tune headline length (38–70)');
+      if(s.length<30) add(-4,'Body too short'); if(s.length>220) add(-6,'Body likely truncates');
+      score = Math.max(1, Math.min(99, score));
+      document.getElementById('score').textContent = score;
+      document.getElementById('scoreBar').style.width = score + '%';
+      const ul = document.getElementById('scoreWhy'); ul.innerHTML = ''; why.forEach(w=>{ const li=document.createElement('li'); li.textContent=w; ul.appendChild(li); });
+      // compliance checks
+      const checks = document.getElementById('checks'); checks.innerHTML='';
+      ['Click here','FREE!!!','All caps','Misleading claims'].forEach(flag=>{
+        const bad = /FREE!!!|CLICK HERE/i.test(h+s) || (flag==='All caps' && (h===h.toUpperCase()||s===s.toUpperCase()));
+        const li = document.createElement('li'); li.textContent = (bad?'⚠︎ ':'✓ ') + (bad?('Avoid '+flag):('Pass: '+flag));
+        checks.appendChild(li);
       });
-    });
+      // fatigue
+      const fatigue = Math.max(10, 100 - score*0.8); document.getElementById('fatigueBar').style.width = fatigue + '%';
+      TC.println(`> creative score: ${score}/100`, score>70?'term-success':'term-warn');
+    }
+    document.getElementById('btn-score').onclick = scoreCreative;
 
-    // best minute (toy)
-    $('#bestMinute').addEventListener('click', ()=>{
-      const now = new Date();
-      const opts = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      const hour = 7 + Math.floor(Math.random()*12);
-      const min  = [0,5,10,15,20,25,30,35,40,45,50,55][Math.floor(Math.random()*12)];
-      const ampm = hour >= 12 ? 'PM':'AM';
-      const m = document.createElement('div'); m.className='card';
-      m.innerHTML = `<strong>Recommended window</strong>
-        <p class="muted" style="margin:.35rem 0 0">${opts[now.getDay()]} ${hour}:${String(min).padStart(2,'0')} ${ampm} · ${state.platform} · CTR +${(6+Math.floor(Math.random()*8))}%</p>`;
-      const box = $('#minuteBox'); box.innerHTML=''; box.appendChild(m);
-    });
+    // seed defaults
+    brand.value='EVRT'; headline.value='Predict CTR before you spend'; sub.value='Creative variants + predictive timing + closed-loop analytics.'; updatePreviews(); scoreCreative();
 
-    // share link
-    $('#shareLink').addEventListener('click', async ()=>{
-      const payload = encodeURIComponent(btoa(JSON.stringify(state)));
-      const url = `${location.origin}${location.pathname}#s=${payload}`;
-      try { await navigator.clipboard.writeText(url); alert('Shareable link copied!'); }
-      catch { prompt('Copy your share link:', url); }
-    });
+    /* ===== Plan & Predict ===== */
+    const ranges = [...document.querySelectorAll('input[type=range][data-plat]')];
+    const inputs = [...document.querySelectorAll('input[data-plat-val]')];
+    function normalize(){
+      let vals = ranges.map(r=>+r.value);
+      const sum = vals.reduce((a,b)=>a+b,0)||1;
+      vals = vals.map(v=> v*100/sum);
+      ranges.forEach((r,i)=> r.value = Math.round(vals[i]));
+      inputs.forEach(inp=>{
+        const i = ranges.findIndex(r=> r.dataset.plat===inp.dataset.platVal);
+        inp.value = ranges[i].value;
+      });
+      drawChart(); predict();
+    }
+    ranges.forEach(r=> r.addEventListener('input', normalize));
+    inputs.forEach(inp=> inp.addEventListener('change', ()=>{ const r = ranges.find(x=> x.dataset.plat===inp.dataset.platVal); r.value = +inp.value||0; normalize(); }));
+    function randIn(a,b){ return (a + Math.random()*(b-a)); }
+    function predict(){
+      const budget = +document.getElementById('budget').value||0;
+      const obj = document.getElementById('objective').value;
+      // base rates (simulated)
+      const ctr = (randIn(1.2, 4.4)).toFixed(1);
+      const cvr = (obj==='Conversions'?randIn(1.6,3.2):obj==='Leads'?randIn(3.0,6.0):randIn(0.8,1.2)).toFixed(1);
+      const cpa = (obj==='Conversions'?randIn(9,22):obj==='Leads'?randIn(12,28):randIn(6,14)).toFixed(2);
+      const roas = (randIn(1.6,3.8)).toFixed(1);
+      document.getElementById('ctr').textContent = ctr+'%';
+      document.getElementById('cvr').textContent = cvr+'%';
+      document.getElementById('cpa').textContent = cpa;
+      document.getElementById('roas').textContent = roas+'×';
+      document.getElementById('roasBar').style.width = Math.min(100, roas*22)+'%';
+      document.getElementById('bestWin').textContent = 'Best windows: 9:10–9:30am, 6:05–6:30pm (local)';
+      TP.println(`> predicted CTR ${ctr}% • CVR ${cvr}% • CPA $${cpa} • ROAS ${roas}×`, 'term-success');
+    }
+    document.getElementById('budget').addEventListener('change', predict);
+    document.getElementById('days').addEventListener('change', predict);
+    document.getElementById('objective').addEventListener('change', predict);
 
-    // export PNG
-    $('#exportPng').addEventListener('click', ()=>{
-      makePNG(state.platform);
-    });
-
-    function aspect(platform){
-      if (platform==='instagram') return [1080,1350];
-      if (platform==='tiktok') return [1080,1920];
-      return [1200,628]; // facebook
+    // tiny canvas bar chart
+    const chart = document.getElementById('chart'); const ctx = chart.getContext('2d');
+    function drawChart(){
+      const labels = ranges.map(r=> r.dataset.plat); const vals = ranges.map(r=> +r.value);
+      const W = chart.width, H = chart.height; ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = '#0f141c'; ctx.fillRect(0,0,W,H);
+      const bw = (W-80)/vals.length, max = 100;
+      vals.forEach((v,i)=>{
+        const x = 40 + i*bw + 12, y = H-28, h = (H-60) * (v/max);
+        ctx.fillStyle = '#6ee7ff'; ctx.shadowColor='#6ee7ff66'; ctx.shadowBlur=10;
+        ctx.fillRect(x, y-h, bw-24, h);
+        ctx.shadowBlur=0; ctx.fillStyle = '#9fb3c8'; ctx.font = '12px Inter,system-ui';
+        ctx.fillText(labels[i], x, H-10);
+        ctx.fillText(v+'%', x+2, y-h-6);
+      });
+      ctx.strokeStyle='rgba(255,255,255,.08)'; for(let i=0;i<5;i++){ ctx.beginPath(); ctx.moveTo(36, 20+i*(H-60)/4); ctx.lineTo(W-20, 20+i*(H-60)/4); ctx.stroke(); }
     }
 
-    function makePNG(platform){
-      const [W,H] = aspect(platform);
-      const c = document.getElementById('exportCanvas');
-      c.width=W; c.height=H;
-      const ctx = c.getContext('2d');
+    document.getElementById('btn-auto').onclick = ()=>{
+      // heuristic: boost Meta & Google slightly, re-normalize
+      ranges.find(r=>r.dataset.plat==='Meta').value = 44;
+      ranges.find(r=>r.dataset.plat==='Google').value = 24;
+      ranges.find(r=>r.dataset.plat==='TikTok').value = 18;
+      ranges.find(r=>r.dataset.plat==='LinkedIn').value = 9;
+      ranges.find(r=>r.dataset.plat==='X').value = 5;
+      normalize();
+      TP.typeCmd('evrt plan optimize --objective ' + document.getElementById('objective').value.toLowerCase(), ()=> TP.println('✓ split optimized', 'term-success'));
+    };
+    document.getElementById('btn-sim').onclick = ()=>{
+      TP.typeCmd('evrt plan simulate --days '+document.getElementById('days').value, ()=>{ predict(); TP.println('✓ simulation complete', 'term-success'); });
+    };
 
-      // bg gradient
-      const g = ctx.createLinearGradient(0,0,W,H);
-      g.addColorStop(0,'#0b0f16'); g.addColorStop(1,'#0f1220');
-      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    normalize(); // initial draw + predict
 
-      // media rect
-      const mediaH = platform==='facebook' ? H*0.58 : platform==='instagram' ? H*0.62 : H*0.68;
-      if (state.media){
-        const img = new Image();
-        img.onload = ()=>{ drawAfterMedia(); };
-        img.src = state.media;
-      } else {
-        // decorative
-        const g2 = ctx.createRadialGradient(W*0.2,H*0.2,80, W*0.7,H*0.3, W*0.8);
-        g2.addColorStop(0,'rgba(86,156,255,.55)'); g2.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.fillStyle=g2; ctx.fillRect(32,140,W-64, mediaH-48);
-        drawAfterMedia();
-      }
+    /* ===== Review ===== */
+    function renderReview(){
+      const val = document.getElementById('val'); const nba = document.getElementById('nba');
+      val.innerHTML = '';
+      const issues = [];
+      if(ints.get().length===0 && kws.get().length===0) issues.push('Add at least one interest or keyword set.');
+      const ageMin = +ageMinEl.value, ageMax=+ageMaxEl.value; if(ageMax-ageMin < 8) issues.push('Age range too narrow; expand to reach enough scale.');
+      if(geo.get().length===0) issues.push('Select at least one geography.');
+      if((+document.getElementById('budget').value) < 300) issues.push('Budget is very low for learning. Consider ≥ $300.');
+      if(issues.length===0) issues.push('All base checks passed.');
+      issues.forEach(x=>{ const li=document.createElement('li'); li.textContent = (x==='All base checks passed.'?'✓ ':'⚠︎ ')+x; val.appendChild(li); });
 
-      function drawAfterMedia(){
-        // draw media (cover)
-        if (state.media){
-          const img = new Image();
-          img.onload = ()=>{
-            const rect = {x:32, y:140, w:W-64, h:mediaH-48};
-            const ir = img.width/img.height, rr = rect.w/rect.h;
-            let sw, sh, sx, sy;
-            if (ir>rr){ sh=img.height; sw=sh*rr; sx=(img.width-sw)/2; sy=0; }
-            else { sw=img.width; sh=sw/rr; sx=0; sy=(img.height-sh)/2; }
-            ctx.save(); roundRect(ctx, rect.x, rect.y, rect.w, rect.h, 20); ctx.clip();
-            ctx.drawImage(img, sx, sy, sw, sh, rect.x, rect.y, rect.w, rect.h);
-            ctx.restore();
-            drawUI();
-          };
-          img.src = state.media;
-        } else {
-          drawUI();
+      nba.innerHTML='';
+      ['Duplicate this creative with 3 hooks and rotate daily.',
+       'Add a Stories/Reels cut—vertical aspect tends to lift CTR.',
+       'Set a frequency cap of '+document.getElementById('freq').value+'/day to prevent fatigue.',
+       'Schedule prime windows (9:10–9:30am, 6:05–6:30pm).'].forEach(x=>{
+         const li=document.createElement('li'); li.textContent=x; nba.appendChild(li);
+       });
+      TR.println('> review updated', 'term-success');
+    }
+
+    document.getElementById('btn-json').onclick = ()=>{
+      const payload = {
+        ts: new Date().toISOString(),
+        audience: {
+          age: [+ageMinEl.value, +ageMaxEl.value], gender: {male:gM.checked, female:gF.checked},
+          geo: geo.get(), interests: ints.get(), keywords: kws.get(),
+          placements: { feed:pFeed.checked, stories:pStories.checked, search:pSearch.checked },
+          freq: +document.getElementById('freq').value
+        },
+        creative: { brand: brand.value, color: brandColor.value, headline: headline.value, text: sub.value, cta: cta.value },
+        plan: {
+          budget:+document.getElementById('budget').value, days:+document.getElementById('days').value, objective: document.getElementById('objective').value,
+          split: Object.fromEntries(ranges.map(r=>[r.dataset.plat, +r.value]))
         }
-      }
+      };
+      download('evrt_ad_campaign.json', JSON.stringify(payload, null, 2), 'application/json');
+      TR.println('✓ exported campaign JSON', 'term-success');
+    };
 
-      function drawUI(){
-        // brand row
-        ctx.fillStyle='#fff'; ctx.font='700 42px Inter, system-ui, -apple-system';
-        ctx.fillText(safe(state.brand).slice(0,20), 32, 72);
-        ctx.fillStyle='rgba(255,255,255,.7)'; ctx.font='400 22px Inter, system-ui, -apple-system';
-        const tag = platform==='facebook' ? 'Sponsored · 1h' : (platform==='instagram' ? safe(state.handle) : 'Promoted');
-        ctx.fillText(tag, 32, 102);
+    document.getElementById('btn-csv').onclick = ()=>{
+      const budget = +document.getElementById('budget').value;
+      let rows = 'Platform,Share %,Budget USD\n';
+      ranges.forEach(r=>{
+        const share = +r.value; const spend = (budget * share/100).toFixed(2);
+        rows += `${r.dataset.plat},${share},${spend}\n`;
+      });
+      download('evrt_media_plan.csv', rows, 'text/csv');
+      TR.println('✓ exported media plan CSV', 'term-success');
+    };
 
-        // copy
-        ctx.fillStyle='#dfe5ff'; ctx.font='700 38px Inter, system-ui, -apple-system';
-        wrapText(ctx, safe(state.headline), 32, 120, W-64, 44);
-
-        // CTA chip
-        const chip = safe(state.cta).slice(0,18);
-        const cw = ctx.measureText(chip).width + 34;
-        roundedChip(ctx, W-32-cw, 40, cw, 44, chip);
-
-        // URL
-        ctx.fillStyle='rgba(255,255,255,.75)'; ctx.font='500 22px Inter, system-ui, -apple-system';
-        const disp = platform==='tiktok' ? safe(state.handle) : hostFromUrl(state.url) || 'evrt.ai';
-        ctx.fillText(disp, 32, H-28);
-
-        // save
-        const a = document.createElement('a');
-        a.download = `evrt-${platform}.png`;
-        a.href = c.toDataURL('image/png');
-        a.click();
-      }
+    function download(name, text, type='text/plain'){
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click();
     }
 
-    // drawing helpers
-    function roundRect(ctx, x, y, w, h, r=12){
-      const rr = Math.min(r, w/2, h/2);
-      ctx.beginPath();
-      ctx.moveTo(x+rr, y);
-      ctx.arcTo(x+w, y,   x+w, y+h, rr);
-      ctx.arcTo(x+w, y+h, x,   y+h, rr);
-      ctx.arcTo(x,   y+h, x,   y,   rr);
-      ctx.arcTo(x,   y,   x+w, y,   rr);
-      ctx.closePath();
-    }
-    function roundedChip(ctx, x, y, w, h, text){
-      const g = ctx.createLinearGradient(x, y, x+w, y+h);
-      g.addColorStop(0,'hsl(252 86% 62%)'); g.addColorStop(1,'hsl(190 95% 50%)');
-      ctx.fillStyle=g;
-      roundRect(ctx, x, y, w, h, h/2);
-      ctx.fill();
-      if (text){
-        ctx.fillStyle='#fff'; ctx.font='800 20px Inter, system-ui, -apple-system';
-        ctx.fillText(text, x+17, y+h*0.68);
-      }
-    }
-    function wrapText(ctx, text, x, y, maxWidth, lineHeight){
-      const words = safe(text).split(/\s+/);
-      let line = '', cy = y;
-      for (let n=0; n<words.length; n++){
-        const test = line + words[n] + ' ';
-        if (ctx.measureText(test).width > maxWidth && n>0){
-          ctx.fillText(line, x, cy);
-          line = words[n] + ' ';
-          cy += lineHeight;
-        } else {
-          line = test;
-        }
-      }
-      ctx.fillText(line.trim(), x, cy);
-    }
+    // render review initially and on key changes
+    ['ageMin','ageMax','freq','budget','days','objective'].forEach(id=> document.getElementById(id).addEventListener('change', renderReview));
+    renderReview();
 
-    // ---------- live preview renderers
-    function applyMedia(el){
-      if (state.media) {
-        el.style.backgroundImage = `url(${state.media})`;
-      } else {
-        el.style.backgroundImage = '';
-      }
-    }
-
-    function render(){
-      // Facebook
-      $('#pBrandFB').textContent = safe(state.brand);
-      $('#pTagFB').textContent = 'Sponsored · 1h';
-      $('#pCopyFB').textContent = safe(state.headline);
-      $('#pCtaFB').textContent = safe(state.cta);
-      $('#pUrlFB').textContent = hostFromUrl(state.url) || 'evrt.ai';
-      applyMedia($('#pMediaFB'));
-
-      // Instagram
-      $('#pBrandIG').textContent = safe(state.brand);
-      $('#pTagIG').textContent = safe(state.handle) || '@brand';
-      $('#pCopyIG').textContent = safe(state.body);
-      $('#pCtaIG').textContent = safe(state.cta) || 'Learn more';
-      $('#pUrlIG').textContent = hostFromUrl(state.url) || 'evrt.ai';
-      applyMedia($('#pMediaIG'));
-
-      // TikTok
-      $('#pBrandTT').textContent = safe(state.brand) + ' · Official';
-      $('#pTagTT').textContent = 'Promoted';
-      $('#pCopyTT').textContent = safe(state.headline);
-      $('#pCtaTT').textContent = safe(state.cta) || 'Learn more';
-      $('#pUrlTT').textContent = safe(state.handle) || '@brand';
-      applyMedia($('#pMediaTT'));
-
-      renderMetrics();
-    }
-
-    function renderMetrics(){
-      // lightweight toy model
-      const {clarity, energy, depth} = state;
-      const reach = Math.round( (clarity*0.45 + energy*0.35 + depth*0.20) * 120 );           // scaled
-      const ctr   = ( (clarity*0.018 + energy*0.022 + depth*0.014) / 10 + 0.8 ).toFixed(2); // %
-      const conf  = Math.round( 60 + (depth*0.35 + clarity*0.25 + energy*0.2)/3 );
-
-      $('#mReach').textContent = Intl.NumberFormat().format(reach);
-      $('#mCTR').textContent   = ctr + '%';
-      $('#mConf').textContent  = clamp(conf, 0, 99) + '%';
-    }
-
-    // init
-    render();
+    // Simple terminal loops for vibes
+    (function loops(){
+      TA.typeCmd('evrt audience build --geo us --interests 2', ()=> TA.println('> base audience ready', 'term-success'));
+      TC.typeCmd('evrt creative score', ()=> TC.println('> score computed', 'term-success'));
+      TP.typeCmd('evrt plan preview --objective conversions', ()=> TP.println('> predicted CPA and ROAS ready', 'term-success'));
+      TR.typeCmd('evrt export --json --csv', ()=> TR.println('> exports available', 'term-success'));
+      setInterval(()=> {
+        TA.typeCmd('evrt audience refine --overlap', ()=> TA.println('> overlap minimized', 'term-success'));
+        TP.typeCmd('evrt plan simulate', ()=> {});
+      }, 9000);
+    })();
   </script>
-  <script defer src="assets/app.js"></script>
 </body>
 </html>
