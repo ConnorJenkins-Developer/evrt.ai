@@ -3,354 +3,504 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>EVRT — Cybersecurity</title>
-  <meta name="description" content="Zero-trust by default. Live anomaly detection. Incident automation. Explore EVRT’s interactive 3D defense model."/>
+  <title>Cyber Operations — EVRT</title>
+  <meta name="description" content="Red/Blue/Purple teaming, SecOps automation, cloud & app security. Cinematic live demo with terminal and breach simulator."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="assets/style.css"/>
 
   <style>
-    .chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .chip{display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .7rem;border-radius:999px;border:1px solid var(--line);background:#0e121b}
-    .defense-grid{display:grid;gap:18px}
-    @media(min-width:1020px){.defense-grid{grid-template-columns:360px 1fr}}
-    .tool{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border-radius:16px;padding:16px}
-    .muted{color:var(--muted)}
-    .btnbar{display:flex;gap:10px;flex-wrap:wrap}
-    .btn.primary{background:linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2)));border-color:transparent;color:#fff}
-    .toggles{display:grid;gap:8px;margin-top:8px}
-    .toggles label{display:flex;align-items:center;gap:.6rem}
-    .toggles input{accent-color:hsl(var(--accent))}
-    .seg{display:inline-flex;gap:6px;border:1px solid var(--line);background:#0e121b;padding:4px;border-radius:999px}
-    .seg button{border:0;background:transparent;color:var(--text);padding:.45rem .8rem;border-radius:999px;font-weight:700;cursor:pointer}
-    .seg button.active{background:linear-gradient(90deg,hsl(var(--accent)/.35),hsl(var(--accent-2)/.35))}
-    .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
-    .metrics .m{border:1px dashed var(--line);padding:10px;border-radius:12px;text-align:center}
-    .metrics .v{font-weight:800;font-size:1.2rem}
-    .scene-card{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015))}
-    #scene{display:block;width:100%;height:560px}
-    @media(max-width:560px){#scene{height:440px}}
-    .legend{position:absolute;right:12px;top:12px;display:flex;gap:8px;flex-wrap:wrap}
-    .legend .key{display:flex;align-items:center;gap:.45rem;border:1px solid var(--line);padding:.25rem .5rem;border-radius:10px;background:rgba(10,14,23,.5)}
-    .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
-    .dot.blue{background:#6da8ff;box-shadow:0 0 10px #6da8ff}
-    .dot.green{background:#5cf2c9;box-shadow:0 0 10px #5cf2c9}
-    .dot.red{background:#ff6b91;box-shadow:0 0 10px #ff6b91}
-    .svc-grid{display:grid;gap:18px}
-    @media(min-width:900px){.svc-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-    .card{border:1px solid var(--line);border-radius:16px;padding:16px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015))}
-    .icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;margin-bottom:10px;background:linear-gradient(135deg,hsl(var(--accent)/.25),hsl(var(--accent-2)/.25));color:#fff}
+    /* ===== Cinematic Cyber Theme (scoped to this page) ===== */
+    :root {
+      --cy-neon: #6ee7ff;
+      --cy-accent: #63ffa5;
+      --cy-danger: #ff4d6d;
+      --cy-amber: #ffd75a;
+      --cy-bg: #0a0e14;
+      --cy-card: #0f141c;
+      --cy-grid: rgba(255,255,255,.06);
+      --cy-mute: #8fa2b7;
+    }
+    body{ background: radial-gradient(1200px 800px at 80% -200px,#142034 0,#0a0e14 65%); }
+
+    /* background layers */
+    .cy-layers { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .cy-scanlines {
+      position:absolute; inset:0; background:
+        linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px;
+      opacity:.25; mix-blend-mode: overlay;
+    }
+    #cy-matrix { position:absolute; inset:0; opacity:.26; }
+
+    .eyebrow { letter-spacing:.12em; text-transform:uppercase; color:var(--cy-mute); }
+    .hero h1 { font-size: clamp(40px, 6vw, 72px); line-height:1.02; margin:.2rem 0 1rem; }
+    .hero .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:14px; }
+    .hero .stat { background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+      border:1px solid var(--cy-grid); border-radius:14px; padding:12px; }
+    .big { font-size:28px; font-weight:800; letter-spacing:.02em; }
+
+    .cy-section { position:relative; z-index:1; }
+
+    /* Terminal */
+    .terminal {
+      background: #05080d;
+      border: 1px solid rgba(110,231,255,.25);
+      box-shadow: 0 0 40px rgba(110,231,255,.08) inset, 0 12px 40px rgba(0,0,0,.35);
+      border-radius: 12px; overflow: hidden; color: #bfefff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .term-top { display:flex; align-items:center; gap:8px; padding:8px 12px; background: #07121b; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .dot{ width:10px; height:10px; border-radius:999px; }
+    .dot.r{ background:#ff5f56; } .dot.y{ background:#ffbd2e; } .dot.g{ background:#27c93f; }
+    .term-body { height: 280px; overflow: auto; padding: 12px; }
+    .term-line { white-space: pre-wrap; }
+    .term-caret { display:inline-block; width:9px; height:1.05em; background:#bfefff; vertical-align:-2px; animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity:0; } }
+    .term-success { color:#63ffa5; }
+    .term-warn { color:#ffd75a; }
+    .term-err { color:#ff8299; }
+
+    /* Threat ticker */
+    .ticker { display:flex; align-items:center; gap:8px; border:1px solid var(--cy-grid); border-radius:12px; padding:8px 10px; background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02)); overflow: hidden; }
+    .ticker-label { font-weight:700; color:var(--cy-amber); }
+    .ticker-track { display:flex; gap:28px; white-space:nowrap; animation: ticker 22s linear infinite; }
+    @keyframes ticker { from{ transform: translateX(0); } to{ transform: translateX(-50%); } }
+
+    /* Capability cards */
+    .grid-3 { display:grid; gap:16px; grid-template-columns:1fr; }
+    @media(min-width:980px){ .grid-3{ grid-template-columns: repeat(3, 1fr); } }
+    .cy-card {
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+      border:1px solid var(--cy-grid); border-radius:14px; padding:14px;
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+      position:relative; overflow:hidden;
+    }
+    .cy-card:hover { transform: translateY(-4px); border-color: rgba(110,231,255,.55);
+      box-shadow: 0 12px 40px rgba(110,231,255,.08), 0 0 0 1px rgba(110,231,255,.25) inset; }
+    .cy-card .mini { color: var(--cy-mute); }
+
+    /* Simulator */
+    .sim { display:grid; gap:16px; grid-template-columns:1fr; }
+    @media(min-width:1100px){ .sim{ grid-template-columns: 1.2fr 1fr; } }
+    .sim-controls .row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+    .select, .input, .toggle { width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--cy-grid); background:#0f141c; color:inherit; }
+    .toggle { display:flex; align-items:center; gap:8px; padding:10px; cursor:pointer; user-select:none; }
+    .toggle input { accent-color: var(--cy-neon); }
+
+    .risk {
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+      border:1px solid var(--cy-grid); border-radius:14px; padding:12px;
+    }
+    .risk-score { font-size:46px; font-weight:900; }
+    .risk-meter { height:12px; border-radius:10px; border:1px solid var(--cy-grid); background:#0f141c; overflow:hidden; }
+    .risk-meter > div { height:100%; width:0%; background:linear-gradient(90deg,#63ffa5,#ffd75a,#ff4d6d); transition: width .5s ease; }
+
+    /* CTA buttons */
+    .btn.ghost { border:1px solid var(--cy-grid); }
+    .btn.danger { border:1px solid rgba(255,77,109,.4); color:#ffdfe6; }
+    .btn.neon { background: linear-gradient(90deg,var(--cy-neon),var(--cy-accent)); color:#061019; border:0; font-weight:800; }
+
+    /* subtle grid overlay for sections */
+    .grid-overlay::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px,
+        linear-gradient(0deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px;
+      mask: linear-gradient(to bottom, transparent, rgba(0,0,0,.3) 20%, rgba(0,0,0,.3) 80%, transparent);
+      opacity:.25; border-radius:16px;
+    }
+
+    /* tiny badge */
+    .badge { display:inline-flex; align-items:center; gap:6px; padding:2px 8px; border-radius:999px; border:1px solid var(--cy-grid); font-size:12px; color:var(--cy-mute); }
+    .dot-live { display:inline-block; width:8px; height:8px; background:#f44; border-radius:999px; animation:pulse 1.8s infinite; }
+    @keyframes pulse { 0%{ box-shadow:0 0 0 0 rgba(255,77,109,.6);} 70%{ box-shadow:0 0 0 8px rgba(255,77,109,0);} 100%{ box-shadow:0 0 0 0 rgba(255,77,109,0);} }
   </style>
 </head>
 <body>
-  <div class="bg-orbs" aria-hidden="true"></div>
+  <!-- Background FX -->
+  <div class="cy-layers">
+    <canvas id="cy-matrix" aria-hidden="true"></canvas>
+    <div class="cy-scanlines" aria-hidden="true"></div>
+  </div>
+
   <div data-include="partials/header.html"></div>
 
-  <section class="container hero">
-    <span class="eyebrow">Security</span>
-    <h1 class="gradient-text">Cybersecurity, engineered for blast-radius zero</h1>
-    <p class="sub">Zero-trust by default. Live anomaly detection. Incident automation. See it in the interactive 3D defense model.</p>
-    <div class="chips">
-      <a class="chip" href="#soc2">SOC 2 (in progress)</a>
-      <a class="chip" href="#zt" data-jump="zt">SASE / Zero-Trust</a>
-      <a class="chip" href="#waf" data-jump="waf">WAF / RASP</a>
-      <a class="chip" href="#mdr" data-jump="mdr">Managed Detection & Response</a>
+  <!-- HERO -->
+  <section class="container hero cy-section" style="margin-top:20px">
+    <span class="eyebrow">EVRT Cyber Operations</span>
+    <h1 class="gradient-text">Assume breach.<br/>Outlearn the adversary.</h1>
+    <p class="sub">Red/Blue/Purple teaming, SecOps automation, and cloud/app hardening. Real-time detection and response, wrapped in a UX that actually helps you win.</p>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+      <button id="btn-sim" class="btn neon">Launch breach simulator</button>
+      <a class="btn ghost" href="contact.html">Book a breach drill</a>
+      <span class="badge"><span class="dot-live"></span> live demo • simulated data</span>
     </div>
-    <div class="hero-cta" style="margin-top:12px">
-      <a class="btn primary" id="ctaAssess" href="#">Book a security assessment</a>
-      <a class="btn" href="#model" id="ctaSeeModel">See the 3D model</a>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="big" id="ctr1">0</div>
+        <div class="muted">Assets indexed</div>
+      </div>
+      <div class="stat">
+        <div class="big" id="ctr2">0</div>
+        <div class="muted">Controls validated</div>
+      </div>
+      <div class="stat">
+        <div class="big" id="ctr3">0</div>
+        <div class="muted">Signals/min analyzed</div>
+      </div>
     </div>
   </section>
 
-  <section class="container section" id="model">
-    <div class="defense-grid">
-      <aside class="tool">
-        <h3>Live defense controls</h3>
-        <p class="muted">Toggle protections and launch scenarios. The scene reacts in real time.</p>
+  <!-- TERMINAL + TICKER -->
+  <section class="container section cy-section">
+    <div class="grid grid-2">
+      <div class="terminal grid-overlay">
+        <div class="term-top">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <strong style="margin-left:6px">/opt/evrt/secops</strong>
+          <span class="muted" style="margin-left:auto">root@evrt:~$</span>
+        </div>
+        <div id="term" class="term-body" role="log" aria-live="polite"></div>
+      </div>
 
-        <div class="toggles" id="toggles">
-          <label><input type="checkbox" data-k="waf" checked> WAF & API Shield</label>
-          <label><input type="checkbox" data-k="zt" checked> Zero-Trust access (IAM/Policies)</label>
-          <label><input type="checkbox" data-k="mdr" checked> Managed Detection & Response</label>
-          <label><input type="checkbox" data-k="rate" checked> Adaptive rate-limit / DDoS</label>
+      <div class="card grid-overlay">
+        <h3 style="display:flex;align-items:center;gap:8px;margin-top:2px">Live Threat Feed
+          <span class="badge"><span class="dot-live"></span> monitoring</span>
+        </h3>
+        <div class="ticker" style="margin-top:6px">
+          <span class="ticker-label">IOC</span>
+          <div id="ticker" class="ticker-track"></div>
+        </div>
+        <div class="muted" style="margin-top:8px">Aggregated indicators: OSINT + internal honeypots + partner intel. Demo stream below.</div>
+        <div id="ioc-list" class="prose" style="max-height:200px; overflow:auto; margin-top:8px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPABILITIES -->
+  <section class="container section cy-section">
+    <h2 class="gradient-text">What we do</h2>
+    <p class="sub">Operator-grade services with automation where it matters.</p>
+    <div class="grid-3">
+      <div class="cy-card">
+        <h3>Red Team</h3>
+        <p class="mini">External recon, initial access, lateral movement, crown-jewel reach.</p>
+        <ul class="cta-sugg">
+          <li>Phishing & MFA fatigue campaigns</li>
+          <li>Cloud misconfig & key sprawl hunts</li>
+          <li>Attack path mapping (BloodHound-style)</li>
+        </ul>
+      </div>
+      <div class="cy-card">
+        <h3>Blue Team</h3>
+        <p class="mini">Detection engineering, playbooks, and response time compression.</p>
+        <ul class="cta-sugg">
+          <li>Sigma → SIEM rules with test data</li>
+          <li>EDR tuning, alert dedup & triage</li>
+          <li>IR runbooks + tabletops</li>
+        </ul>
+      </div>
+      <div class="cy-card">
+        <h3>Purple Team</h3>
+        <p class="mini">Continuous exercise loop that improves both sides weekly.</p>
+        <ul class="cta-sugg">
+          <li>Atomic tests mapped to MITRE ATT&CK</li>
+          <li>Gaps → fixes → re-test automation</li>
+          <li>Dashboard of detection coverage</li>
+        </ul>
+      </div>
+      <div class="cy-card">
+        <h3>Cloud & AppSec</h3>
+        <p class="mini">IaC guardrails, least privilege, secrets hygiene, SAST/DAST.</p>
+        <ul class="cta-sugg">
+          <li>Multi-cloud posture baselines</li>
+          <li>CI/CD sign & SBOM policy gates</li>
+          <li>Runtime protections</li>
+        </ul>
+      </div>
+      <div class="cy-card">
+        <h3>SecOps Automation</h3>
+        <p class="mini">SOAR playbooks that actually save time, not add noise.</p>
+        <ul class="cta-sugg">
+          <li>Enrichment: VT, WHOIS, sandbox, GH</li>
+          <li>Quarantine, revocation, rotate keys</li>
+          <li>Case trails + learning loops</li>
+        </ul>
+      </div>
+      <div class="cy-card">
+        <h3>Compliance That Helps</h3>
+        <p class="mini">SOC2/ISO/NIST, but mapped to risk, not busywork.</p>
+        <ul class="cta-sugg">
+          <li>Control catalogs that devs accept</li>
+          <li>Evidence via automation</li>
+          <li>Board-ready metrics</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- BREACH SIMULATOR -->
+  <section class="container section cy-section">
+    <h2 class="gradient-text">Breach simulator</h2>
+    <p class="sub">Pick an entry vector, toggle your controls, get a rapid risk & blast radius estimate. (All data here is simulated.)</p>
+    <div class="sim">
+      <div class="sim-controls card grid-overlay">
+        <div class="row">
+          <select id="vector" class="select">
+            <option value="phish">Phishing (MFA fatigue)</option>
+            <option value="keys">Leaked keys / tokens</option>
+            <option value="s3">Exposed S3 bucket</option>
+            <option value="rce">App RCE (dependency)</option>
+            <option value="vpn">VPN credential stuffing</option>
+          </select>
+          <select id="crown" class="select">
+            <option value="pii">Customer PII</option>
+            <option value="secrets">Secrets / signing keys</option>
+            <option value="ip">Source code / IP</option>
+            <option value="ops">Ops control / prod data</option>
+          </select>
+        </div>
+        <div class="row">
+          <label class="toggle"><input id="ctl-mfa" type="checkbox" checked/> MFA enforced</label>
+          <label class="toggle"><input id="ctl-edr" type="checkbox" checked/> EDR coverage</label>
+        </div>
+        <div class="row">
+          <label class="toggle"><input id="ctl-siem" type="checkbox" checked/> SIEM detections</label>
+          <label class="toggle"><input id="ctl-least" type="checkbox" checked/> Least privilege</label>
+        </div>
+        <div class="row">
+          <label class="toggle"><input id="ctl-rotate" type="checkbox" checked/> Key rotation</label>
+          <label class="toggle"><input id="ctl-alert" type="checkbox" checked/> Alerting on anomalies</label>
         </div>
 
-        <div style="margin:12px 0 6px"><strong>Launch a scenario</strong></div>
-        <div class="btnbar">
-          <button class="btn" id="sPhish">Phishing → token reuse</button>
-          <button class="btn" id="sDdos">DDoS burst</button>
-          <button class="btn" id="sLateral">Lateral movement</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px">
+          <button id="btn-run" class="btn neon">Run simulation</button>
+          <button id="btn-export" class="btn">Export JSON</button>
+          <a class="btn danger" href="contact.html">Talk to a responder</a>
         </div>
+      </div>
 
-        <div style="margin:12px 0 6px"><strong>Scene</strong></div>
-        <div class="btnbar">
-          <button class="btn" id="tour">Auto-tour</button>
-          <button class="btn" id="reset">Reset</button>
-          <button class="btn" id="exportPng">Export PNG</button>
-          <button class="btn" id="shareLink">Share scene link</button>
-        </div>
-
-        <div class="metrics">
-          <div class="m"><div class="v" id="mBlocked">0</div><div class="muted">Blocked</div></div>
-          <div class="m"><div class="v" id="mAnom">0</div><div class="muted">Anomalies</div></div>
-          <div class="m"><div class="v" id="mAllowed">0</div><div class="muted">Allowed</div></div>
-        </div>
-
-        <div style="margin-top:10px">
-          <div class="seg" role="tablist" aria-label="Traffic">
-            <button class="active" data-traffic="balanced">Balanced</button>
-            <button data-traffic="high">High</button>
-            <button data-traffic="low">Low</button>
+      <div class="risk card grid-overlay">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <div>
+            <div class="mini">Risk score</div>
+            <div class="risk-score"><span id="risk">—</span>/100</div>
+          </div>
+          <div>
+            <div class="mini">Blast radius</div>
+            <div style="font-size:22px; font-weight:800"><span id="radius">—</span></div>
           </div>
         </div>
-
-        <p class="muted" style="margin-top:10px">Tip: drag to orbit · scroll to zoom · dbl-tap to center.</p>
-      </aside>
-
-      <div class="scene-card">
-        <canvas id="scene"></canvas>
-        <div class="legend">
-          <div class="key"><span class="dot blue"></span> Legit traffic</div>
-          <div class="key"><span class="dot red"></span> Attack vector</div>
-          <div class="key"><span class="dot green"></span> Sensor alert</div>
+        <div class="risk-meter" style="margin:10px 0 8px">
+          <div id="bar"></div>
+        </div>
+        <div class="mini">Why this score</div>
+        <ul id="why" class="cta-sugg"></ul>
+        <div style="margin-top:10px">
+          <div class="mini">Recommended actions (top)</div>
+          <ul id="fixes" class="cta-sugg"></ul>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="container section">
-    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif">Security capabilities</h2>
-    <div class="svc-grid" style="margin-top:12px">
-      <div class="card" data-reveal><div class="icon">🛡️</div><strong>Threat modeling</strong><p class="muted">Map assets, attack paths, and blast radius. Prioritize fixes that measurably reduce risk.</p></div>
-      <div class="card" data-reveal><div class="icon">🛰️</div><strong>MDR & SIEM</strong><p class="muted">Continuous monitoring with anomaly detection, playbooks, and on-call response.</p></div>
-      <div class="card" data-reveal><div class="icon">🧩</div><strong>AppSec: WAF / RASP</strong><p class="muted">Runtime protection at the edge and in-app. False-positive tuning included.</p></div>
-      <div class="card" data-reveal><div class="icon">☁️</div><strong>Cloud posture</strong><p class="muted">CSPM for AWS/GCP/Azure: identity, network, storage, and KMS baselines with drift alerts.</p></div>
-      <div class="card" data-reveal><div class="icon">🚨</div><strong>Incident response</strong><p class="muted">Retainers with SLAs. Contain, investigate, and recover with forensic reporting.</p></div>
-      <div class="card" data-reveal><div class="icon">🔐</div><strong>Zero-Trust rollout</strong><p class="muted">Strong auth, least-privilege policies, device posture, and segmented networks.</p></div>
+  <!-- CTA -->
+  <section class="container section cy-section">
+    <div class="card" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+      <div>
+        <h3 style="margin:0 0 4px">Run a 2-week Purple Team sprint</h3>
+        <p class="muted" style="margin:0">We test real TTPs, harden controls, and leave you faster than we found you.</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <a class="btn neon" href="contact.html">Start a sprint</a>
+        <a class="btn ghost" href="pricing.html">See pricing</a>
+      </div>
     </div>
   </section>
 
   <div data-include="partials/footer.html"></div>
 
-  <!-- Three.js (classic globals) -->
-  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-  <script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
-
+  <script defer src="assets/app.js"></script>
   <script>
-  (function(){
-    const $ = s => document.querySelector(s);
-    const $$ = s => [...document.querySelectorAll(s)];
-
-    // ---- state (shareable)
-    const features = { waf:true, zt:true, mdr:true, rate:true };
-    const metrics  = { blocked:0, anomalies:0, allowed:0 };
-    let trafficMode = 'balanced';
-
-    // ---- renderer / scene
-    const canvas = document.getElementById('scene');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(55, 2, 0.1, 200);
-    camera.position.set(10,6,12);
-    scene.add(camera);
-    const controls = new THREE.OrbitControls(camera, canvas);
-    controls.enableDamping = true; controls.maxDistance=28; controls.minDistance=3.5;
-
-    // lights
-    scene.add(new THREE.AmbientLight(0x9eb2ff, 0.7));
-    const dir = new THREE.DirectionalLight(0x88aaff, 0.9); dir.position.set(5,8,5); scene.add(dir);
-
-    // core + layers
-    const coreMat = new THREE.MeshStandardMaterial({ color:0x0d1628, metalness:0.25, roughness:0.55, emissive:0x1a2b55, emissiveIntensity:0.8 });
-    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.6, 2), coreMat); scene.add(core);
-    const halo = new THREE.Mesh(new THREE.SphereGeometry(2.05, 48, 48), new THREE.MeshBasicMaterial({ color:0x4ea6ff, transparent:true, opacity:0.08 })); scene.add(halo);
-    const wafRing = new THREE.Mesh(new THREE.TorusGeometry(6.4, 0.12, 24, 180), new THREE.MeshBasicMaterial({ color:0x6da8ff, transparent:true, opacity:0.9 })); scene.add(wafRing);
-    const ztShell = new THREE.Mesh(new THREE.SphereGeometry(4.7, 48, 48), new THREE.MeshBasicMaterial({ color:0x5cf2c9, wireframe:true, transparent:true, opacity:0.32 })); scene.add(ztShell);
-
-    // nodes around ring
-    const group = new THREE.Group(); scene.add(group);
-    const nodeCount = (innerWidth<900)?24:40;
-    const nodes=[], nodeGeo=new THREE.SphereGeometry(0.16,16,16);
-    function randOnSphere(r){ const u=Math.random(), v=Math.random(); const t=2*Math.PI*u, p=Math.acos(2*v-1); return new THREE.Vector3(r*Math.sin(p)*Math.cos(t), r*Math.sin(p)*Math.sin(t), r*Math.cos(p)); }
-    for(let i=0;i<nodeCount;i++){ const p = randOnSphere(6+Math.random()*0.3); const m = new THREE.MeshBasicMaterial(); m.color.setHSL(0.62+Math.random()*0.05,0.6,0.65); const n=new THREE.Mesh(nodeGeo,m); n.position.copy(p); group.add(n); nodes.push(n); }
-    const arcMat=new THREE.LineBasicMaterial({ color:0x2b3450, transparent:true, opacity:0.6 });
-    for(let i=0;i<nodeCount;i+=2){ const a=nodes[i].position, b=nodes[(i+7)%nodeCount].position; const mid=a.clone().add(b).multiplyScalar(0.5).setLength(6.6); const curve=new THREE.CatmullRomCurve3([a,mid,b]); const g=new THREE.BufferGeometry().setFromPoints(curve.getPoints(32)); scene.add(new THREE.Line(g, arcMat)); }
-
-    // particles
-    const particles=[]; const pGeo=new THREE.SphereGeometry(0.075,8,8); const legitMat=new THREE.MeshBasicMaterial({ color:0x6da8ff }); const attackMat=new THREE.MeshBasicMaterial({ color:0xff6b91 });
-    function spawnParticle(type='legit'){ const start=randOnSphere(9.5); const target=(type==='legit')?randOnSphere(3.3):new THREE.Vector3(0,0,0); const mat=(type==='legit'?legitMat:attackMat).clone(); const mesh=new THREE.Mesh(pGeo,mat); mesh.position.copy(start); const speed=(type==='legit')?(0.020+Math.random()*0.015):(0.028+Math.random()*0.02); particles.push({mesh,target,type,speed,alive:true}); scene.add(mesh); }
-
-    // sensors
-    const sensors=[], sGeo=new THREE.SphereGeometry(0.09,12,12);
-    for(let i=0;i<10;i++){ const s=new THREE.Mesh(sGeo,new THREE.MeshBasicMaterial({ color:0x5cf2c9 })); s.position.copy(randOnSphere(4.9)); sensors.push(s); scene.add(s); }
-
-    // beams
-    function beam(from,to,color=0xff6b91){ const pts=new THREE.CatmullRomCurve3([from, from.clone().add(to).multiplyScalar(0.5).setLength(7.2), to]).getPoints(40); const g=new THREE.BufferGeometry().setFromPoints(pts); const m=new THREE.LineBasicMaterial({ color, transparent:true, opacity:0.9 }); const l=new THREE.Line(g,m); scene.add(l); let life=26; const id=setInterval(()=>{ life--; m.opacity*=0.92; if(life<=0){ clearInterval(id); scene.remove(l); g.dispose(); } },16); }
-
-    // scenarios
-    function scenarioPhish(){ for(let i=0;i<6;i++){ const n=nodes[(Math.random()*nodes.length)|0]; beam(n.position.clone(), new THREE.Vector3(0,0,0), 0xff6b91); spawnParticle('attack'); } highlight('zt'); }
-    function scenarioDdos(){ for(let i=0;i<32;i++){ setTimeout(()=>spawnParticle('attack'), i*40); } highlight('waf'); }
-    function scenarioLateral(){ for(let i=0;i<8;i++) spawnParticle('legit'); for(let i=0;i<6;i++) setTimeout(()=>spawnParticle('attack'), i*60); highlight('mdr'); }
-
-    // highlight a layer (visual pulse)
-    function highlight(layer){
-      if(layer==='waf'){ const base=wafRing.material.opacity; let t=0; const id=setInterval(()=>{ t+=0.08; wafRing.material.opacity=base+Math.sin(t)*0.35; if(t>Math.PI*2){ clearInterval(id); wafRing.material.opacity=base; } },16); }
-      if(layer==='zt'){ const base=ztShell.material.opacity; let t=0; const id=setInterval(()=>{ t+=0.08; ztShell.material.opacity=base+Math.sin(t)*0.25; if(t>Math.PI*2){ clearInterval(id); ztShell.material.opacity=base; } },16); }
-      if(layer==='mdr'){ for(const s of sensors){ const base=s.material.color.getHex(); s.material.color.set(0xffffff); setTimeout(()=>s.material.color.set(base), 280); } }
-    }
-
-    // resize
-    function resize(){ const w = canvas.clientWidth || canvas.parentElement.clientWidth || 800; const h = canvas.clientHeight || 560; if (canvas.width!==w || canvas.height!==h){ renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); } }
-    if('ResizeObserver' in window){ new ResizeObserver(resize).observe(canvas); } window.addEventListener('resize', resize, { passive:true }); resize();
-
-    // HUD
-    function updateMetrics(){ $('#mBlocked').textContent=metrics.blocked; $('#mAnom').textContent=metrics.anomalies; $('#mAllowed').textContent=metrics.allowed; }
-
-    // fx
-    function explode(pos,color=0xffffff){ const N=18,g=new THREE.BufferGeometry(),positions=new Float32Array(N*3),dirs=[]; for(let i=0;i<N;i++){ const v=randOnSphere(1).multiplyScalar(0.06+Math.random()*0.06); positions.set([pos.x,pos.y,pos.z], i*3); dirs.push(v); } g.setAttribute('position', new THREE.BufferAttribute(positions,3)); const m=new THREE.PointsMaterial({ size:0.06, color, transparent:true, opacity:0.95 }); const pts=new THREE.Points(g,m); scene.add(pts); let life=22; const id=setInterval(()=>{ life--; const arr=pts.geometry.attributes.position.array; for(let i=0;i<N;i++){ arr[i*3]+=dirs[i].x; arr[i*3+1]+=dirs[i].y; arr[i*3+2]+=dirs[i].z; } pts.geometry.attributes.position.needsUpdate=true; m.opacity*=0.92; if(life<=0){ clearInterval(id); scene.remove(pts); g.dispose(); } },16); }
-    function ping(pos){ const geo=new THREE.RingGeometry(0.1,0.13,32); const mat=new THREE.MeshBasicMaterial({ color:0x5cf2c9, transparent:true, opacity:0.95, side:THREE.DoubleSide }); const r=new THREE.Mesh(geo,mat); r.position.copy(pos); scene.add(r); let s=1,life=24; const id=setInterval(()=>{ life--; s+=0.12; r.scale.set(s,s,1); mat.opacity*=0.9; if(life<=0){ clearInterval(id); scene.remove(r); geo.dispose(); } },16); }
-
-    // animate
-    const R_WAF=6.4, R_ZT=4.7, R_CORE=1.6; let pump=0;
-    function pumpRate(){ return trafficMode==='high'?3:(trafficMode==='low'?0.5:1); }
-    function animate(){
-      requestAnimationFrame(animate); resize();
-      group.rotation.y+=0.0009; wafRing.rotation.z+=0.0012; ztShell.rotation.y-=0.0007; core.rotation.x-=0.0007; halo.rotation.y+=0.0005;
-      pump += 0.02 * pumpRate(); if (pump>1){ pump=0; spawnParticle('legit'); }
-      for(const p of particles){
-        if(!p.alive) continue;
-        const dir=p.target.clone().sub(p.mesh.position).normalize(); p.mesh.position.addScaledVector(dir, p.speed);
-        const r=p.mesh.position.length();
-        if(features.waf && p.type==='attack' && r < R_WAF-0.1 && r > R_ZT+0.1){
-          if(Math.random() < (features.rate?0.88:0.75)){ p.alive=false; metrics.blocked++; updateMetrics(); explode(p.mesh.position,0xff6b91); scene.remove(p.mesh); continue; }
+    /* ========= MATRIX RAIN BACKDROP ========= */
+    (function matrix(){
+      const c = document.getElementById('cy-matrix'); const ctx = c.getContext('2d');
+      function resize(){ c.width = window.innerWidth; c.height = window.innerHeight; }
+      resize(); window.addEventListener('resize', resize);
+      const chars = 'アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$#@!*%&';
+      const cols = ()=>Math.floor(c.width / 14);
+      let drops = Array(cols()).fill(0).map(()=>Math.random()*c.height/14);
+      function step(){
+        ctx.fillStyle = 'rgba(10,14,20,0.08)'; ctx.fillRect(0,0,c.width,c.height);
+        ctx.fillStyle = '#6ee7ff';
+        ctx.shadowColor = '#6ee7ff88'; ctx.shadowBlur = 8;
+        for(let i=0;i<drops.length;i++){
+          const x = i*14, y = drops[i]*14;
+          const ch = chars[Math.floor(Math.random()*chars.length)];
+          ctx.fillText(ch, x, y);
+          if(y > c.height && Math.random()>0.975) drops[i]=0;
+          drops[i]++;
         }
-        if(features.zt && p.type==='attack' && r < R_ZT-0.05){
-          if(Math.random() < 0.88){ p.alive=false; metrics.blocked++; updateMetrics(); explode(p.mesh.position,0x5cf2c9); scene.remove(p.mesh); continue; }
+        requestAnimationFrame(step);
+      }
+      ctx.font = '14px monospace';
+      step();
+    })();
+
+    /* ========= HERO COUNTERS ========= */
+    function animateNumber(el, target, dur=1000){
+      const t0 = performance.now(); const start = 0;
+      function tick(t){
+        const p = Math.min(1, (t-t0)/dur); const v = Math.floor(start + (target-start)*(1- Math.cos(p*Math.PI))/2);
+        el.textContent = v.toLocaleString();
+        if(p<1) requestAnimationFrame(tick);
+      } requestAnimationFrame(tick);
+    }
+    animateNumber(document.getElementById('ctr1'), 128_432);
+    animateNumber(document.getElementById('ctr2'), 4_219);
+    animateNumber(document.getElementById('ctr3'), 19_840);
+
+    /* ========= TERMINAL ========= */
+    const term = document.getElementById('term');
+    function println(s, cls=''){ const line = document.createElement('div'); line.className = 'term-line ' + cls; line.textContent = s; term.appendChild(line); term.scrollTop = term.scrollHeight; }
+    function typeCmd(cmd, cb){
+      const row = document.createElement('div'); row.className='term-line';
+      term.appendChild(row); let i=0;
+      const iv = setInterval(()=>{ row.textContent = '$ ' + cmd.slice(0, ++i) + (i%2? '_':''); term.scrollTop = term.scrollHeight;
+        if(i>=cmd.length){ clearInterval(iv); row.innerHTML = '$ ' + cmd + ' <span class="term-caret"></span>'; cb&&cb(); }}, 20);
+    }
+    const demo = [
+      ()=> typeCmd('evrt scan --surface perimeter --quick', ()=> {
+        setTimeout(()=> println('> Resolving assets… 342 found', 'term-success'), 200);
+        setTimeout(()=> println('> Checking TLS, HTTP headers, CSP…', 'term-success'), 600);
+        setTimeout(()=> println('! Missing security.txt on 3 assets', 'term-warn'), 900);
+        setTimeout(()=> println('! CSP allows unsafe-inline on app.evrt.example', 'term-warn'), 1200);
+        setTimeout(()=> println('✓ Surface scan complete in 4.9s', 'term-success'), 1700);
+      }),
+      ()=> typeCmd('evrt detect --simulate atomic/T1059.003', ()=> {
+        setTimeout(()=> println('> Injecting test event…', 'term-success'), 300);
+        setTimeout(()=> println('✓ SIEM rule matched: Command & Control beacon (simulated)', 'term-success'), 900);
+        setTimeout(()=> println('> Mean detection time: 1.8s', 'term-success'), 1300);
+      }),
+      ()=> typeCmd('evrt respond --playbook revoke-keys --dry-run', ()=> {
+        setTimeout(()=> println('> Would revoke 2 long-lived tokens', 'term-warn'), 500);
+        setTimeout(()=> println('> Would rotate 4 signing keys', 'term-warn'), 900);
+        setTimeout(()=> println('✓ Dry run complete', 'term-success'), 1300);
+      })
+    ];
+    (function loop(i=0){ demo[i](); setTimeout(()=> loop((i+1)%demo.length), 5200); })();
+
+    /* ========= THREAT TICKER ========= */
+    const iocEl = document.getElementById('ticker'); const iocList = document.getElementById('ioc-list');
+    const countries = ['US','DE','SG','IN','NL','GB','FR','BR','JP','UA','CA'];
+    const mal = ['QakBot','CobaltStrike','AsyncRAT','RedLine','AgentTesla','Remcos','DarkGate'];
+    const makeIOC = ()=> ({
+      ip: `${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`,
+      sha: (crypto.getRandomValues(new Uint8Array(8))).reduce((a,b)=>a+('0'+b.toString(16)).slice(-2),''),
+      tag: mal[Math.floor(Math.random()*mal.length)],
+      cc: countries[Math.floor(Math.random()*countries.length)]
+    });
+    function pushIOC(){
+      const x = makeIOC();
+      const item = document.createElement('span');
+      item.textContent = `${x.ip} • ${x.tag} • ${x.cc} • ${x.sha}`;
+      iocEl.appendChild(item);
+      if(iocEl.children.length>18){ iocEl.removeChild(iocEl.firstChild); }
+      const li = document.createElement('div');
+      li.className='row'; li.innerHTML = `<strong>${x.tag}</strong><span class="muted">${x.ip} • ${x.cc} • ${x.sha}</span>`;
+      iocList.prepend(li);
+      const rows = iocList.querySelectorAll('.row'); if(rows.length>12) rows[rows.length-1].remove();
+    }
+    for(let i=0;i<16;i++) pushIOC();
+    setInterval(pushIOC, 1800);
+
+    /* ========= BREACH SIMULATOR ========= */
+    const selVector = document.getElementById('vector');
+    const selCrown  = document.getElementById('crown');
+    const ctl = id => document.getElementById(id);
+    const state = {
+      vector: selVector.value, crown: selCrown.value,
+      mfa:true, edr:true, siem:true, least:true, rotate:true, alert:true
+    };
+    ['ctl-mfa','ctl-edr','ctl-siem','ctl-least','ctl-rotate','ctl-alert'].forEach(k=>{
+      ctl(k).addEventListener('change', ()=>{ state[k.split('-')[1]] = ctl(k).checked; });
+    });
+    selVector.addEventListener('change', ()=> state.vector = selVector.value);
+    selCrown .addEventListener('change', ()=> state.crown  = selCrown.value);
+
+    function score(state){
+      // base risk by vector (0–100)
+      const base = { phish:68, keys:82, s3:74, rce:88, vpn:70 }[state.vector] || 70;
+      // control reductions
+      let risk = base;
+      const reasons = [];
+      function reduce(cond, pts, why){ if(cond){ risk -= pts; reasons.push(`-${pts}: ${why}`); } else { reasons.push(`+${Math.ceil(pts/2)}: Missing ${why}`); risk += Math.ceil(pts/2); } }
+      reduce(state.mfa,    10, 'MFA resisted account takeover');
+      reduce(state.edr,    12, 'EDR blocks common payloads');
+      reduce(state.siem,    8, 'Detections trigger early');
+      reduce(state.least,  10, 'Least privilege narrows lateral movement');
+      reduce(state.rotate,  6, 'Key rotation limits token lifetime');
+      reduce(state.alert,   8, 'Anomaly alerts shorten MTTR');
+      // clamp
+      risk = Math.max(1, Math.min(99, Math.round(risk)));
+      // blast radius mapping
+      const radius = risk>80 ? 'Org-wide' : risk>65 ? 'Multi-env' : risk>50 ? 'Single env' : 'Limited';
+      // fixes
+      const fixes = [];
+      if(!state.mfa)   fixes.push('Enforce phishing-resistant MFA (FIDO2/WebAuthn).');
+      if(!state.edr)   fixes.push('Deploy EDR to all prod endpoints & servers.');
+      if(!state.siem)  fixes.push('Add ATT&CK-mapped detections for your top 10 TTPs.');
+      if(!state.least) fixes.push('Audit IAM; remove wildcard grants; add JIT elevation.');
+      if(!state.rotate)fixes.push('Rotate long-lived keys; enforce short-lived tokens.');
+      if(!state.alert) fixes.push('Wire anomaly alerts to on-call with playbooks.');
+      if(fixes.length===0) fixes.push('Run purple-team re-test monthly to keep the edge.');
+      return { risk, reasons, radius, fixes };
+    }
+
+    function renderSim(){
+      const out = score(state);
+      document.getElementById('risk').textContent = out.risk;
+      document.getElementById('bar').style.width = out.risk + '%';
+      document.getElementById('radius').textContent = out.radius;
+      const why = document.getElementById('why'); why.innerHTML='';
+      out.reasons.forEach(r=>{ const li=document.createElement('li'); li.textContent=r; why.appendChild(li); });
+      const fx = document.getElementById('fixes'); fx.innerHTML='';
+      out.fixes.forEach(r=>{ const li=document.createElement('li'); li.textContent=r; fx.appendChild(li); });
+      return out;
+    }
+
+    document.getElementById('btn-run').addEventListener('click', ()=>{
+      // cinematic: print a terminal job for this simulation
+      typeCmd(`evrt simulate --vector ${state.vector} --crown ${state.crown}`, ()=>{
+        println('> Running TTPs in lab…', 'term-success');
+        setTimeout(()=> println('> Aggregating control signals…', 'term-success'), 500);
+        setTimeout(()=> { println('✓ Simulation complete. See Risk panel →', 'term-success'); renderSim(); }, 1100);
+      });
+    });
+
+    document.getElementById('btn-export').addEventListener('click', ()=>{
+      const out = renderSim();
+      const payload = {
+        timestamp: new Date().toISOString(),
+        input: state, result: out, mapping: {
+          vectorToATTACK: {
+            phish: ['TA0001', 'TA0006'], keys:['TA0006','TA0007'], s3:['TA0006','TA0009'],
+            rce:['TA0001','TA0003','TA0004'], vpn:['TA0001','TA0006']
+          }[state.vector]
         }
-        if(features.mdr && p.type==='attack' && r < 5.4 && Math.random()<0.015){ metrics.anomalies++; updateMetrics(); ping(p.mesh.position); }
-        if(r < R_CORE+0.05){ p.alive=false; scene.remove(p.mesh); if(p.type==='attack'){ core.material.emissiveIntensity=1.3; setTimeout(()=>core.material.emissiveIntensity=0.8,220); } else { metrics.allowed++; updateMetrics(); } }
-      }
-      for(let i=particles.length-1;i>=0;i--) if(!particles[i].alive) particles.splice(i,1);
-      wafRing.material.opacity = features.waf ? 0.9 : 0.25;
-      ztShell.material.opacity = features.zt ? 0.32 : 0.08;
-      controls.update(); renderer.render(scene, camera);
-    }
-    animate();
-
-    // UI wiring
-    document.getElementById('sPhish').addEventListener('click', scenarioPhish);
-    document.getElementById('sDdos').addEventListener('click', scenarioDdos);
-    document.getElementById('sLateral').addEventListener('click', scenarioLateral);
-
-    document.getElementById('tour').addEventListener('click', ()=>{
-      const start=camera.position.clone(), target=new THREE.Vector3(0,0,0);
-      let t=0; const id=setInterval(()=>{ t+=0.02;
-        camera.position.x = start.x*Math.cos(0.02) + start.z*Math.sin(0.02);
-        camera.position.z = start.z*Math.cos(0.02) - start.x*Math.sin(0.02);
-        camera.lookAt(target); if(t>6){ clearInterval(id); }
-      },16);
+      };
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)], {type:'application/json'}));
+      a.download = `evrt_sim_${Date.now()}.json`; a.click();
     });
 
-    document.getElementById('reset').addEventListener('click', ()=>{
-      metrics.blocked = metrics.anomalies = metrics.allowed = 0; updateMetrics();
-      for(const p of particles){ p.alive=false; scene.remove(p.mesh); } particles.length=0;
-      core.material.emissiveIntensity=0.8; camera.position.set(10,6,12); controls.update();
+    document.getElementById('btn-sim').addEventListener('click', ()=>{
+      // Scroll to simulator and auto-run once for wow-effect
+      document.getElementById('btn-run').scrollIntoView({behavior:'smooth', block:'center'});
+      setTimeout(()=> document.getElementById('btn-run').click(), 600);
     });
-
-    document.getElementById('exportPng').addEventListener('click', ()=>{ const url=canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=url; a.download='evrt-security-scene.png'; a.click(); });
-
-    // Share scene link (encodes toggles + traffic)
-    function sceneLink(){
-      const payload = { features, trafficMode };
-      const hash = 'state=' + encodeURIComponent(btoa(JSON.stringify(payload)));
-      return `${location.origin}${location.pathname}#${hash}`;
-    }
-    document.getElementById('shareLink').addEventListener('click', async ()=>{
-      const link = sceneLink();
-      try{ await navigator.clipboard.writeText(link); alert('Shareable scene link copied!'); }
-      catch{ prompt('Copy this link:', link); }
-    });
-
-    // Book assessment: export PNG + open mail
-    document.getElementById('ctaAssess').addEventListener('click', (e)=>{
-      e.preventDefault();
-      // download snapshot
-      const url=canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=url; a.download='evrt-security-scene.png'; a.click();
-      // mailto with metrics + link
-      const subject = 'Security assessment request — EVRT scene snapshot';
-      const body =
-`Hello EVRT Security,
-
-Please review my environment snapshot.
-
-Features:
-- WAF/API Shield: ${features.waf?'ON':'OFF'}
-- Zero-Trust: ${features.zt?'ON':'OFF'}
-- MDR: ${features.mdr?'ON':'OFF'}
-- Rate-limit/DDoS: ${features.rate?'ON':'OFF'}
-Traffic mode: ${trafficMode}
-
-Metrics:
-- Blocked: ${metrics.blocked}
-- Anomalies: ${metrics.anomalies}
-- Allowed: ${metrics.allowed}
-
-Shareable scene link:
-${sceneLink()}
-
-(Attach the downloaded "evrt-security-scene.png")
-
-Thanks!`;
-      const mailto = `mailto:security@evrt.ai?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.location.href = mailto;
-    });
-
-    // Toggle + traffic controls
-    $$('#toggles input[type="checkbox"]').forEach(cb=> cb.addEventListener('change', ()=>{ features[cb.dataset.k]=cb.checked; }));
-    $$('[data-traffic]').forEach(b=>{
-      b.addEventListener('click', ()=>{ $$('[data-traffic]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); trafficMode=b.dataset.traffic; });
-    });
-
-    // Deep-link jumps from hero chips
-    function jumpTo(key){
-      document.getElementById('model').scrollIntoView({ behavior:'smooth', block:'start' });
-      if (key==='waf'){ scenarioDdos(); }
-      if (key==='zt'){ scenarioPhish(); }
-      if (key==='mdr'){ scenarioLateral(); }
-    }
-    $$('[data-jump]').forEach(a=>{
-      a.addEventListener('click', (e)=>{ e.preventDefault(); jumpTo(a.dataset.jump); });
-    });
-    document.getElementById('ctaSeeModel').addEventListener('click', (e)=>{ e.preventDefault(); document.getElementById('model').scrollIntoView({behavior:'smooth'}); });
-
-    // Hash handling: #waf / #zt / #mdr or #state=...
-    function handleHash(){
-      const h = (location.hash||'').replace(/^#/, '');
-      if(!h) return;
-      if (h.startsWith('state=')){
-        try{
-          const payload = JSON.parse(atob(decodeURIComponent(h.slice(6))));
-          if (payload && payload.features){
-            for (const k of ['waf','zt','mdr','rate']) features[k] = !!payload.features[k];
-            trafficMode = payload.trafficMode || 'balanced';
-            // reflect toggles UI
-            $$('#toggles input[type="checkbox"]').forEach(cb=> cb.checked = !!features[cb.dataset.k]);
-            $$('[data-traffic]').forEach(b=> b.classList.toggle('active', b.dataset.traffic===trafficMode));
-          }
-          document.getElementById('model').scrollIntoView({behavior:'smooth'});
-        }catch(e){}
-        return;
-      }
-      if (['waf','zt','mdr'].includes(h)) jumpTo(h);
-    }
-    window.addEventListener('hashchange', handleHash);
-    handleHash();
-
-    // dbl-click center
-    canvas.addEventListener('dblclick', ()=> controls.target.set(0,0,0));
-  })();
   </script>
 </body>
 </html>
