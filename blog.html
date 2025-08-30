@@ -1,36 +1,538 @@
-<!DOCTYPE html><html lang="en" data-theme="dark">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Insights — EVRT</title>
-  <meta name="description" content="Short, technical, and useful."/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>EVRT — Studies & Blog</title>
+  <meta name="description" content="EVRT Study Lab: real-looking case studies, experiments, and methods. Hypotheses, design, results, charts, and briefs."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
-  <link rel="icon" href="assets/favicon.svg">
-  <meta property="og:title" content="Insights — EVRT">
-  <meta property="og:description" content="Short, technical, and useful.">
-  <meta property="og:image" content="assets/og-image.svg">
   <link rel="stylesheet" href="assets/style.css"/>
+
+  <style>
+    :root{
+      --b-neon:#6ee7ff; --b-accent:#63ffa5; --b-amber:#ffd75a; --b-danger:#ff4d6d;
+      --b-bg:#0a0e14; --b-card:#0f141c; --b-grid:rgba(255,255,255,.06); --b-mute:#8fa2b7;
+    }
+    body{ background: radial-gradient(1400px 900px at 80% -260px,#142034 0,#0a0e14 65%); }
+
+    /* Backdrop FX */
+    .layers{ position:fixed; inset:0; z-index:0; pointer-events:none }
+    #stars{ position:absolute; inset:0; opacity:.22 }
+    .scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.26; mix-blend-mode:overlay }
+
+    /* Layout / UI */
+    .section{ position:relative; z-index:1 }
+    .eyebrow{ letter-spacing:.12em; text-transform:uppercase; color:var(--b-mute) }
+    .muted{ color:var(--b-mute) }
+    .control{ border:1px solid var(--b-grid); border-radius:12px; background:#0f141c; padding:10px 12px; color:inherit }
+    .chips{ display:flex; flex-wrap:wrap; gap:8px }
+    .chip{ padding:6px 10px; border-radius:999px; border:1px solid var(--b-grid); cursor:pointer; user-select:none }
+    .chip.active{ background:linear-gradient(90deg,var(--b-neon),var(--b-accent)); color:#061019; border:0; font-weight:800 }
+    .btn.neon{ background:linear-gradient(90deg,var(--b-neon),var(--b-accent)); color:#061019; border:0; font-weight:800 }
+    .btn.ghost{ border:1px solid var(--b-grid) }
+
+    .grid{ display:grid; gap:14px; grid-template-columns:1fr; }
+    @media(min-width:980px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+    @media(min-width:1340px){ .grid{ grid-template-columns:repeat(3,1fr); } }
+
+    /* Cards */
+    .card{ position:relative; border:1px solid var(--b-grid); border-radius:16px; background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); padding:14px; overflow:hidden; transform-style:preserve-3d; transition:transform .15s ease, box-shadow .2s ease, border-color .2s; }
+    .card:hover{ border-color:rgba(110,231,255,.45); box-shadow:0 14px 50px rgba(110,231,255,.10), 0 0 0 1px rgba(110,231,255,.25) inset; }
+    .orb{ position:absolute; inset:auto auto -12% -10%; width:160px; height:160px; background:radial-gradient(closest-side, rgba(110,231,255,.28), transparent 70%); filter:blur(12px); pointer-events:none }
+    .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--b-grid); border-radius:999px; font-size:12px }
+    .row{ display:flex; justify-content:space-between; align-items:center; gap:10px }
+    .row.wrap{ flex-wrap:wrap }
+    .tag{ font-size:11px; padding:2px 8px; border:1px solid var(--b-grid); border-radius:999px; color:var(--b-mute) }
+    .tags{ display:flex; gap:6px; flex-wrap:wrap }
+
+    /* Drawer (study detail) */
+    .drawer{ position:fixed; left:50%; transform:translateX(-50%); bottom:18px; width:min(1080px,92vw); z-index:60; display:none }
+    .drawer .box{ background:#07121b; border:1px solid rgba(110,231,255,.35); border-radius:14px; padding:12px }
+    .drawer .mini{ color:#9fb3c8; font-size:12px }
+    .artifact{ border:1px solid var(--b-grid); border-radius:12px; background:#0f141c; padding:10px; }
+
+    canvas.chart{ width:100%; height:220px; border:1px solid var(--b-grid); border-radius:12px; background:#0f141c; }
+
+    /* Timeline */
+    .timeline{ display:flex; gap:10px; overflow:auto; padding-bottom:6px }
+    .milestone{ min-width:280px; border:1px solid var(--b-grid); border-radius:12px; background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); padding:10px }
+
+    /* Sticky CTA */
+    .sticky-cta{ position:sticky; bottom:12px; z-index:40; display:flex; justify-content:center }
+    .sticky-cta .bar{ width:min(1080px,92vw); backdrop-filter:blur(8px); background:#07121b; border:1px solid rgba(110,231,255,.35); border-radius:14px; padding:10px; display:flex; gap:10px; align-items:center }
+    .ping{ width:8px; height:8px; border-radius:50%; background:#63ffa5; box-shadow:0 0 0 6px rgba(99,255,165,.15) }
+
+    /* Grid overlay */
+    .grid-overlay{ position:relative }
+    .grid-overlay::before{
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px,
+        linear-gradient(0deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px;
+      mask: linear-gradient(to bottom, transparent, rgba(0,0,0,.3) 20%, rgba(0,0,0,.3) 80%, transparent);
+      opacity:.22; border-radius:16px
+    }
+
+    .note{ font-size:12px; color:#9fb3c8 }
+  </style>
 </head>
 <body>
-  <div class="bg-orbs" aria-hidden="true"></div>
+  <!-- Backdrop -->
+  <div class="layers">
+    <canvas id="stars" aria-hidden="true"></canvas>
+    <div class="scan" aria-hidden="true"></div>
+  </div>
+
   <div data-include="partials/header.html"></div>
 
-  <section class="container hero">
-    <span class="eyebrow">Journal</span>
-    <h1 class="gradient-text">Insights</h1>
-    <p class="sub">Short, technical, and useful.</p>
-    <div class="hero-cta"></div>
+  <!-- HERO -->
+  <section class="container hero section" style="margin-top:20px">
+    <span class="eyebrow">EVRT Study Lab</span>
+    <h1 class="gradient-text">Studies & Field Notes.<br/>Hypothesis → Design → Results.</h1>
+    <p class="sub">Everything here reads like a **real study**—with hypotheses, methods, and charts. <span class="note">Metrics are demo/simulated for illustration; use consulting to run the real thing.</span></p>
+    <div class="row wrap" style="margin-top:10px">
+      <input id="q" class="control" placeholder="Search studies, metrics, tags…"/>
+      <div id="topics" class="chips"></div>
+      <div id="types" class="chips"></div>
+      <select id="sort" class="control">
+        <option value="new">Sort: Newest</option>
+        <option value="impact">Sort: Highest Lift</option>
+        <option value="alpha">Sort: A–Z</option>
+      </select>
+      <a class="btn neon" href="consulting.html">Run a study →</a>
+    </div>
   </section>
 
-  
-<section class="container section grid grid-3">
-  <a class="card" href="blog-post.html#best-minute" data-reveal><div class="icon">📓</div><strong>Best minute to post</strong><p class="muted">Building activity curves.</p></a>
-  <a class="card" href="blog-post.html#creative-scoring" data-reveal><div class="icon">🧩</div><strong>Creative scoring 101</strong><p class="muted">From n-grams to embeddings.</p></a>
-  <a class="card" href="blog-post.html#privacy" data-reveal><div class="icon">🔒</div><strong>Listening without creepiness</strong><p class="muted">Privacy-first monitoring.</p></a>
-</section>
+  <!-- SCATTER / OVERVIEW -->
+  <section class="container section">
+    <div class="grid">
+      <div class="artifact grid-overlay">
+        <div class="row"><h3 style="margin:0">Overview — Lift vs Spend Efficiency</h3><div class="muted">Each dot is a study.</div></div>
+        <canvas id="scatter" class="chart" width="1000" height="240" style="margin-top:8px"></canvas>
+      </div>
+      <div class="artifact grid-overlay">
+        <div class="row"><h3 style="margin:0">Methods Mix</h3><div class="muted">Bandits, A/B, Regression, Uplift.</div></div>
+        <canvas id="mix" class="chart" width="1000" height="240" style="margin-top:8px"></canvas>
+      </div>
+    </div>
+  </section>
 
+  <!-- GRID -->
+  <section class="container section">
+    <div id="grid" class="grid"></div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="container section">
+    <div class="row">
+      <h3 style="margin:0">Timeline — Releases & Replications</h3>
+      <div class="muted">Blueprint → Launch → Readout</div>
+    </div>
+    <div id="timeline" class="timeline" style="margin-top:8px"></div>
+  </section>
+
+  <!-- DRAWER -->
+  <div id="drawer" class="drawer">
+    <div class="box">
+      <div class="row wrap">
+        <strong id="dTitle">Study</strong>
+        <div class="muted" id="dMeta" style="margin-left:auto">—</div>
+      </div>
+      <div class="row wrap" style="margin-top:8px">
+        <div id="dBadges" class="tags"></div>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <a id="dOpen" class="btn">Open post</a>
+          <button id="dCopy" class="btn">Copy citation</button>
+          <button id="dBrief" class="btn ghost">Download brief (.md)</button>
+          <button id="dClose" class="btn">Close</button>
+        </div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1.2fr 1fr; gap:12px; margin-top:10px">
+        <div class="artifact">
+          <h4 style="margin:0 0 6px">Results (Before/After)</h4>
+          <canvas id="dChart" class="chart" width="700" height="220"></canvas>
+          <p class="mini note" id="dChartNote" style="margin-top:6px">Simulated telemetry for visualization; consult to reproduce with your data.</p>
+        </div>
+        <div class="artifact">
+          <h4 style="margin:0 0 6px">Abstract</h4>
+          <p id="dAbstract" class="muted"></p>
+          <div class="tags" id="dTags" style="margin-top:6px"></div>
+        </div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:12px">
+        <div class="artifact">
+          <h4 style="margin:0 0 6px">Hypothesis</h4>
+          <p id="dHyp" class="muted"></p>
+        </div>
+        <div class="artifact">
+          <h4 style="margin:0 0 6px">Method</h4>
+          <p id="dMethod" class="muted"></p>
+        </div>
+        <div class="artifact">
+          <h4 style="margin:0 0 6px">Limitations</h4>
+          <p id="dLimit" class="muted"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky CTA -->
+  <div class="sticky-cta">
+    <div class="bar">
+      <span class="badge"><span class="ping"></span> Study-ready</span>
+      <div class="muted" style="flex:1">Want these results with your data? We’ll design, run, and prove in 3 weeks.</div>
+      <a class="btn neon" href="consulting.html">Book consult</a>
+    </div>
+  </div>
 
   <div data-include="partials/footer.html"></div>
+
   <script defer src="assets/app.js"></script>
-</body></html>
+  <script>
+    /* ===== Backdrop: stars ===== */
+    (function sky(){
+      const c=document.getElementById('stars'), ctx=c.getContext('2d');
+      function resize(){ c.width=innerWidth; c.height=innerHeight; }
+      resize(); addEventListener('resize', resize);
+      const pts = Array.from({length:180}, ()=>({x:Math.random()*c.width, y:Math.random()*c.height, s:Math.random()*1.3+0.3, v:0.2+Math.random()*0.8}));
+      (function tick(){
+        ctx.fillStyle='rgba(10,14,20,.10)'; ctx.fillRect(0,0,c.width,c.height);
+        pts.forEach(p=>{ p.y+=p.v; if(p.y>c.height){ p.y=-4; p.x=Math.random()*c.width; }
+          ctx.beginPath(); ctx.fillStyle='#6ee7ff'; ctx.globalAlpha = .25 + p.s*.35; ctx.arc(p.x,p.y,p.s,0,6.283); ctx.fill(); ctx.globalAlpha=1; });
+        requestAnimationFrame(tick);
+      })();
+    })();
+
+    /* ===== Data ===== */
+    const TOPICS = ['Social AI','Ad Studio','Ad Lab','Dashboard','Security','Attribution'];
+    const TYPES  = ['Study','Case','Method'];
+
+    const POSTS = [
+      {
+        id:'study-best-minute-scheduler',
+        title:'Predicting the Best Minute to Post Raises CTR by 18% (Median) in Week 1',
+        subtitle:'Cross-platform predictive scheduling via Social AI',
+        date:'2025-08-22',
+        topic:'Social AI', type:'Study', sector:'eCommerce',
+        tags:['CTR','Scheduling','Prediction','TikTok','Meta'],
+        abstract:'We evaluate whether minute-level posting predictions increase early CTR relative to human schedules. Using a cross-platform predictor trained on historical engagement windows, we observe a median +18% CTR in the first week across 12 accounts.',
+        hypothesis:'Minute-level predictions align posts with micro-peaks of attention, driving higher seen-first rates and uplift in initial CTR.',
+        method:'Prospective A/B with ε-greedy exploration (ε=0.2). Control: human-selected times. Treatment: predicted minute. Primary metric: CTR@24h. Secondary: saves, comments.',
+        limitations:'Short window (7 days), seasonal content bias, and imperfect holdout across time zones.',
+        metrics:{ n:12, uplift_ctr:18, pval:0.04, roas:+1.6, cpa:-12 },
+        brief:[
+          'Hook telemetry and normalize time zones.',
+          'Generate minute-level score curves per platform.',
+          'ε-greedy assignment to avoid overfitting.',
+          'Evaluate CTR@24h; confirm significance.',
+          'Promote winner to default schedule.'
+        ]
+      },
+      {
+        id:'study-bandit-creative-rotation',
+        title:'Bandit Rotation Finds Creative Winners ~2.4× Faster at 30% Lower Cost',
+        subtitle:'Ad Lab: ε-greedy vs static A/B across 5 creatives',
+        date:'2025-08-10',
+        topic:'Ad Lab', type:'Study', sector:'SaaS',
+        tags:['Bandits','Creative','Exploration','ROAS'],
+        abstract:'We compare ε-greedy rotation against static A/B across five creatives. Bandit allocation converged to the top-2 winners ~2.4× faster while spending ~30% less on underperformers.',
+        hypothesis:'Adaptive exploration reduces regret and speeds winner identification in volatile creative spaces.',
+        method:'Simulated then live pilot. ε=0.15; min 1k impressions per creative before throttling. Primary metrics: time-to-winner, regret, CPA.',
+        limitations:'Creative fatigue and audience overlap; ε tuning may be account-specific.',
+        metrics:{ n:5, uplift_ctr:12, pval:0.03, roas:+2.0, cpa:-26 },
+        brief:[
+          'Seed 5 creatives with distinct angles.',
+          'Initialize equal budget; log reward per impression.',
+          'ε-greedy reallocation each hour.',
+          'Freeze top-2 once 95% CI separates.',
+          'Scale winners; archive others.'
+        ]
+      },
+      {
+        id:'study-guardrails-zero-critical',
+        title:'Security Guardrails During Launch: 0 Critical Incidents with Live Spend',
+        subtitle:'Hardening + anomaly triage in Finance',
+        date:'2025-07-28',
+        topic:'Security', type:'Case', sector:'Finance',
+        tags:['Guardrails','Anomalies','Compliance'],
+        abstract:'During a high-visibility product launch, we enforced WAF rules, SIEM hooks, and anomaly alerts. Outcome: zero critical incidents, no downtime, and stable CPA.',
+        hypothesis:'Proactive guardrails allow fast scaling without increasing incident risk.',
+        method:'Threat modeling + staged rules. Anomaly triggers on auth failure spikes and spend anomalies.',
+        limitations:'One brand; results depend on prior hygiene.',
+        metrics:{ n:1, uplift_ctr:7, pval:0.21, roas:+1.5, cpa:-12 },
+        brief:[
+          'Map threats and sensitive endpoints.',
+          'Enable WAF; tune false positives.',
+          'Hook SIEM and anomaly alerts.',
+          'Dry run; then live.',
+          'Daily postmortem even without incidents.'
+        ]
+      },
+      {
+        id:'study-predictive-mix-roas',
+        title:'Predictive Budget Mix Lifts ROAS by +2.1× in D2C',
+        subtitle:'Ad Studio: simulate mixes before spend',
+        date:'2025-07-12',
+        topic:'Ad Studio', type:'Study', sector:'eCommerce',
+        tags:['ROAS','Mix Modeling','Planning'],
+        abstract:'We test a simple predictive mix planner to allocate budget across Meta, Google, and TikTok. Compared to business-as-usual, observed ROAS improved +2.1× over 21 days.',
+        hypothesis:'Even coarse mix predictions prevent over-allocation to diminishing-return channels.',
+        method:'Prior 60 days as training; horizon 21 days; weekly re-optimization with guardrails.',
+        limitations:'Attribution noise; promotion confounds.',
+        metrics:{ n:3, uplift_ctr:14, pval:0.05, roas:+2.1, cpa:-18 },
+        brief:[
+          'Pull 60d baseline.',
+          'Fit simple response curves (diminishing returns).',
+          'Simulate candidate mixes.',
+          'Pick Pareto frontier choice.',
+          'Re-opt weekly with anomaly checks.'
+        ]
+      }
+    ];
+
+    /* ===== State ===== */
+    const state = { q:'', topic:'all', type:'all', sort:'new' };
+
+    /* ===== Helpers ===== */
+    const el = s=>document.querySelector(s), els = s=>Array.from(document.querySelectorAll(s));
+    function kebab(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
+    function daysBetween(a,b){ return Math.round((+b - +a)/86400000); }
+
+    /* ===== Controls ===== */
+    function buildChips(){
+      const tBox = el('#topics'); tBox.innerHTML='';
+      const any = document.createElement('span'); any.className='chip active'; any.dataset.id='all'; any.textContent='All Topics'; any.onclick=()=>{ state.topic='all'; updateAll(); }; tBox.appendChild(any);
+      TOPICS.forEach(t=>{ const c=document.createElement('span'); c.className='chip'; c.dataset.id=t; c.textContent=t; c.onclick=()=>{ state.topic=t; updateAll(); }; tBox.appendChild(c); });
+
+      const yBox = el('#types'); yBox.innerHTML='';
+      const any2 = document.createElement('span'); any2.className='chip active'; any2.dataset.id='all'; any2.textContent='All Types'; any2.onclick=()=>{ state.type='all'; updateAll(); }; yBox.appendChild(any2);
+      TYPES.forEach(t=>{ const c=document.createElement('span'); c.className='chip'; c.dataset.id=t; c.textContent=t; c.onclick=()=>{ state.type=t; updateAll(); }; yBox.appendChild(c); });
+    }
+    el('#q').addEventListener('input', e=>{ state.q = e.target.value; updateAll(); });
+    el('#sort').addEventListener('change', e=>{ state.sort = e.target.value; updateAll(); });
+
+    /* ===== Scatter & Mix charts ===== */
+    const scat=el('#scatter'), sctx=scat.getContext('2d');
+    function drawScatter(){
+      const W=scat.width=scat.clientWidth, H=scat.height=scat.clientHeight;
+      sctx.clearRect(0,0,W,H); sctx.fillStyle='#0f141c'; sctx.fillRect(0,0,W,H);
+      sctx.strokeStyle='rgba(255,255,255,.08)'; for(let i=0;i<4;i++){ sctx.beginPath(); sctx.moveTo(40,20+i*(H-60)/3); sctx.lineTo(W-20,20+i*(H-60)/3); sctx.stroke(); }
+      const list = POSTS.map(p=>({x: Math.max(0.6, p.metrics.roas), y: Math.max(2, p.metrics.uplift_ctr), c: ({'Social AI':'#6ee7ff','Ad Studio':'#63ffa5','Ad Lab':'#ffd75a','Dashboard':'#8ab6ff','Security':'#ff4d6d','Attribution':'#e9d5ff'})[p.topic] || '#caffbf', label:p.title}));
+      const maxX = Math.max(...list.map(d=>d.x)), maxY = Math.max(...list.map(d=>d.y));
+      list.forEach(d=>{
+        const x=60 + (W-100)*(d.x/(maxX||1)), y=H-40 - (H-80)*(d.y/(maxY||1));
+        sctx.beginPath(); sctx.fillStyle=d.c; sctx.arc(x,y,5,0,6.283); sctx.fill();
+      });
+      sctx.fillStyle='#9fb3c8'; sctx.font='12px Inter,system-ui'; sctx.fillText('ROAS (×)', 50, H-12); sctx.rotate(-Math.PI/2); sctx.fillText('CTR Uplift (%)', -H+30, 14); sctx.setTransform(1,0,0,1,0,0);
+    }
+
+    const mix=el('#mix'), mctx=mix.getContext('2d');
+    function drawMix(){
+      const W=mix.width=mix.clientWidth, H=mix.height=mix.clientHeight;
+      mctx.clearRect(0,0,W,H); mctx.fillStyle='#0f141c'; mctx.fillRect(0,0,W,H);
+      const methods=['A/B','ε-greedy','Uplift','Regression'];
+      const counts=[0,0,0,0];
+      POSTS.forEach(p=>{
+        const t=p.method.toLowerCase();
+        if(t.includes('ε-greedy')) counts[1]++; else if(t.includes('uplift')) counts[2]++; else if(t.includes('regression')) counts[3]++; else counts[0]++;
+      });
+      const total = Math.max(...counts,1); const bw=(W-120)/methods.length;
+      counts.forEach((v,i)=>{
+        const h=(H-60)*(v/total); const x=60+i*bw+10; const y=H-30-h;
+        const colors=['#6ee7ff','#ffd75a','#e9d5ff','#63ffa5']; mctx.fillStyle=colors[i];
+        mctx.fillRect(x,y,bw-20,h); mctx.fillStyle='#9fb3c8'; mctx.font='12px Inter,system-ui'; mctx.fillText(methods[i], x, H-12);
+        mctx.fillText(String(v), x+bw/2-6, y-6);
+      });
+    }
+
+    /* ===== Grid ===== */
+    function match(p){
+      const inT = state.topic==='all' || p.topic===state.topic;
+      const inY = state.type==='all'  || p.type===state.type;
+      const q = state.q.trim().toLowerCase();
+      const inQ = !q || [p.title,p.subtitle,p.abstract,p.hypothesis,p.method, ...(p.tags||[])].join(' ').toLowerCase().includes(q);
+      return inT && inY && inQ;
+    }
+    function sortList(list){
+      if(state.sort==='alpha') return list.sort((a,b)=> a.title.localeCompare(b.title));
+      if(state.sort==='impact') return list.sort((a,b)=> (b.metrics.uplift_ctr||0) - (a.metrics.uplift_ctr||0));
+      return list.sort((a,b)=> new Date(b.date) - new Date(a.date));
+    }
+    function cardHTML(p){
+      const color = ({'Social AI':'#6ee7ff','Ad Studio':'#63ffa5','Ad Lab':'#ffd75a','Dashboard':'#8ab6ff','Security':'#ff4d6d','Attribution':'#e9d5ff'})[p.topic] || '#caffbf';
+      const days = daysBetween(new Date(p.date), new Date());
+      return `
+        <div class="card" data-id="${p.id}">
+          <div class="orb"></div>
+          <div class="row">
+            <div class="badge" style="border-color:${color}80">${p.topic} • ${p.type}</div>
+            <div class="row" style="gap:8px">
+              <span class="badge" title="CTR uplift">+${p.metrics.uplift_ctr}% CTR</span>
+              <span class="badge" title="ROAS">${p.metrics.roas>0?'+':''}${p.metrics.roas.toFixed(1)}× ROAS</span>
+              <span class="badge" title="Sample size">n=${p.metrics.n}</span>
+            </div>
+          </div>
+          <h3 style="margin:8px 0 2px">${p.title}</h3>
+          <div class="muted">${p.subtitle}</div>
+          <div class="tags" style="margin-top:8px">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+          <div class="row wrap" style="margin-top:10px">
+            <button class="btn neon" data-open="${p.id}">Open Study</button>
+            <a class="btn" href="blog-post.html?id=${encodeURIComponent(p.id)}">Full post</a>
+            <span class="muted" style="margin-left:auto">${new Date(p.date).toLocaleDateString()} • ${days<=14?'<span class="badge"><span class="ping"></span> new</span>':''}</span>
+          </div>
+        </div>
+      `;
+    }
+    function renderGrid(){
+      const grid = el('#grid'); grid.innerHTML='';
+      const list = sortList(POSTS.filter(match));
+      if(!list.length){ grid.innerHTML='<div class="muted">No matches. Try different filters.</div>'; return; }
+      list.forEach(p=>{
+        const w=document.createElement('div'); w.innerHTML=cardHTML(p); const card=w.firstElementChild; grid.appendChild(card);
+      });
+      // tilt + handlers
+      els('.card').forEach(card=>{
+        card.addEventListener('mousemove', (e)=>{ const r=card.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width, y=(e.clientY-r.top)/r.height; card.style.transform=`rotateX(${(y-.5)*8}deg) rotateY(${(x-.5)*-8}deg)`; });
+        card.addEventListener('mouseleave', ()=> card.style.transform='' );
+      });
+      els('[data-open]').forEach(b=> b.onclick=()=> openDrawer(b.dataset.open));
+    }
+
+    /* ===== Timeline ===== */
+    function renderTimeline(){
+      const box = el('#timeline'); box.innerHTML='';
+      sortList([...POSTS]).forEach(p=>{
+        const m=document.createElement('div'); m.className='milestone';
+        m.innerHTML = `<div class="badge">${p.topic} • ${p.type}</div>
+                       <strong style="display:block;margin:6px 0">${p.title}</strong>
+                       <div class="muted">${new Date(p.date).toLocaleDateString()} • n=${p.metrics.n}</div>
+                       <div class="tags" style="margin-top:6px">${p.tags.slice(0,4).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+                       <div class="row wrap" style="margin-top:8px"><button class="btn" data-open="${p.id}">Open</button><span class="badge">+${p.metrics.uplift_ctr}% CTR</span></div>`;
+        box.appendChild(m);
+      });
+      box.querySelectorAll('[data-open]').forEach(b=> b.onclick=()=> openDrawer(b.dataset.open));
+    }
+
+    /* ===== Drawer / Detail ===== */
+    let current=null;
+    const drawer=el('#drawer');
+    const dChart=el('#dChart'), dctx=dChart.getContext('2d');
+
+    function openDrawer(id){
+      const p = POSTS.find(x=>x.id===id); if(!p) return; current=p;
+      el('#dTitle').textContent = p.title;
+      el('#dMeta').textContent = `${p.topic} • ${p.type} • ${new Date(p.date).toLocaleDateString()} • n=${p.metrics.n}`;
+      el('#dBadges').innerHTML = `
+        <span class="badge">+${p.metrics.uplift_ctr}% CTR</span>
+        <span class="badge">${p.metrics.roas>0?'+':''}${p.metrics.roas.toFixed(1)}× ROAS</span>
+        <span class="badge">p=${p.metrics.pval.toFixed(2)}</span>
+        <span class="badge">CPA ${p.metrics.cpa}%</span>
+      `;
+      el('#dAbstract').textContent = p.abstract;
+      el('#dTags').innerHTML = p.tags.map(t=> `<span class="tag">${t}</span>`).join('');
+      el('#dHyp').textContent = p.hypothesis;
+      el('#dMethod').textContent = p.method;
+      el('#dLimit').textContent = p.limitations;
+      el('#dOpen').href = 'blog-post.html?id=' + encodeURIComponent(p.id);
+
+      drawDetailChart(p);
+      drawer.style.display='block';
+      history.replaceState(null,'', location.pathname + '?id=' + encodeURIComponent(p.id));
+    }
+    function closeDrawer(){
+      drawer.style.display='none'; current=null;
+      const u = new URL(location.href); u.searchParams.delete('id'); history.replaceState(null,'', u.pathname);
+    }
+    el('#dClose').onclick = closeDrawer;
+
+    function drawDetailChart(p){
+      const W=dChart.width=dChart.clientWidth, H=dChart.height=dChart.clientHeight;
+      dctx.clearRect(0,0,W,H); dctx.fillStyle='#0f141c'; dctx.fillRect(0,0,W,H);
+      dctx.strokeStyle='rgba(255,255,255,.08)'; for(let i=0;i<4;i++){ dctx.beginPath(); dctx.moveTo(40, 20+i*(H-60)/3); dctx.lineTo(W-20, 20+i*(H-60)/3); dctx.stroke(); }
+      const N=24;
+      const base=Array.from({length:N},(_,i)=> 0.9 + Math.sin(i*.3)*0.08 + (Math.random()-.5)*0.02);
+      const after=Array.from({length:N},(_,i)=> base[i]*(1 + p.metrics.uplift_ctr/100) + (Math.random()-.5)*0.02);
+      function line(series,color){
+        dctx.beginPath(); series.forEach((v,i)=>{ const x=50+i*(W-100)/(N-1); const y=H-40 - (H-80)*( (v-0.8) / 0.8 ); i? dctx.lineTo(x,y):dctx.moveTo(x,y); });
+        dctx.strokeStyle=color; dctx.lineWidth=2; dctx.stroke();
+      }
+      line(base,'#9fb3c8'); line(after,'#63ffa5');
+      dctx.fillStyle='#9fb3c8'; dctx.font='12px Inter,system-ui'; dctx.fillText('CTR before vs after (simulated)', 50, 24);
+    }
+
+    /* ===== Citation + Brief ===== */
+    el('#dCopy').onclick = ()=>{
+      if(!current) return;
+      const cite = `EVRT Study: ${current.title}. ${new Date(current.date).toISOString().slice(0,10)}. Topic: ${current.topic}. Type: ${current.type}. n=${current.metrics.n}. Uplift=${current.metrics.uplift_ctr}%. (Demo visuals) ${location.origin + location.pathname + '?id=' + current.id}`;
+      navigator.clipboard.writeText(cite);
+      alert('Citation copied to clipboard.');
+    };
+    el('#dBrief').onclick = ()=>{
+      if(!current) return;
+      const p=current;
+      const md = [
+        `# ${p.title}`,
+        ``,
+        `**Date:** ${new Date(p.date).toLocaleDateString()}  `,
+        `**Topic:** ${p.topic}  `,
+        `**Type:** ${p.type}  `,
+        `**Sector:** ${p.sector}  `,
+        `**Tags:** ${p.tags.join(', ')}`,
+        ``,
+        `## Abstract`,
+        p.abstract,
+        ``,
+        `## Hypothesis`,
+        p.hypothesis,
+        ``,
+        `## Method`,
+        p.method,
+        ``,
+        `## Results`,
+        `- CTR uplift: +${p.metrics.uplift_ctr}%`,
+        `- ROAS: ${(p.metrics.roas>0?'+':'')+p.metrics.roas.toFixed(1)}×`,
+        `- CPA: ${p.metrics.cpa}%`,
+        `- Sample size: n=${p.metrics.n}`,
+        `- p-value: ${p.metrics.pval}`,
+        ``,
+        `## Limitations`,
+        p.limitations,
+        ``,
+        `## Steps`,
+        ...(p.brief||[]).map(x=>`- ${x}`),
+        ``,
+        `> Note: This page uses demo/simulated visuals. Run a live engagement to reproduce with your data.`,
+        ``,
+        `Permalink: ${location.origin + location.pathname + '?id=' + p.id}`
+      ].join('\n');
+      const blob = new Blob([md], {type:'text/markdown'});
+      const url = URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download=`${kebab(p.title)}.md`; a.click(); URL.revokeObjectURL(url);
+    };
+
+    /* ===== Deep link ===== */
+    function bootFromQuery(){
+      const p = new URLSearchParams(location.search);
+      if(p.get('id')) setTimeout(()=> openDrawer(p.get('id')), 0);
+    }
+
+    /* ===== Update ===== */
+    function updateAll(){
+      els('#topics .chip').forEach(ch=> ch.classList.toggle('active', ch.dataset.id===state.topic || (state.topic==='all'&&ch.dataset.id==='all')));
+      els('#types .chip').forEach(ch=> ch.classList.toggle('active', ch.dataset.id===state.type || (state.type==='all'&&ch.dataset.id==='all')));
+      renderGrid(); renderTimeline(); drawScatter(); drawMix();
+    }
+
+    /* ===== Boot ===== */
+    function boot(){
+      buildChips(); updateAll(); bootFromQuery();
+      addEventListener('resize', ()=>{ drawScatter(); drawMix(); });
+    }
+    boot();
+  </script>
+</body>
+</html>
