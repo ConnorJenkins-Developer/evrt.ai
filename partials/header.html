@@ -24,7 +24,7 @@
     .site-header .brand .logo{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--neon),var(--accent))}
     .site-header .brand span{font-weight:800;letter-spacing:.4px;color:#fff}
 
-    /* Desktop nav with simple dropdowns */
+    /* Desktop nav */
     .site-header .nav{display:flex;gap:6px;align-items:center}
     .site-header .nav > details{position:relative}
     .site-header .nav > details > summary{
@@ -53,11 +53,11 @@
     .site-header .menu-btn{
       display:none;align-items:center;gap:8px;background:#0f141c;color:#fff;
       padding:8px 12px;border-radius:10px;border:1px solid var(--hdr-line-strong);
-      font-weight:600;cursor:pointer;user-select:none;margin-left:auto; /* push to right */
+      font-weight:600;cursor:pointer;user-select:none;margin-left:auto;
     }
     .site-header .menu-btn:focus{outline:2px solid var(--neon);outline-offset:2px}
 
-    /* Mobile dropdown panel (anchored to RIGHT) */
+    /* Mobile panel (top-right) */
     .site-header .mnav{
       display:none;position:absolute;right:10px;top:58px;width:90vw;max-width:420px;
       background:#0f141c;border:1px solid var(--hdr-line-strong);border-radius:14px;
@@ -67,7 +67,7 @@
     .site-header .backdrop{display:none;position:fixed;inset:0;background:rgba(6,10,15,.6);backdrop-filter:blur(2px);z-index:1001}
     .site-header #navToggle:checked ~ .backdrop{display:block}
 
-    /* Mobile categories as accordions */
+    /* Mobile accordions */
     .site-header .mcat{border:1px solid var(--hdr-line);border-radius:12px;margin-bottom:10px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01))}
     .site-header .mcat > summary{
       list-style:none;cursor:pointer;user-select:none;display:flex;align-items:center;
@@ -103,12 +103,11 @@
   </style>
 
   <div class="wrap container">
-    <!-- Brand on the LEFT -->
     <a class="brand" href="index.html" aria-label="EVRT Home">
       <i class="logo" aria-hidden="true"></i><span>EVRT</span>
     </a>
 
-    <!-- Desktop navigation (unchanged) -->
+    <!-- Desktop nav -->
     <nav class="nav" aria-label="Primary">
       <details>
         <summary>Products</summary>
@@ -120,7 +119,6 @@
           <a href="dashboard.html">Dashboards</a>
         </div>
       </details>
-
       <details>
         <summary>Solutions</summary>
         <div class="menu" role="menu">
@@ -129,7 +127,6 @@
           <a href="projects.html">Projects & Case Studies</a>
         </div>
       </details>
-
       <details>
         <summary>Resources</summary>
         <div class="menu" role="menu">
@@ -137,7 +134,6 @@
           <a href="pricing.html">Pricing</a>
         </div>
       </details>
-
       <details>
         <summary>Trust</summary>
         <div class="menu" role="menu">
@@ -145,7 +141,6 @@
           <a href="privacy.html">Privacy</a>
         </div>
       </details>
-
       <details>
         <summary>Company</summary>
         <div class="menu" role="menu">
@@ -155,80 +150,30 @@
           <a href="contact.html">Contact</a>
         </div>
       </details>
-
       <a class="cta" href="portal.html?plan=pro-trial">Start trial</a>
     </nav>
 
-    <!-- Hidden checkbox controls the mobile panel -->
+    <!-- Mobile controls -->
     <input type="checkbox" id="navToggle" aria-hidden="true"/>
-
-    <!-- MOBILE: Menu button on the RIGHT -->
     <label for="navToggle" class="menu-btn" aria-controls="mobileCatalog" aria-expanded="false">Menu</label>
 
-    <!-- MOBILE panel (opens from top-right) -->
     <nav id="mobileCatalog" class="mnav" aria-label="Mobile catalog">
-      <!-- Products -->
-      <details class="mcat">
-        <summary>
-          <span>Products</span><span class="chev" aria-hidden="true">›</span>
-        </summary>
+      <details class="mcat"><summary><span>Products</span><span class="chev">›</span></summary>
         <div class="mlinks">
-          <a href="apps.html">Apps overview</a>
-          <a href="social-ai.html">Social AI</a>
-          <a href="ad-studio.html">Ad Studio</a>
-          <a href="adlab.html">Ad Lab</a>
-          <a href="dashboard.html">Dashboards</a>
-        </div>
-      </details>
-
-      <!-- Solutions -->
-      <details class="mcat">
-        <summary>
-          <span>Solutions</span><span class="chev" aria-hidden="true">›</span>
-        </summary>
+          <a href="apps.html">Apps overview</a><a href="social-ai.html">Social AI</a>
+          <a href="ad-studio.html">Ad Studio</a><a href="adlab.html">Ad Lab</a><a href="dashboard.html">Dashboards</a>
+        </div></details>
+      <details class="mcat"><summary><span>Solutions</span><span class="chev">›</span></summary>
         <div class="mlinks">
-          <a href="consulting.html">Consulting</a>
-          <a href="industries.html">Industries</a>
-          <a href="projects.html">Projects & Case Studies</a>
-        </div>
-      </details>
+          <a href="consulting.html">Consulting</a><a href="industries.html">Industries</a><a href="projects.html">Projects & Case Studies</a>
+        </div></details>
+      <details class="mcat"><summary><span>Resources</span><span class="chev">›</span></summary>
+        <div class="mlinks"><a href="blog.html">Insights</a><a href="pricing.html">Pricing</a></div></details>
+      <details class="mcat"><summary><span>Trust</span><span class="chev">›</span></summary>
+        <div class="mlinks"><a href="cybersecurity.html">Cybersecurity</a><a href="privacy.html">Privacy</a></div></details>
+      <details class="mcat"><summary><span>Company</span><span class="chev">›</span></summary>
+        <div class="mlinks"><a href="about.html">About</a><a href="press.html">Press</a><a href="careers.html">Careers</a><a href="contact.html">Contact</a></div></details>
 
-      <!-- Resources -->
-      <details class="mcat">
-        <summary>
-          <span>Resources</span><span class="chev" aria-hidden="true">›</span>
-        </summary>
-        <div class="mlinks">
-          <a href="blog.html">Insights</a>
-          <a href="pricing.html">Pricing</a>
-        </div>
-      </details>
-
-      <!-- Trust -->
-      <details class="mcat">
-        <summary>
-          <span>Trust</span><span class="chev" aria-hidden="true">›</span>
-        </summary>
-        <div class="mlinks">
-          <a href="cybersecurity.html">Cybersecurity</a>
-          <a href="privacy.html">Privacy</a>
-        </div>
-      </details>
-
-      <!-- Company -->
-      <details class="mcat">
-        <summary>
-          <span>Company</span><span class="chev" aria-hidden="true">›</span>
-        </summary>
-        <div class="mlinks">
-          <a href="about.html">About</a>
-          <a href="press.html">Press</a>
-          <a href="careers.html">Careers</a>
-          <a href="contact.html">Contact</a>
-        </div>
-      </details>
-
-      <!-- Account (label only + buttons) -->
       <div class="acc" role="group" aria-label="Account">
         <h4>Account</h4>
         <div class="row">
@@ -238,7 +183,9 @@
       </div>
     </nav>
 
-    <!-- Backdrop closes the panel via the checkbox -->
     <label for="navToggle" class="backdrop" aria-hidden="true" title="Close menu"></label>
   </div>
+
+  <!-- Add the kill switch (hides “slots left” etc. everywhere) -->
+  <script src="assets/urgency-kill.js" defer></script>
 </header>
