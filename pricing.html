@@ -1,36 +1,545 @@
-<!DOCTYPE html><html lang="en" data-theme="dark">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Simple, transparent pricing — EVRT</title>
-  <meta name="description" content="Start free. Scale as you grow."/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>EVRT — Pricing</title>
+  <meta name="description" content="Transparent pricing for EVRT consulting retainers and apps. Build your bundle, estimate ROI, and generate a quote in seconds."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
-  <link rel="icon" href="assets/favicon.svg">
-  <meta property="og:title" content="Simple, transparent pricing — EVRT">
-  <meta property="og:description" content="Start free. Scale as you grow.">
-  <meta property="og:image" content="assets/og-image.svg">
   <link rel="stylesheet" href="assets/style.css"/>
+
+  <style>
+    :root{
+      --pr-neon:#6ee7ff; --pr-accent:#63ffa5; --pr-amber:#ffd75a; --pr-danger:#ff4d6d;
+      --pr-bg:#0a0e14; --pr-card:#0f141c; --pr-grid:rgba(255,255,255,.06); --pr-mute:#8fa2b7;
+    }
+    body{ background: radial-gradient(1400px 900px at 80% -260px,#142034 0,#0a0e14 65%); }
+
+    /* Backdrop */
+    .layers{ position:fixed; inset:0; z-index:0; pointer-events:none }
+    #halo{ position:absolute; inset:0; opacity:.26 }
+    .scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.26; mix-blend-mode:overlay }
+
+    /* Layout / UI */
+    .section{ position:relative; z-index:1 }
+    .eyebrow{ letter-spacing:.12em; text-transform:uppercase; color:var(--pr-mute) }
+    .muted{ color:var(--pr-mute) }
+    .grid{ display:grid; gap:14px }
+    .grid-3{ display:grid; gap:14px; grid-template-columns:1fr; }
+    @media(min-width:980px){ .grid-3{ grid-template-columns:repeat(3,1fr) } }
+    .grid-2{ display:grid; gap:14px; grid-template-columns:1fr; }
+    @media(min-width:980px){ .grid-2{ grid-template-columns:1.2fr 1fr } }
+
+    .card{ position:relative; border:1px solid var(--pr-grid); border-radius:16px; background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); padding:14px; overflow:hidden }
+    .card:hover{ border-color:rgba(110,231,255,.45); box-shadow:0 14px 50px rgba(110,231,255,.10), 0 0 0 1px rgba(110,231,255,.25) inset }
+    .row{ display:flex; justify-content:space-between; align-items:center; gap:10px }
+    .row.wrap{ flex-wrap:wrap }
+    .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--pr-grid); border-radius:999px; font-size:12px }
+    .tag{ font-size:11px; padding:2px 8px; border:1px solid var(--pr-grid); border-radius:999px; color:var(--pr-mute) }
+    .tags{ display:flex; gap:6px; flex-wrap:wrap }
+    .price{ font-size:28px; font-weight:900 }
+    .strike{ text-decoration: line-through; opacity:.6; font-weight:500; }
+
+    .btn.neon{ background:linear-gradient(90deg,var(--pr-neon),var(--pr-accent)); color:#061019; border:0; font-weight:800 }
+    .btn.ghost{ border:1px solid var(--pr-grid) }
+    .control{ border:1px solid var(--pr-grid); border-radius:12px; background:#0f141c; padding:10px 12px; color:inherit }
+
+    /* Switch */
+    .switch{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none }
+    .switch input{ appearance:none; width:44px; height:24px; border-radius:999px; background:#0b0e13; border:1px solid var(--pr-grid); position:relative; outline:0 }
+    .switch input:checked{ background:linear-gradient(90deg,var(--pr-neon),var(--pr-accent)); border:0 }
+    .switch input::after{ content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:999px; background:#9fb3c8; transition:left .2s }
+    .switch input:checked::after{ left:23px; background:#061019 }
+
+    /* Builder */
+    .basket{ position:sticky; top:12px }
+    .line{ display:flex; justify-content:space-between; gap:10px; border-bottom:1px dashed rgba(255,255,255,.12); padding:6px 0 }
+    .line .x{ cursor:pointer; opacity:.7; }
+    .total{ font-size:22px; font-weight:900 }
+
+    /* Slider group */
+    .sliders .group{ border:1px solid var(--pr-grid); border-radius:12px; padding:10px; background:#0f141c }
+    .sliders label{ font-size:12px; color:#9fb3c8 }
+    .sliders input[type=range]{ width:100% }
+    .kpi{ display:grid; gap:10px; grid-template-columns:1fr 1fr }
+    @media(min-width:980px){ .kpi{ grid-template-columns:repeat(4,1fr) } }
+    .knum{ text-align:center; border:1px solid var(--pr-grid); border-radius:12px; padding:10px; background:#0f141c }
+    .knum .num{ font-size:24px; font-weight:900 }
+
+    /* Sticky CTA */
+    .sticky-cta{ position:sticky; bottom:12px; z-index:40; display:flex; justify-content:center }
+    .sticky-cta .bar{ width:min(1080px,92vw); backdrop-filter:blur(8px); background:#07121b; border:1px solid rgba(110,231,255,.35); border-radius:14px; padding:10px; display:flex; gap:10px; align-items:center }
+    .ping{ width:8px; height:8px; border-radius:50%; background:#63ffa5; box-shadow:0 0 0 6px rgba(99,255,165,.15) }
+  </style>
 </head>
 <body>
-  <div class="bg-orbs" aria-hidden="true"></div>
+  <!-- Backdrop -->
+  <div class="layers">
+    <canvas id="halo" aria-hidden="true"></canvas>
+    <div class="scan" aria-hidden="true"></div>
+  </div>
+
   <div data-include="partials/header.html"></div>
 
-  <section class="container hero">
-    
-    <h1 class="gradient-text">Simple, transparent pricing</h1>
-    <p class="sub">Start free. Scale as you grow.</p>
-    <div class="hero-cta"></div>
+  <!-- HERO -->
+  <section class="container hero section" style="margin-top:20px">
+    <span class="eyebrow">Pricing</span>
+    <h1 class="gradient-text">Transparent. Proof-first.<br/>Scale at your speed.</h1>
+    <p class="sub">Pick a **consulting retainer** and add the **apps** you want. Switch between **monthly** and **annual** (save 20%). Generate a **quote** instantly.</p>
+    <div class="row wrap" style="margin-top:10px">
+      <label class="switch"><span class="muted">Monthly</span><input id="annual" type="checkbox"/><span class="muted">Annual <span class="badge">Save 20%</span></span></label>
+      <div class="tags"><span class="tag">Cancel anytime (monthly)</span><span class="tag">No hidden fees</span><span class="tag">America/Chicago support</span></div>
+    </div>
   </section>
 
-  
-<section class="container section grid grid-3">
-  <div class="card" data-reveal><div class="muted">Starter</div><div style="font-size:2rem;font-weight:800">$0</div><p class="muted">1 brand • 3 platforms • basic AI</p><a class="btn" href="contact.html">Get started</a></div>
-  <div class="card" data-reveal style="border-color:hsl(var(--accent)/.5);box-shadow:0 20px 50px hsl(var(--accent)/.18)"><div class="muted">Pro</div><div style="font-size:2rem;font-weight:800">$49<span class="muted" style="font-size:1rem;font-weight:600">/mo</span></div><p class="muted">3 brands • 5 platforms • predictive • A/B</p><a class="btn primary" href="contact.html">Start trial</a></div>
-  <div class="card" data-reveal><div class="muted">Enterprise</div><div style="font-size:2rem;font-weight:800">Custom</div><p class="muted">SSO • roles • audit • white-glove</p><a class="btn" href="contact.html">Talk to sales</a></div>
-</section>
+  <!-- CONSULTING RETAINERS -->
+  <section class="container section">
+    <div class="row"><h3 style="margin:0">Consulting Retainers</h3><div class="muted">Proof before scale. Real deliverables.</div></div>
+    <div id="retainers" class="grid-3" style="margin-top:8px"></div>
+  </section>
 
+  <!-- APPS -->
+  <section class="container section">
+    <div class="row"><h3 style="margin:0">Apps & Add-ons</h3><div class="muted">Mix and match. Bundle discounts apply.</div></div>
+    <div id="apps" class="grid-3" style="margin-top:8px"></div>
+  </section>
+
+  <!-- BUILDER + ROI -->
+  <section class="container section grid-2">
+    <!-- Builder -->
+    <div class="card">
+      <div class="row">
+        <h3 style="margin:0">Your Bundle</h3>
+        <div class="tags"><span class="badge" id="bundleBadge">0 apps — 0% bundle discount</span></div>
+      </div>
+      <div id="basket" class="basket" style="margin-top:8px">
+        <div class="muted">Choose a retainer and add apps to build your quote.</div>
+      </div>
+      <div class="row wrap" style="margin-top:10px">
+        <button id="dlQuote" class="btn neon" disabled>Download Quote (.md)</button>
+        <a class="btn" href="consulting.html">Book a consult</a>
+        <a class="btn" href="portal.html">Client portal</a>
+      </div>
+      <p class="muted" style="margin-top:8px; font-size:12px">All prices USD. Annual billed upfront. Apps require at least the Sprint or Core retainer for onboarding and guardrails.</p>
+    </div>
+
+    <!-- ROI -->
+    <div class="card">
+      <div class="row"><h3 style="margin:0">ROI Estimator</h3><div class="muted">Play with the assumptions</div></div>
+      <div class="sliders" style="margin-top:8px">
+        <div class="group">
+          <label>Monthly ad spend ($)</label>
+          <input id="spend" type="range" min="5000" max="200000" step="5000" value="25000"/>
+          <div class="row"><div class="muted">5k</div><div id="spendV">$25,000</div></div>
+        </div>
+        <div class="group" style="margin-top:8px">
+          <label>Expected CTR uplift (%)</label>
+          <input id="ctr" type="range" min="0" max="50" step="1" value="12"/>
+          <div class="row"><div class="muted">0%</div><div id="ctrV">12%</div></div>
+        </div>
+        <div class="group" style="margin-top:8px">
+          <label>Expected CPA change (%) (negative is good)</label>
+          <input id="cpa" type="range" min="-40" max="10" step="1" value="-15"/>
+          <div class="row"><div class="muted">-40%</div><div id="cpaV">-15%</div></div>
+        </div>
+        <div class="group" style="margin-top:8px">
+          <label>Attribution confidence (0–1)</label>
+          <input id="conf" type="range" min="0.4" max="1" step="0.05" value="0.8"/>
+          <div class="row"><div class="muted">0.4</div><div id="confV">0.80</div></div>
+        </div>
+      </div>
+      <div class="kpi" style="margin-top:10px">
+        <div class="knum"><div class="muted">Est. incremental revenue / mo</div><div class="num" id="kRev">$0</div></div>
+        <div class="knum"><div class="muted">Bundle cost / mo</div><div class="num" id="kCost">$0</div></div>
+        <div class="knum"><div class="muted">Net / mo</div><div class="num" id="kNet">$0</div></div>
+        <div class="knum"><div class="muted">Payback</div><div class="num" id="kPB">—</div></div>
+      </div>
+      <p class="muted" style="margin-top:8px; font-size:12px">Illustrative only. For a precise forecast, we’ll fit response curves to your data.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="container section">
+    <div class="grid">
+      <div class="card">
+        <strong>What’s included in onboarding?</strong>
+        <p class="muted">Access setup, telemetry & guardrails, account map, quick wins playbook, plus a live blueprint session.</p>
+      </div>
+      <div class="card">
+        <strong>Can we start with apps only?</strong>
+        <p class="muted">You’ll need at least the Sprint or Core retainer for safe setup, then you can self-serve apps with our guardrails in place.</p>
+      </div>
+      <div class="card">
+        <strong>How do you prove lift?</strong>
+        <p class="muted">Short sprints with clear metrics. We publish readouts and a case drawer in your portal.</p>
+      </div>
+      <div class="card">
+        <strong>Security & data</strong>
+        <p class="muted">We operate with least privilege, PII-safe telemetry, and anomaly alerts. See <a href="cybersecurity.html">Cybersecurity</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sticky CTA -->
+  <div class="sticky-cta">
+    <div class="bar">
+      <span class="badge"><span class="ping"></span> Ready when you are</span>
+      <div class="muted" style="flex:1">Build your bundle and grab a quote. We’ll prove lift in 3 weeks.</div>
+      <a class="btn neon" href="consulting.html">Book consult</a>
+      <a class="btn" href="portal.html">Client portal</a>
+    </div>
+  </div>
 
   <div data-include="partials/footer.html"></div>
+
   <script defer src="assets/app.js"></script>
-</body></html>
+  <script>
+    /* ===== Backdrop halo ===== */
+    (function haloFX(){
+      const c=document.getElementById('halo'), ctx=c.getContext('2d');
+      function resize(){ c.width=innerWidth; c.height=innerHeight; }
+      resize(); addEventListener('resize', resize);
+      const orbs = Array.from({length:7}, ()=>({x:Math.random()*c.width, y:Math.random()*c.height*0.6, r: 90+Math.random()*160, dx:(Math.random()-.5)*0.45, dy:(Math.random()-.5)*0.45, hue: 180+Math.random()*90}));
+      (function tick(){
+        ctx.clearRect(0,0,c.width,c.height);
+        orbs.forEach(o=>{
+          o.x+=o.dx; o.y+=o.dy; if(o.x<-120||o.x>c.width+120) o.dx*=-1; if(o.y<-120||o.y>c.height*0.8) o.dy*=-1;
+          const g=ctx.createRadialGradient(o.x,o.y, 0, o.x,o.y, o.r);
+          g.addColorStop(0, `hsla(${o.hue}, 100%, 60%, .12)`); g.addColorStop(1, 'transparent');
+          ctx.fillStyle=g; ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,6.283); ctx.fill();
+        });
+        requestAnimationFrame(tick);
+      })();
+    })();
+
+    /* ===== Pricing Data (edit here to change numbers) ===== */
+    const PRICING = {
+      annualDiscount: 0.20,         // 20% off when annual toggle is ON
+      bundleBreaks: [               // discount by app count in bundle
+        {min:0,  off:0.00},
+        {min:2,  off:0.05},         // 5% off 2+ apps
+        {min:3,  off:0.10},         // 10% off 3+ apps
+        {min:4,  off:0.15}          // 15% off 4+ apps
+      ],
+      retainers: [
+        {
+          id:'sprint', name:'Sprint', badge:'3-week pilot', base: 7500, unit:'/engagement',
+          desc:'Blueprint → Launch → Readout. Prove lift fast.',
+          bullets:[
+            'Best-minute scheduler OR Ad Studio pilot',
+            'Guardrails + telemetry setup',
+            'Weekly readout + case drawer',
+            'One playbook shipped'
+          ],
+          cta:'Start sprint'
+        },
+        {
+          id:'core', name:'Core', badge:'Most popular', base: 6000, unit:'/mo',
+          desc:'Ongoing experiments + weekly readouts.',
+          bullets:[
+            'Social AI + Ad Studio (lite)',
+            '2x experiments / month',
+            'Dashboard + anomaly alerts',
+            'Quarterly strategy review'
+          ],
+          highlight:true,
+          cta:'Choose Core'
+        },
+        {
+          id:'lab', name:'Growth Lab', badge:'Scale',
+          base: 12000, unit:'/mo',
+          desc:'Full Ad Lab + Studio + Security guardrails.',
+          bullets:[
+            'Bandit Arena (5+ creatives)',
+            'Full mix modeling + planner',
+            'Security rails & incident triage',
+            'Executive dashboard & war-room'
+          ],
+          cta:'Launch Lab'
+        }
+      ],
+      apps: [
+        { id:'social',   name:'Social AI',    base:199,  unit:'/mo', desc:'Predict the best minute per platform. Scheduler & telemetry.', tags:['Prediction','Scheduler'] },
+        { id:'studio',   name:'Ad Studio',    base:399,  unit:'/mo', desc:'Predictive budget mix. Simulate before spend.', tags:['ROAS','Mix Modeling'] },
+        { id:'lab',      name:'Ad Lab',       base:799,  unit:'/mo', desc:'Bandit creative exploration to find winners fast.', tags:['Bandits','Creative'] },
+        { id:'dash',     name:'Dashboards',   base:299,  unit:'/mo', desc:'PII-safe telemetry, funnels, anomaly alerts.', tags:['Telemetry','Alerts'] },
+        { id:'security', name:'Security',     base:249,  unit:'/mo', desc:'WAF rules, SIEM hooks, spend anomaly guardrails.', tags:['Guardrails','Zero-trust'] }
+      ]
+    };
+
+    /* ===== State ===== */
+    const state = {
+      annual:false,
+      selection:{ retainer:null, apps:[] }
+    };
+
+    /* ===== Helpers ===== */
+    const el = s=>document.querySelector(s), els=s=>Array.from(document.querySelectorAll(s));
+    const money = v => '$' + (Math.round(v).toLocaleString());
+    function currentRetainerPrice(r){
+      // Sprint is per-engagement; apply annual discount only to /mo retainers
+      if(r.unit==='/engagement') return r.base;
+      return state.annual ? r.base*(1-PRICING.annualDiscount) : r.base;
+    }
+    function currentAppPrice(a){
+      return state.annual ? a.base*(1-PRICING.annualDiscount) : a.base;
+    }
+    function bundleDiscount(appCount){
+      let off=0; for(const b of PRICING.bundleBreaks){ if(appCount>=b.min) off=b.off; }
+      return off;
+    }
+
+    /* ===== Render Retainers ===== */
+    function renderRetainers(){
+      const box=el('#retainers'); box.innerHTML='';
+      PRICING.retainers.forEach(r=>{
+        const price = currentRetainerPrice(r);
+        const per = r.unit==='/mo' ? (state.annual ? '<span class="strike">$'+r.base.toLocaleString()+'/mo</span> ' : '') : '';
+        const card=document.createElement('div'); card.className='card';
+        card.innerHTML = `
+          <div class="row"><h4 style="margin:0">${r.name}</h4><span class="badge">${r.badge}</span></div>
+          <div class="muted" style="margin-top:4px">${r.desc}</div>
+          <div style="margin-top:8px">${r.bullets.map(b=>`<div class="row" style="gap:8px"><span class="tag">•</span><span class="muted">${b}</span></div>`).join('')}</div>
+          <div class="row" style="margin-top:10px">
+            <div class="price">${per}${money(price)}<span class="muted" style="font-size:14px">${r.unit}</span></div>
+            <button class="btn ${r.highlight?'neon':''}" data-ret="${r.id}">${r.cta}</button>
+          </div>
+        `;
+        box.appendChild(card);
+      });
+      els('[data-ret]').forEach(b=> b.onclick=()=> selectRetainer(b.dataset.ret));
+    }
+
+    /* ===== Render Apps ===== */
+    function renderApps(){
+      const box=el('#apps'); box.innerHTML='';
+      PRICING.apps.forEach(a=>{
+        const p = currentAppPrice(a);
+        const selected = state.selection.apps.includes(a.id);
+        const card=document.createElement('div'); card.className='card';
+        card.innerHTML = `
+          <div class="row"><h4 style="margin:0">${a.name}</h4><div class="tags">${a.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>
+          <div class="muted" style="margin-top:4px">${a.desc}</div>
+          <div class="row" style="margin-top:10px">
+            <div class="price">${state.annual?'<span class="strike">$'+a.base+'/mo</span> ':''}${money(p)}<span class="muted" style="font-size:14px">${a.unit}</span></div>
+            <button class="btn ${selected?'':'neon'}" data-app="${a.id}">${selected?'Remove':'Add'}</button>
+          </div>
+        `;
+        box.appendChild(card);
+      });
+      els('[data-app]').forEach(b=> b.onclick=()=> toggleApp(b.dataset.app));
+    }
+
+    /* ===== Selection handlers ===== */
+    function selectRetainer(id){
+      state.selection.retainer = id;
+      updateBasket();
+    }
+    function toggleApp(id){
+      const i = state.selection.apps.indexOf(id);
+      if(i===-1) state.selection.apps.push(id);
+      else state.selection.apps.splice(i,1);
+      renderApps();
+      updateBasket();
+    }
+
+    /* ===== Basket / Totals ===== */
+    function updateBadge(){
+      const n = state.selection.apps.length;
+      const off = bundleDiscount(n);
+      el('#bundleBadge').textContent = `${n} ${n===1?'app':'apps'} — ${Math.round(off*100)}% bundle discount`;
+    }
+
+    function updateBasket(){
+      const box=el('#basket'); box.innerHTML='';
+      updateBadge();
+
+      if(!state.selection.retainer && state.selection.apps.length===0){
+        box.innerHTML = '<div class="muted">Choose a retainer and add apps to build your quote.</div>';
+        el('#dlQuote').disabled = true;
+        updateROI();
+        return;
+      }
+
+      const lines=[];
+      let monthly=0;
+
+      // Retainer
+      if(state.selection.retainer){
+        const r = PRICING.retainers.find(x=>x.id===state.selection.retainer);
+        const rp = currentRetainerPrice(r);
+        const note = r.unit==='/engagement' ? ' (per sprint)' : (state.annual? ' (annual -20%)':'');
+        lines.push({name:`Retainer — ${r.name}${note}`, price: rp, unit:r.unit, id:`ret-${r.id}`});
+        if(r.unit==='/mo') monthly += rp;
+      }
+
+      // Apps
+      const selectedApps = PRICING.apps.filter(a=> state.selection.apps.includes(a.id));
+      const off = bundleDiscount(selectedApps.length);
+      let appsTotal=0;
+      selectedApps.forEach(a=>{
+        const ap = currentAppPrice(a);
+        appsTotal += ap;
+        lines.push({name:`App — ${a.name}${state.annual?' (annual -20%)':''}`, price: ap, unit:a.unit, id:`app-${a.id}`});
+      });
+      // apply bundle discount to apps subtotal
+      const appsDiscount = appsTotal * off;
+      if(appsTotal>0 && off>0){
+        lines.push({name:`Bundle discount (${Math.round(off*100)}% on apps)`, price: -appsDiscount, unit:'/mo', id:'discount'});
+      }
+      monthly += (appsTotal - appsDiscount);
+
+      // Render lines
+      lines.forEach(L=>{
+        const row=document.createElement('div'); row.className='line';
+        row.innerHTML = `<div>${L.name}</div><div>${money(L.price)} <span class="muted">${L.unit}</span></div>`;
+        box.appendChild(row);
+      });
+
+      // Total line
+      const total=document.createElement('div'); total.className='line';
+      total.innerHTML = `<div class="total">Est. monthly total</div><div class="total">${money(monthly)}</div>`;
+      box.appendChild(total);
+
+      // Annual hint
+      if(state.annual){
+        const hint=document.createElement('div'); hint.className='muted';
+        hint.style.marginTop='6px';
+        hint.textContent = 'Billed annually at 20% off. Shown numbers are effective monthly.';
+        box.appendChild(hint);
+      }
+
+      el('#dlQuote').disabled = false;
+
+      // Update ROI panel cost number
+      el('#kCost').textContent = money(monthly);
+      updateROI();
+    }
+
+    /* ===== ROI ===== */
+    function updateROI(){
+      const spend = +el('#spend').value;
+      const ctr = +el('#ctr').value/100;
+      const cpa = +el('#cpa').value/100; // negative good
+      const conf = +el('#conf').value;
+
+      // Very simple illustrative model:
+      // incremental revenue ~ spend * (0.3*ctr uplift + 0.7*max(-cpa,0)) * confidence
+      const inc = Math.max(0, spend * (0.3*ctr + 0.7*Math.max(-cpa,0)) * conf);
+
+      // Current bundle monthly cost (parsed from KPI or recompute)
+      let cost = 0;
+      if(state.selection.retainer){
+        const r = PRICING.retainers.find(x=>x.id===state.selection.retainer);
+        if(r.unit==='/mo') cost += currentRetainerPrice(r);
+      }
+      const selectedApps = PRICING.apps.filter(a=> state.selection.apps.includes(a.id));
+      const off = bundleDiscount(selectedApps.length);
+      let appsTotal=0;
+      selectedApps.forEach(a=> appsTotal += currentAppPrice(a));
+      cost += appsTotal * (1-off);
+
+      const net = inc - cost;
+      const payback = cost>0 ? Math.max(0.2, cost>0 && inc>0 ? (cost/inc) : Infinity) : 0;
+
+      el('#spendV').textContent = money(spend);
+      el('#ctrV').textContent = Math.round(ctr*100) + '%';
+      el('#cpaV').textContent = Math.round(cpa*100) + '%';
+      el('#confV').textContent = conf.toFixed(2);
+
+      el('#kRev').textContent = money(inc);
+      el('#kCost').textContent = money(cost);
+      el('#kNet').textContent  = money(net);
+      el('#kPB').textContent   = (inc>0 && cost>0) ? (payback.toFixed(2)+' mo') : '—';
+    }
+    ['spend','ctr','cpa','conf'].forEach(id=> el('#'+id).addEventListener('input', updateROI));
+
+    /* ===== Annual toggle ===== */
+    el('#annual').addEventListener('change', (e)=>{ state.annual = e.target.checked; renderRetainers(); renderApps(); updateBasket(); });
+
+    /* ===== Quote download ===== */
+    function kebab(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
+    el('#dlQuote').addEventListener('click', ()=>{
+      const r = state.selection.retainer ? PRICING.retainers.find(x=>x.id===state.selection.retainer) : null;
+      const apps = PRICING.apps.filter(a=> state.selection.apps.includes(a.id));
+      const annual = state.annual;
+
+      // recompute summary
+      let monthly=0, lines=[];
+      if(r){
+        const rp=currentRetainerPrice(r);
+        lines.push(`- Retainer — ${r.name} ${r.unit} — ${money(rp)}`);
+        if(r.unit==='/mo') monthly += rp;
+      }
+      const off = bundleDiscount(apps.length);
+      let appsTotal=0;
+      apps.forEach(a=>{ const ap=currentAppPrice(a); appsTotal+=ap; lines.push(`- App — ${a.name} ${a.unit} — ${money(ap)}`); });
+      if(appsTotal>0 && off>0){
+        lines.push(`- Bundle discount (${Math.round(off*100)}% on apps) — -${money(appsTotal*off)}`);
+      }
+      monthly += (appsTotal * (1-off));
+
+      const md = [
+        `# EVRT — Quote`,
+        ``,
+        `**Plan:** ${r? r.name : 'Apps only'} (${annual?'Annual (20% off)':'Monthly'})`,
+        ``,
+        `## Line Items`,
+        ...lines,
+        ``,
+        `**Estimated monthly total:** ${money(monthly)}`,
+        `${annual? '_Billed annually at 20% off. Shown numbers are effective monthly._' : ''}`,
+        ``,
+        `## Notes`,
+        `- Onboarding includes telemetry, guardrails, and blueprint.`,
+        `- Apps require at least Sprint or Core for setup.`,
+        `- Security & privacy: least privilege, PII-safe telemetry, anomaly alerts.`,
+        ``,
+        `[Book a consult](consulting.html)  |  [Client portal](portal.html)`
+      ].join('\n');
+
+      const blob=new Blob([md],{type:'text/markdown'}); const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download=`evrt-quote-${kebab(r? r.name : 'apps')}.md`; a.click(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+    });
+
+    /* ===== Initial render ===== */
+    function boot(){
+      renderRetainers(); renderApps(); updateBasket(); updateROI();
+    }
+    boot();
+
+    /* ===== JSON-LD Offers (SEO) ===== */
+    (function schema(){
+      const offers = [];
+      PRICING.retainers.forEach(r=>{
+        if(r.unit==='/mo'){
+          offers.push({
+            '@type':'Offer', name:`${r.name} Retainer`,
+            priceSpecification:{'@type':'UnitPriceSpecification', price: r.base, priceCurrency:'USD', billingDuration:'P1M'},
+            url: location.origin + location.pathname + '#retainer-'+r.id
+          });
+        }
+      });
+      PRICING.apps.forEach(a=>{
+        offers.push({
+          '@type':'Offer', name:`${a.name} App`,
+          priceSpecification:{'@type':'UnitPriceSpecification', price: a.base, priceCurrency:'USD', billingDuration:'P1M'},
+          url: location.origin + location.pathname + '#app-'+a.id
+        });
+      });
+      const s=document.createElement('script'); s.type='application/ld+json';
+      s.textContent = JSON.stringify({
+        '@context':'https://schema.org',
+        '@type':'Product',
+        name:'EVRT Consulting & Apps',
+        description:'Consulting retainers and apps for predictive growth with security guardrails.',
+        brand:{'@type':'Brand','name':'EVRT'},
+        offers
+      });
+      document.head.appendChild(s);
+    })();
+  </script>
+</body>
+</html>
