@@ -4,281 +4,353 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>EVRT — App</title>
-  <meta name="description" content="EVRT client app: projects, docs, messages." />
+  <meta name="description" content="EVRT client app: projects, docs, messages, predictions." />
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="assets/style.css" />
   <style>
-    .muted-danger{color:#f66}
-    .badge{position:fixed;top:10px;right:10px;background:#ffd54d;color:#222;padding:6px 10px;border-radius:999px;font-weight:700;z-index:999}
+    /* Minimal extras so this file is self-sufficient */
+    :root { --ink:#0f141c; --panel:#111823; --muted:#9fb0c3; --line:#263241; --glow:#6ee7ff; --mint:#63ffa5; }
+    body { background: var(--ink); }
+    .container { max-width: 1120px; margin: 0 auto; padding: 24px 16px; }
+    .hero { padding-top: 12px; padding-bottom: 8px; }
+    .eyebrow { color: var(--muted); letter-spacing: .12em; font-size:12px; text-transform: uppercase;}
+    .gradient-text { background: linear-gradient(90deg, var(--glow), var(--mint)); -webkit-background-clip: text; background-clip:text; color: transparent;}
+    .card { background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00)); border:1px solid var(--line); border-radius:16px; padding:16px;}
+    .row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,.05);}
+    .row:last-child{ border-bottom:0; }
+    .muted { color: var(--muted); }
+    .grid { display:grid; gap:16px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    @media (max-width: 860px){ .grid-2 { grid-template-columns: 1fr; } }
+    .btn { background:#171f2b; border:1px solid var(--line); color:#e8f6ff; border-radius:12px; padding:10px 14px; cursor:pointer; }
+    .btn.primary { background: linear-gradient(90deg, var(--glow), var(--mint)); color:#061019; font-weight:700; }
+    .badge { font-size:12px; padding:3px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); }
+    .pill { padding:6px 10px; border-radius:999px; background:#101723; border:1px solid var(--line); color:#dff7ff; font-size:12px;}
+    .flex { display:flex; gap:8px; align-items:center; }
+    .right { margin-left:auto; }
+    .hidden { display:none; }
+    .ok { color:#76ffb4; }
+    .err { color:#ff7f98; }
+    .spinner { width:16px;height:16px;border-radius:50%; border:2px solid #2a3a4f; border-top-color:#6ee7ff; animation:spin 0.8s linear infinite; display:inline-block; vertical-align:middle;}
+    @keyframes spin { to { transform: rotate(360deg);} }
+    .pro-only { outline:1px dashed rgba(110,231,255,.35); border-radius:12px; padding:8px; }
+    .panel-title { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .panel-title h3 { margin: 0; }
+    /* Include loader (so header/footer partials work even if assets/app.js isn’t loaded yet) */
+    [data-include] { display:block; }
   </style>
 </head>
 <body>
   <div class="bg-orbs" aria-hidden="true"></div>
+  <!-- Header include -->
   <div data-include="partials/header.html"></div>
 
+  <!-- HERO -->
   <section class="container hero">
     <span class="eyebrow">EVRT</span>
-    <h1 class="gradient-text">Client App</h1>
-    <p class="sub">Projects, documents, and messages for your team.</p>
+    <h1 class="gradient-text" style="margin:6px 0 2px">Client App</h1>
+    <p class="muted" style="margin:0">Projects, Documents, Messages — plus Ad Studio & Predictions.</p>
   </section>
 
-  <section class="container section" id="app" style="display:none">
-    <div class="card" data-reveal>
-      <div style="display:flex;justify-content:space-between;align-items:center">
+  <!-- GATE: shown while we verify the session / restore hash -->
+  <section class="container" id="gate">
+    <div class="card">
+      <div class="flex">
+        <span class="spinner" aria-hidden="true"></span>
         <div>
-          <h3 style="margin:0">Welcome, <span id="user-email"></span></h3>
-          <p class="muted" style="margin:0">Account: <span id="account-name"></span></p>
+          <strong>Checking your session…</strong>
+          <div class="muted">If you just clicked a magic link, we’ll finalize the login.</div>
         </div>
-        <div style="display:flex; gap:8px">
-          <a class="btn" href="portal.html" id="manage-link">Switch Account</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <section class="container section hidden" id="app">
+    <div class="card">
+      <div class="flex" style="justify-content:space-between; align-items:center">
+        <div>
+          <div class="flex" style="gap:10px; align-items:baseline">
+            <h3 style="margin:0">Welcome, <span id="user-email"></span></h3>
+            <span class="pill" id="plan-pill">plan: free</span>
+          </div>
+          <div class="muted">Account:
+            <select id="account-select" class="pill"></select>
+          </div>
+        </div>
+        <div class="flex">
+          <a class="btn" href="ad-studio.html">Open Ad Studio</a>
+          <button class="btn" id="upgrade" title="Upgrade to Pro">Upgrade to Pro</button>
           <button class="btn" id="signout">Sign out</button>
         </div>
       </div>
     </div>
 
-    <div class="grid grid-2">
-      <div class="card" data-reveal>
-        <h3>Your Projects</h3>
+    <div class="grid grid-2" style="margin-top:16px">
+      <!-- Projects -->
+      <div class="card">
+        <div class="panel-title">
+          <h3>Your Projects</h3>
+          <span class="badge" id="projects-count">—</span>
+        </div>
         <div id="projects"></div>
         <form id="new-project" class="grid" style="gap:8px;margin-top:8px">
           <input id="pname" placeholder="New project name" />
           <button class="btn">Add Project</button>
         </form>
       </div>
-      <div class="card" data-reveal>
-        <h3>Documents</h3>
+
+      <!-- Documents -->
+      <div class="card">
+        <div class="panel-title">
+          <h3>Documents</h3>
+          <span class="badge">private bucket</span>
+        </div>
         <div id="documents"></div>
         <div style="margin-top:10px">
           <label class="btn">
             <input id="file-input" type="file" style="display:none" />
             Upload file
           </label>
-          <p class="muted" id="upload-hint" style="margin-top:6px"></p>
         </div>
       </div>
     </div>
 
-    <div class="card" data-reveal style="margin-top:16px">
-      <h3>Messages</h3>
+    <!-- Messages -->
+    <div class="card" style="margin-top:16px">
+      <div class="panel-title">
+        <h3>Messages</h3>
+        <span class="badge">realtime</span>
+      </div>
       <div id="messages" class="prose" style="max-height:280px;overflow:auto"></div>
       <form id="msg-form" style="display:flex;gap:8px;margin-top:8px">
         <input id="msg-text" placeholder="Write a message…" required />
         <button class="btn primary">Send</button>
       </form>
     </div>
+
+    <!-- Predictions (optional if table exists) -->
+    <div class="card" id="pred-card" style="margin-top:16px; display:none">
+      <div class="panel-title">
+        <h3>Latest Predictions</h3>
+        <span class="badge">Ad Lab</span>
+      </div>
+      <div id="predictions"></div>
+      <div class="muted" style="margin-top:6px">Create more in <a href="ad-studio.html">Ad Studio</a>.</div>
+    </div>
+
+    <div class="muted" style="margin-top:10px">Need access? Ask EVRT to invite you to an account.</div>
   </section>
 
+  <!-- Footer include -->
   <div data-include="partials/footer.html"></div>
 
-  <!-- Supabase lib (unused in mock mode; used later when flipping provider) -->
+  <!-- Libs -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="assets/app.js"></script>
+
   <script>
-  // ---------------- CONFIG ----------------
-  // Flip this to 'supabase' later, or add ?mode=supabase to the URL
-  const PROVIDER = new URLSearchParams(location.search).get('mode') || 'mock';
+  // ========= CONFIG (replace these) =========
+  const SUPABASE_URL = "https://onhkipsguouxsraxsxfq.supabase.co";     // TODO
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uaGtpcHNndW91eHNyYXhzeGZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1MTM2MTgsImV4cCI6MjA3MjA4OTYxOH0.FaOVD9FfW8Cy7mgyDIsNoSL8LLliV-L4V--I5rbHlFs";                  // TODO
+  const FUNCTIONS_BASE = "https://YOUR-REF.functions.supabase.co"; // TODO
+  const DOCS_BUCKET = "client-docs"; // private bucket
+  // =========================================
 
-  // Only needed when PROVIDER === 'supabase'
-  const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";  // TODO later
-  const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";         // TODO later
-  // ---------------------------------------
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true } });
 
-  // ---------- UI refs ----------
-  const ui = {
-    app: document.getElementById('app'),
-    userEmail: document.getElementById('user-email'),
-    accountName: document.getElementById('account-name'),
-    projects: document.getElementById('projects'),
-    docs: document.getElementById('documents'),
-    msgs: document.getElementById('messages'),
-    signout: document.getElementById('signout'),
-    manage: document.getElementById('manage-link'),
-    uploadHint: document.getElementById('upload-hint'),
-  };
-
-  // ---------- Data provider abstraction ----------
-  const Data = (function makeProvider(){
-    if (PROVIDER === 'supabase') {
-      // --- REAL backend (wire up later) ---
-      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      async function bootstrapSessionFromHash() {
-        const hash = new URLSearchParams(window.location.hash.slice(1));
-        const access_token = hash.get("access_token");
-        const refresh_token = hash.get("refresh_token");
-        if (access_token && refresh_token) {
-          const { error } = await client.auth.setSession({ access_token, refresh_token });
-          if (!error) history.replaceState({}, document.title, window.location.pathname);
-        }
-      }
-      async function requireSession(){
-        const { data } = await client.auth.getSession();
-        const session = data.session;
-        if (!session) { window.location.href = 'portal.html'; return null; }
-        return session.user;
-      }
-      // NOTE: For now we keep a single-account assumption (first membership)
-      async function resolveAccount(userId){
-        const { data: ms } = await client.from('memberships').select('account_id').eq('user_id', userId);
-        return ms?.[0]?.account_id || null;
-      }
-      return {
-        mode: 'supabase',
-        async init(){ await bootstrapSessionFromHash(); const user = await requireSession(); return { user, accountId: user ? await resolveAccount(user.id) : null, client }; },
-        async userEmail(ctx){ return ctx.user?.email || ''; },
-        async accountName(ctx){
-          if (!ctx.accountId) return 'No Access';
-          const { data } = await ctx.client.from('accounts').select('name').eq('id', ctx.accountId).maybeSingle();
-          return data?.name || ctx.accountId;
-        },
-        async listProjects(ctx){
-          const { data, error } = await ctx.client.from('projects').select('id,name,status,updated_at').eq('account_id', ctx.accountId).order('updated_at', { ascending:false });
-          if (error) throw error; return data||[];
-        },
-        async addProject(ctx, name){
-          const { error } = await ctx.client.from('projects').insert({ account_id: ctx.accountId, name, status:'active' }); if (error) throw error;
-        },
-        async listDocuments(ctx){
-          const { data, error } = await ctx.client.from('documents').select('id,name,storage_path,created_at').eq('account_id', ctx.accountId).order('created_at', { ascending:false });
-          if (error) throw error;
-          // convert to {name, url, created_at}
-          const items = await Promise.all((data||[]).map(async d=>{
-            try {
-              const { data: urlData } = await ctx.client.storage.from('client-docs').createSignedUrl(d.storage_path, 60*10);
-              return { name: d.name, url: urlData?.signedUrl || '#', created_at: d.created_at };
-            } catch { return { name: d.name, url:'#', created_at: d.created_at }; }
-          }));
-          return items;
-        },
-        async uploadDocument(ctx, file){
-          const path = `${ctx.accountId}/${Date.now()}_${file.name}`;
-          const { error: upErr } = await ctx.client.storage.from('client-docs').upload(path, file, { upsert:false });
-          if (upErr) throw upErr;
-          await ctx.client.from('documents').insert({ account_id: ctx.accountId, name: file.name, storage_path: path });
-        },
-        async listMessages(ctx){
-          const { data, error } = await ctx.client.from('messages').select('id,body,created_at,author_name').eq('account_id', ctx.accountId).order('created_at',{ascending:false}).limit(100);
-          if (error) throw error; return data||[];
-        },
-        async sendMessage(ctx, body){
-          const { error } = await ctx.client.from('messages').insert({ account_id: ctx.accountId, author_name: (ctx.user?.email||'User'), body });
-          if (error) throw error;
-        },
-        subscribeMessages(ctx, cb){
-          const ch = ctx.client.channel('msgs-'+ctx.accountId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`account_id=eq.${ctx.accountId}`}, cb).subscribe();
-          return ()=>ctx.client.removeChannel(ch);
-        }
-      };
-    }
-
-    // --- MOCK provider (no auth, localStorage persistence) ---
-    const KEY = 'evrt_mock_v1';
-    const store = JSON.parse(localStorage.getItem(KEY) || 'null') || (function seed(){
-      const now = Date.now();
-      return {
-        userEmail: 'demo@client.com',
-        accountName: 'Demo Co.',
-        accountId: 'demo-account',
-        projects: [
-          { id: 'p1', name:'Kickoff', status:'active', updated_at: new Date(now-864e5).toISOString() },
-          { id: 'p2', name:'Pilot Build', status:'in progress', updated_at: new Date(now-432e5).toISOString() },
-          { id: 'p3', name:'Scale Program Q3', status:'planning', updated_at: new Date(now-216e5).toISOString() },
-        ],
-        documents: [
-          { id:'d1', name:'Discovery Report.pdf', url:'#', created_at: new Date(now-3*864e5).toISOString() },
-          { id:'d2', name:'KPI Baseline.xlsx',   url:'#', created_at: new Date(now-6*864e5).toISOString() },
-        ],
-        messages: [
-          { id:'m1', author_name:'Connor (EVRT)', body:"Welcome! We'll use this thread for weekly updates.", created_at:new Date(now-1800e3).toISOString() },
-          { id:'m2', author_name:'Client PM', body:'Got it. We uploaded last month’s exports.', created_at:new Date(now-600e3).toISOString() },
-        ]
-      };
-    })();
-    function save(){ localStorage.setItem(KEY, JSON.stringify(store)); }
-    function id(prefix){ return prefix + '_' + (Math.random().toString(36).slice(2,8)) + '_' + Date.now().toString(36); }
-
-    return {
-      mode: 'mock',
-      async init(){ return { user:{ email: store.userEmail }, accountId: store.accountId }; },
-      async userEmail(){ return store.userEmail; },
-      async accountName(){ return store.accountName; },
-      async listProjects(){ return [...store.projects].sort((a,b)=> new Date(b.updated_at)-new Date(a.updated_at)); },
-      async addProject(_, name){
-        store.projects.unshift({ id:id('p'), name, status:'active', updated_at: new Date().toISOString() }); save();
-      },
-      async listDocuments(){ return [...store.documents].sort((a,b)=> new Date(b.created_at)-new Date(a.created_at)); },
-      async uploadDocument(_, file){
-        // Small files only; keep preview realistic
-        const max = 3 * 1024 * 1024; // 3MB
-        if (file.size > max) { throw new Error('Preview limit: 3MB'); }
-        const url = await new Promise((res,rej)=>{
-          const r = new FileReader();
-          r.onload = ()=>res(r.result);
-          r.onerror = ()=>rej(new Error('Read failed'));
-          r.readAsDataURL(file);
-        });
-        store.documents.unshift({ id:id('d'), name:file.name, url, created_at:new Date().toISOString() });
-        save();
-      },
-      async listMessages(){ return [...store.messages].sort((a,b)=> new Date(b.created_at)-new Date(a.created_at)); },
-      async sendMessage(_, body){
-        store.messages.unshift({ id:id('m'), author_name: store.userEmail, body, created_at:new Date().toISOString() });
-        save();
-      },
-      subscribeMessages(_, cb){ // mock realtime via poll
-        let last = store.messages[0]?.id;
-        const iv = setInterval(()=>{
-          if (store.messages[0]?.id !== last){ last = store.messages[0]?.id; cb(); }
-        }, 1500);
-        return ()=>clearInterval(iv);
-      }
-    };
+  // --- include loader (partials/header.html, footer.html) ---
+  (function includePartials(){
+    const nodes = document.querySelectorAll('[data-include]');
+    nodes.forEach(async n=>{
+      try {
+        const path = n.getAttribute('data-include');
+        const res = await fetch(path, { cache: 'no-cache' });
+        if (res.ok) n.innerHTML = await res.text();
+      } catch (e) { /* ignore */ }
+    });
   })();
 
-  // ---------- App wiring (works with either provider) ----------
-  let ctx = null, unsub = null;
+  // --- UI refs ---
+  const ui = {
+    gate: document.getElementById('gate'),
+    app: document.getElementById('app'),
+    userEmail: document.getElementById('user-email'),
+    planPill: document.getElementById('plan-pill'),
+    acctSelect: document.getElementById('account-select'),
+    projects: document.getElementById('projects'),
+    projectsCount: document.getElementById('projects-count'),
+    docs: document.getElementById('documents'),
+    msgs: document.getElementById('messages'),
+    predCard: document.getElementById('pred-card'),
+    preds: document.getElementById('predictions')
+  };
 
-  async function renderProjects(){
-    try {
-      const items = await Data.listProjects(ctx);
-      ui.projects.innerHTML = items.length
-        ? items.map(p=>`<div class="row"><strong>${p.name}</strong><span class="muted">${p.status||''}</span></div>`).join('')
-        : '<p class="muted">No projects yet.</p>';
-    } catch (e){ ui.projects.innerHTML = `<p class="muted-danger">${e.message}</p>`; }
+  let session, user, accountId, accountName, plan = 'free';
+  let rtChannel;
+
+  // --- handle magic-link hash (access_token in URL fragment) ---
+  function parseHashParams() {
+    const h = location.hash?.substring(1) || '';
+    return Object.fromEntries(h.split('&').map(p=>p.split('=')).map(([k,v])=>[decodeURIComponent(k||''), decodeURIComponent(v||'')]));
   }
-  async function renderDocuments(){
-    try {
-      const items = await Data.listDocuments(ctx);
-      ui.docs.innerHTML = items.length
-        ? items.map(d=>`<div class="row"><a href="${d.url||'#'}">${d.name}</a><span class="muted">${new Date(d.created_at).toLocaleDateString()}</span></div>`).join('')
-        : '<p class="muted">No documents yet.</p>';
-    } catch (e){ ui.docs.innerHTML = `<p class="muted-danger">${e.message}</p>`; }
+  async function restoreSessionFromHash(){
+    const params = parseHashParams();
+    if (params.access_token && params.refresh_token) {
+      try {
+        await supabase.auth.setSession({
+          access_token: params.access_token,
+          refresh_token: params.refresh_token
+        });
+        // Clean the hash so refreshes don't repeat
+        history.replaceState({}, document.title, location.pathname + location.search);
+      } catch (e) {
+        console.error('setSession failed', e);
+      }
+    }
   }
-  async function renderMessages(){
+
+  // --- auth/session gating ---
+  async function requireSession(){
+    const { data } = await supabase.auth.getSession();
+    session = data.session;
+    if (!session) return false;
+    user = session.user;
+    ui.userEmail.textContent = user.email || '';
+    return true;
+  }
+
+  // --- memberships / account switcher ---
+  async function loadMembershipsAndChoose(){
+    const { data: ms, error } = await supabase.from('memberships').select('account_id, role').eq('user_id', user.id);
+    if (error) { alert(error.message); return false; }
+    if (!ms?.length) { alert('No account membership found. Ask EVRT to invite you.'); return false; }
+
+    // build select
+    ui.acctSelect.innerHTML = '';
+    for (const m of ms){
+      // try to pull account name
+      let name = m.account_id;
+      try {
+        const { data: acct } = await supabase.from('accounts').select('name').eq('id', m.account_id).maybeSingle();
+        if (acct?.name) name = acct.name;
+      } catch {}
+      const opt = document.createElement('option');
+      opt.value = m.account_id; opt.textContent = name + (m.role ? ` (${m.role})` : '');
+      ui.acctSelect.appendChild(opt);
+    }
+    accountId = ms[0].account_id;
+    ui.acctSelect.value = accountId;
+    ui.acctSelect.addEventListener('change', async (e)=>{ accountId = e.target.value; await refreshAll(); });
+    return true;
+  }
+
+  // --- subscription / plan ---
+  async function loadPlan(){
     try {
-      const items = await Data.listMessages(ctx);
-      ui.msgs.innerHTML = items.map(m=>`
-        <p><strong>${m.author_name||'User'}</strong>
-        <span class="muted">${new Date(m.created_at).toLocaleString()}</span><br>${m.body}</p>
+      const { data: sub } = await supabase.from('subscriptions').select('plan').eq('user_id', user.id).eq('account_id', accountId).maybeSingle();
+      plan = sub?.plan || 'free';
+    } catch { plan = 'free'; }
+    ui.planPill.textContent = 'plan: ' + plan;
+    document.getElementById('upgrade').style.display = (plan === 'pro' || plan === 'sprint') ? 'none' : '';
+  }
+
+  // --- list projects ---
+  async function listProjects(){
+    const { data, error } = await supabase
+      .from('projects')
+      .select('id,name,status,updated_at')
+      .eq('account_id', accountId)
+      .order('updated_at', { ascending:false });
+    if (error) { ui.projects.innerHTML = `<p class="muted err">${error.message}</p>`; return; }
+    ui.projectsCount.textContent = (data||[]).length;
+    ui.projects.innerHTML = (data||[]).map(p=>`
+      <div class="row">
+        <div><strong>${escapeHtml(p.name)}</strong> <span class="muted"> ${p.status?('· '+escapeHtml(p.status)) : ''}</span></div>
+        <span class="muted">${new Date(p.updated_at).toLocaleDateString()}</span>
+      </div>`).join('') || '<p class="muted">No projects yet.</p>';
+  }
+
+  // --- list documents (signed URLs) ---
+  async function listDocuments(){
+    const { data, error } = await supabase
+      .from('documents')
+      .select('id,name,storage_path,created_at')
+      .eq('account_id', accountId)
+      .order('created_at', { ascending:false });
+    if (error) { ui.docs.innerHTML = `<p class="muted err">${error.message}</p>`; return; }
+    const items = await Promise.all((data||[]).map(async d=>{
+      try {
+        const { data: urlData } = await supabase.storage.from(DOCS_BUCKET).createSignedUrl(d.storage_path, 60*10);
+        return `<div class="row"><a href="${urlData?.signedUrl||'#'}">${escapeHtml(d.name)}</a><span class="muted">${new Date(d.created_at).toLocaleDateString()}</span></div>`
+      } catch {
+        return `<div class="row">${escapeHtml(d.name)}</div>`
+      }
+    }));
+    ui.docs.innerHTML = items.join('') || '<p class="muted">No documents yet.</p>';
+  }
+
+  // --- messages (list + realtime) ---
+  async function listMessages(){
+    const { data, error } = await supabase
+      .from('messages')
+      .select('id,body,created_at,author_name')
+      .eq('account_id', accountId)
+      .order('created_at', { ascending:false })
+      .limit(100);
+    if (error) { ui.msgs.innerHTML = `<p class="muted err">${error.message}</p>`; return; }
+    ui.msgs.innerHTML = (data||[]).map(m=>`<p><strong>${escapeHtml(m.author_name||'User')}</strong> <span class="muted">${new Date(m.created_at).toLocaleString()}</span><br>${escapeHtml(m.body)}</p>`).join('');
+  }
+  function joinRealtime(){
+    if (rtChannel) supabase.removeChannel(rtChannel);
+    rtChannel = supabase.channel('msgs-' + accountId)
+      .on('postgres_changes', { event:'INSERT', schema:'public', table:'messages', filter:`account_id=eq.${accountId}` }, listMessages)
+      .subscribe();
+  }
+
+  // --- predictions (optional) ---
+  async function listPredictions(){
+    try {
+      const { data, error } = await supabase
+        .from('ad_predictions')
+        .select('created_at, expected_cpa, expected_roas, confidence')
+        .eq('account_id', accountId)
+        .order('created_at', { ascending:false })
+        .limit(6);
+      if (error) throw error;
+      if (!data?.length) { ui.predCard.style.display='none'; return; }
+      ui.predCard.style.display='';
+      ui.preds.innerHTML = data.map(p=>`
+        <div class="row">
+          <div>ROAS <strong>${p.expected_roas?.toFixed?.(2) ?? p.expected_roas}×</strong> · CPA <strong>$${Number(p.expected_cpa).toFixed(2)}</strong></div>
+          <span class="muted">${new Date(p.created_at).toLocaleString()} · conf ${Number(p.confidence*100||0).toFixed(0)}%</span>
+        </div>
       `).join('');
-    } catch (e){ ui.msgs.innerHTML = `<p class="muted-danger">${e.message}</p>`; }
+    } catch { ui.predCard.style.display='none'; }
   }
 
-  // Events
+  // --- events ---
+  document.getElementById('signout').addEventListener('click', async ()=>{
+    await supabase.auth.signOut();
+    window.location.href = 'portal.html';
+  });
+
   document.getElementById('new-project').addEventListener('submit', async (e)=>{
     e.preventDefault();
     const name = document.getElementById('pname').value.trim();
     if (!name) return;
-    try { await Data.addProject(ctx, name); document.getElementById('pname').value=''; renderProjects(); }
-    catch(e){ alert(e.message); }
+    const { error } = await supabase.from('projects').insert({ account_id: accountId, name, status: 'active' });
+    if (!error) { document.getElementById('pname').value = ''; listProjects(); }
   });
 
   document.getElementById('file-input').addEventListener('change', async (e)=>{
     const f = e.target.files[0]; if (!f) return;
-    try { await Data.uploadDocument(ctx, f); renderDocuments(); }
-    catch(e){ alert(e.message); }
+    const path = `${accountId}/${Date.now()}_${f.name}`;
+    const { error: upErr } = await supabase.storage.from(DOCS_BUCKET).upload(path, f, { upsert:false });
+    if (upErr) { alert(upErr.message); return; }
+    await supabase.from('documents').insert({ account_id: accountId, name: f.name, storage_path: path });
+    await listDocuments();
     e.target.value = '';
   });
 
@@ -286,36 +358,53 @@
     e.preventDefault();
     const t = document.getElementById('msg-text');
     const body = t.value.trim(); if(!body) return;
-    try { await Data.sendMessage(ctx, body); t.value=''; renderMessages(); }
-    catch(e){ alert(e.message); }
+    const { error } = await supabase.from('messages').insert({ account_id: accountId, author_id: user.id, author_name: user.email, body });
+    if (!error) { t.value=''; }
   });
 
-  document.getElementById('signout').addEventListener('click', async ()=>{
-    if (Data.mode === 'mock') { alert('Mock mode: no sign-out.'); return; }
-    // (In supabase mode we could call client.auth.signOut();)
-    location.href = 'portal.html';
+  document.getElementById('upgrade').addEventListener('click', async ()=>{
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return location.href='portal.html';
+    try {
+      const r = await fetch(`${FUNCTIONS_BASE}/create-checkout`, {
+        method:'POST',
+        headers: { 'Authorization': `Bearer ${session.access_token}` },
+        body: JSON.stringify({ accountId })
+      });
+      const j = await r.json();
+      if (j?.url) location.href = j.url;
+      else alert('Checkout link failed.');
+    } catch (e) { alert('Checkout error: ' + e.message); }
   });
 
-  // ---------- Init ----------
+  // --- helpers ---
+  function escapeHtml(s){ return (s??'').toString().replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m])); }
+
+  async function refreshAll(){
+    await loadPlan();
+    await listProjects();
+    await listDocuments();
+    await listMessages();
+    await listPredictions();
+    joinRealtime();
+  }
+
+  // --- boot ---
   (async ()=>{
-    if (Data.mode === 'mock') {
-      const badge = document.createElement('div');
-      badge.className = 'badge';
-      badge.textContent = 'MOCK MODE';
-      document.body.appendChild(badge);
-      ui.manage.style.display = 'none';
-      ui.uploadHint.textContent = 'Preview storage — small files only, saved locally.';
+    try {
+      await restoreSessionFromHash();
+      const ok = await requireSession();
+      if (!ok) { window.location.href = 'portal.html'; return; }
+      const haveAcct = await loadMembershipsAndChoose();
+      if (!haveAcct) return;
+      // show app
+      ui.gate.classList.add('hidden');
+      ui.app.classList.remove('hidden');
+      await refreshAll();
+    } catch (e) {
+      console.error(e);
+      alert('App init failed: ' + e.message);
     }
-
-    ctx = await Data.init();
-    ui.userEmail.textContent = await Data.userEmail(ctx);
-    ui.accountName.textContent = await Data.accountName(ctx) || 'Demo';
-
-    ui.app.style.display = '';
-    await renderProjects();
-    await renderDocuments();
-    await renderMessages();
-    if (unsub) unsub(); unsub = Data.subscribeMessages(ctx, renderMessages);
   })();
   </script>
 </body>
