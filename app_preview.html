@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>EVRT — App (Preview)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root{--bg:#0b0e13;--card:#121721;--muted:#8b95a7;--accent:#6ee7ff;--text:#e7ecf3}
+  *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;color:var(--text);background:radial-gradient(1200px 800px at 80% -100px,#1b2130 0,#0b0e13 60%);}
+  .wrap{max-width:1100px;margin:40px auto;padding:0 20px}
+  .eyebrow{letter-spacing:.12em;font-size:.8rem;color:var(--muted);text-transform:uppercase}
+  h1{margin:.2rem 0 1rem;font-size:2.2rem;background:linear-gradient(90deg,#c3e9ff, #77f0ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);margin:0 0 24px}
+  .grid{display:grid;gap:16px}
+  .grid-2{grid-template-columns:1fr;gap:16px}
+  @media(min-width:900px){.grid-2{grid-template-columns:1fr 1fr}}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px 16px}
+  .row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+  .row:last-child{border-bottom:none}
+  .muted{color:var(--muted)}
+  .badge{position:fixed;top:10px;right:10px;background:#ffd54d;color:#222;padding:6px 10px;border-radius:999px;font-weight:700}
+  .btn{appearance:none;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--text);padding:8px 12px;border-radius:10px;cursor:default;opacity:.6}
+  input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:#0f141c;color:var(--text)}
+  a{color:#b6f3ff;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="badge">PREVIEW</div>
+<div class="wrap">
+  <div>
+    <div class="eyebrow">EVRT</div>
+    <h1>Client App</h1>
+    <p class="sub">Projects, documents, and messages for your team.</p>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <div>
+        <h3 style="margin:0">Welcome, <span class="muted">demo@client.com</span></h3>
+        <p class="muted" style="margin:0">Account: <strong>Demo Co.</strong></p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn">Switch Account</button>
+        <button class="btn">Sign out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:16px">
+    <div class="card">
+      <h3>Your Projects</h3>
+      <div class="row"><strong>Kickoff</strong><span class="muted">active</span></div>
+      <div class="row"><strong>Pilot Build</strong><span class="muted">in progress</span></div>
+      <div class="row"><strong>Scale Program Q3</strong><span class="muted">planning</span></div>
+      <form class="grid" style="gap:8px;margin-top:8px" onsubmit="event.preventDefault();alert('Preview only');">
+        <input placeholder="New project name"/><button class="btn">Add Project</button>
+      </form>
+    </div>
+    <div class="card">
+      <h3>Documents</h3>
+      <div class="row"><a href="#">Discovery Report.pdf</a><span class="muted">8/24/2025</span></div>
+      <div class="row"><a href="#">KPI Baseline.xlsx</a><span class="muted">8/21/2025</span></div>
+      <div class="row"><a href="#">Creative Brief v1.docx</a><span class="muted">8/18/2025</span></div>
+      <div style="margin-top:10px">
+        <label class="btn"><input type="file" style="display:none" onchange="alert('Preview only');"/>Upload file</label>
+        <p class="muted" style="margin-top:6px">Uploads disabled in preview.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Messages</h3>
+    <div style="max-height:280px;overflow:auto">
+      <p><strong>Connor (EVRT)</strong> <span class="muted">8/29/2025, 9:15 AM</span><br/>Welcome! We’ll use this thread for weekly updates.</p>
+      <p><strong>Client PM</strong> <span class="muted">8/29/2025, 9:35 AM</span><br/>Got it. We uploaded last month’s exports.</p>
+      <p><strong>Connor (EVRT)</strong> <span class="muted">8/29/2025, 9:40 AM</span><br/>Perfect—baseline dashboard coming today.</p>
+    </div>
+    <form style="display:flex;gap:8px;margin-top:8px" onsubmit="event.preventDefault();alert('Preview only');">
+      <input placeholder="Write a message…"/><button class="btn">Send</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>
