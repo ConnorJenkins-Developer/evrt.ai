@@ -1,151 +1,66 @@
-<!-- partials/header.html (scriptless; mobile works via CSS + <details>) -->
-<header class="evrt-header" role="banner">
-  <a class="evrt-brand" href="index.html" aria-label="EVRT home">
-    <span class="evrt-logo">EVRT</span>
-  </a>
-
-  <!-- Mobile menu toggle (checkbox hack; no JS needed) -->
-  <input type="checkbox" id="evrt-menu" class="evrt-menu-toggle" />
-  <label for="evrt-menu" class="evrt-toggle" aria-controls="evrt-nav">Menu</label>
-
-  <nav id="evrt-nav" class="evrt-nav" role="navigation" aria-label="Primary">
-    <ul class="evrt-top">
-      <!-- PLATFORM -->
-      <li class="evrt-group">
-        <details>
-          <summary class="evrt-toplink">Platform</summary>
-          <div class="evrt-dropdown evrt-columns-2">
-            <a href="social-ai.html">EVRT Social AI (Overview)</a>
-            <a href="adlab.html">Ad Demo Lab (Live)</a>
-            <a href="ad-studio.html">Ad Studio</a>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="apps.html">All Apps</a>
-          </div>
-        </details>
-      </li>
-
-      <!-- SOLUTIONS -->
-      <li class="evrt-group">
-        <details>
-          <summary class="evrt-toplink">Solutions</summary>
-          <div class="evrt-dropdown">
-            <a href="consulting.html">Consulting</a>
-            <a href="cybersecurity.html">Cybersecurity</a>
-            <a href="industries.html">Industries</a>
-          </div>
-        </details>
-      </li>
-
-      <!-- RESOURCES -->
-      <li class="evrt-group">
-        <details>
-          <summary class="evrt-toplink">Resources</summary>
-          <div class="evrt-dropdown">
-            <a href="projects.html">Projects / Case Studies</a>
-            <a href="blog.html">Insights (Blog)</a>
-            <a href="press.html">Press</a>
-          </div>
-        </details>
-      </li>
-
-      <!-- COMPANY -->
-      <li class="evrt-group">
-        <details>
-          <summary class="evrt-toplink">Company</summary>
-          <div class="evrt-dropdown">
-            <a href="about.html">About</a>
-            <a href="pricing.html">Pricing</a>
-            <a href="contact.html">Contact</a>
-            <a href="portal.html">Client Portal</a>
-            <a href="privacy.html">Privacy</a>
-            <a href="careers.html">Careers</a>
-          </div>
-        </details>
-      </li>
-    </ul>
-
-    <div class="evrt-cta">
-      <a class="evrt-btn" href="adlab.html">Launch live demo</a>
-      <a class="evrt-btn evrt-primary" href="contact.html">Get in touch</a>
-    </div>
-  </nav>
-
+<!-- partials/header.html -->
+<header class="site-header">
   <style>
-    /* ——— Base ——— */
-    .evrt-header{
-      position:sticky;top:0;z-index:60;
-      display:flex;align-items:center;justify-content:space-between;
-      padding:12px 16px;background:rgba(10,12,18,.6);
-      backdrop-filter:blur(8px);
-      border-bottom:1px solid rgba(255,255,255,.06)
-    }
-    .evrt-brand{font-weight:800;letter-spacing:.02em;text-decoration:none;color:inherit}
-    .evrt-logo{display:inline-block;padding:6px 10px;border-radius:10px;
-      background:linear-gradient(90deg,#6ee7ff,#77ffcc);color:#0b0e13;font-weight:900}
-    .evrt-toggle{
-      display:none;background:transparent;color:inherit;cursor:pointer;
-      border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:6px 10px
-    }
-    .evrt-menu-toggle{position:absolute;left:-9999px;top:-9999px}
-
-    .evrt-nav{display:flex;align-items:center;gap:22px}
-    .evrt-top{display:flex;gap:18px;list-style:none;margin:0;padding:0}
-    .evrt-cta{display:flex;gap:10px}
-    .evrt-btn{display:inline-block;padding:8px 12px;border-radius:10px;
-      border:1px solid rgba(255,255,255,.2);text-decoration:none;color:inherit}
-    .evrt-primary{background:linear-gradient(90deg,#6ee7ff,#77ffcc);color:#0b0e13;border:0;font-weight:700}
-
-    /* ——— Groups / dropdowns ——— */
-    .evrt-group{position:relative}
-    details{position:relative}
-    summary.evrt-toplink{
-      list-style:none;cursor:pointer;user-select:none;
-      padding:8px 6px;border-radius:8px
-    }
-    summary.evrt-toplink::-webkit-details-marker{display:none}
-    summary.evrt-toplink:hover{background:rgba(255,255,255,.06)}
-
-    .evrt-dropdown{
-      position:absolute;left:0;top:100%;min-width:260px;display:none;
-      grid-template-columns:1fr;gap:6px;margin-top:6px;
-      background:#0f141c;border:1px solid rgba(255,255,255,.1);
-      border-radius:12px;padding:10px;box-shadow:0 12px 30px rgba(0,0,0,.35)
-    }
-    .evrt-columns-2{min-width:520px;grid-template-columns:1fr 1fr}
-    .evrt-dropdown a{display:block;padding:8px 10px;border-radius:8px;
-      text-decoration:none;color:inherit;white-space:nowrap}
-    .evrt-dropdown a:hover{background:rgba(255,255,255,.06)}
-
-    /* Desktop: open dropdowns on hover/focus OR when details is [open] */
-    @media (pointer:fine){
-      .evrt-group:hover .evrt-dropdown,
-      .evrt-group:focus-within .evrt-dropdown{display:grid}
-    }
-    /* Also respect details[open] (helps keyboard users) */
-    .evrt-group details[open] > .evrt-dropdown{display:grid}
-
-    /* ——— Mobile layout ——— */
-    @media (max-width: 920px){
-      .evrt-toggle{display:block}
-      .evrt-nav{
-        position:fixed;inset:64px 12px auto 12px;flex-direction:column;align-items:stretch;gap:14px;
-        padding:12px;background:#0b0e13;border:1px solid rgba(255,255,255,.08);
-        border-radius:16px;transform:translateY(-20px);opacity:0;pointer-events:none;transition:.2s
-      }
-      /* Open menu when checkbox is checked */
-      .evrt-menu-toggle:checked ~ .evrt-nav{
-        transform:translateY(0);opacity:1;pointer-events:auto
-      }
-      .evrt-top{flex-direction:column;gap:8px}
-
-      /* Mobile submenus use native <details> toggling */
-      .evrt-dropdown{
-        position:static;display:none;border:0;box-shadow:none;padding:6px 4px 8px;margin:0;
-        background:transparent
-      }
-      .evrt-columns-2{min-width:0;grid-template-columns:1fr}
-      .evrt-group details[open] > .evrt-dropdown{display:grid}
-      .evrt-cta{flex-direction:column}
+    .site-header{position:sticky;top:0;z-index:60;background:rgba(7,18,27,.85);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08)}
+    .nav-wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .brand .logo{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#6ee7ff,#63ffa5)}
+    .brand span{font-weight:800;letter-spacing:.4px}
+    .nav{display:flex;gap:12px;align-items:center}
+    .nav a{padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;text-decoration:none}
+    .nav a:hover{border-color:rgba(110,231,255,.45)}
+    .cta{background:linear-gradient(90deg,#6ee7ff,#63ffa5);color:#061019;border:0;font-weight:800}
+    .menu-btn{display:none}
+    @media(max-width:900px){
+      .menu-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:#0f141c;color:#fff;padding:8px 10px}
+      .nav{display:none;position:absolute;right:10px;top:58px;flex-direction:column;align-items:stretch;background:#07121b;border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:10px;width:220px}
+      .nav.open{display:flex}
+      .nav a{display:block}
     }
   </style>
+
+  <div class="nav-wrap container">
+    <a class="brand" href="index.html" aria-label="EVRT">
+      <i class="logo"></i><span>EVRT</span>
+    </a>
+
+    <button id="menuToggle" class="menu-btn" aria-expanded="false" aria-controls="mobileNav">Menu</button>
+
+    <nav id="mobileNav" class="nav">
+      <a href="apps.html">Apps</a>
+      <a href="social-ai.html">Social AI</a>
+      <a href="ad-studio.html">Ad Studio</a>
+      <a href="adlab.html">Ad Lab</a>
+      <a href="dashboard.html">Dashboards</a>
+      <a href="consulting.html">Consulting</a>
+      <a href="projects.html">Projects</a>
+      <a href="blog.html">Insights</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="cybersecurity.html">Security</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="contact.html">Contact</a>
+      <a class="cta" data-cta="primary" href="portal.html">Start trial</a>
+      <a class="cta" href="portal.html">Client portal</a>
+    </nav>
+  </div>
+
+  <script>
+    (function(){
+      const btn=document.getElementById('menuToggle');
+      const nav=document.getElementById('mobileNav');
+      if(!btn||!nav) return;
+      btn.addEventListener('click', ()=>{
+        const open = nav.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open?'true':'false');
+      });
+      // Close on outside click
+      document.addEventListener('click', (e)=>{
+        if(!nav.classList.contains('open')) return;
+        if(!nav.contains(e.target) && e.target!==btn) nav.classList.remove('open');
+      });
+    })();
+  </script>
+
+  <!-- Load global CTA normalizer everywhere -->
+  <script src="assets/cta-normalize.js" defer></script>
 </header>
