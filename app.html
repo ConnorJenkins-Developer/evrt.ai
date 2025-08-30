@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EVRT — App</title>
+  <meta name="description" content="EVRT client app: projects, docs, messages." />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true"></div>
+  <div data-include="partials/header.html"></div>
+
+  <section class="container hero">
+    <span class="eyebrow">EVRT</span>
+    <h1 class="gradient-text">Client App</h1>
+    <p class="sub">Projects, documents, and messages for your team.</p>
+  </section>
+
+  <section class="container section" id="app" style="display:none">
+    <div class="card" data-reveal>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h3 style="margin:0">Welcome, <span id="user-email"></span></h3>
+          <p class="muted" style="margin:0">Account: <span id="account-name"></span></p>
+        </div>
+        <div style="display:flex; gap:8px">
+          <a class="btn" href="portal.html" id="manage-link">Switch Account</a>
+          <button class="btn" id="signout">Sign out</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card" data-reveal>
+        <h3>Your Projects</h3>
+        <div id="projects"></div>
+        <form id="new-project" class="grid" style="gap:8px;margin-top:8px">
+          <input id="pname" placeholder="New project name" />
+          <button class="btn">Add Project</button>
+        </form>
+      </div>
+      <div class="card" data-reveal>
+        <h3>Documents</h3>
+        <div id="documents"></div>
+        <div style="margin-top:10px">
+          <label class="btn">
+            <input id="file-input" type="file" style="display:none" />
+            Upload file
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-reveal style="margin-top:16px">
+      <h3>Messages</h3>
+      <div id="messages" class="prose" style="max-height:280px;overflow:auto"></div>
+      <form id="msg-form" style="display:flex;gap:8px;margin-top:8px">
+        <input id="msg-text" placeholder="Write a message…" required />
+        <button class="btn primary">Send</button>
+      </form>
+    </div>
+  </section>
+
+  <div data-include="partials/footer.html"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="assets/app.js"></script>
+  <script>
+  // ====== CONFIG (replace these) ======
+  const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co"; // TODO
+  const SUPABASE_ANON_KEY = "public-anon-key";              // TODO
+  // ====================================
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const ui = {
+    app: document.getElementById('app'),
+    userEmail: document.getElementById('user-email'),
+    accountName: document.getElementById('account-name'),
+    projects: document.getElementById('projects'),
+    docs: document.getElementById('documents'),
+    msgs: document.getElementById('messages')
+  };
+
+  let session, user, accountId, accountName;
+
+  async function requireSession(){
+    const { data } = await supabase.auth.getSession();
+    session = data.session;
+    if (!session) {
+      // Not logged in → go to portal
+      window.location.href = 'portal.html';
+      return false;
+    }
+    user = session.user;
+    ui.userEmail.textContent = user.email || '';
+    return true;
+  }
+
+  async function loadAccount(){
+    // Simplest: pick first membership for now
+    const { data: ms, error } = await supabase.from('memberships').select('account_id, role').eq('user_id', user.id);
+    if (error || !ms?.length) {
+      alert('No account access. Ask EVRT to invite you.');
+      return false;
+    }
+    accountId = ms[0].account_id;
+    // Optional: fetch account name
+    const { data: acct } = await supabase.from('accounts').select('name').eq('id', accountId).maybeSingle();
+    accountName = acct?.name || accountId;
+    ui.accountName.textContent = accountName;
+    return true;
+  }
+
+  async function listProjects(){
+    const { data, error } = await supabase
+      .from('projects')
+      .select('id,name,status,updated_at')
+      .eq('account_id', accountId)
+      .order('updated_at', { ascending:false });
+    if (error) { ui.projects.innerHTML = `<p class="muted">${error.message}</p>`; return; }
+    ui.projects.innerHTML = (data||[]).map(p=>`<div class="row"><strong>${p.name}</strong><span class="muted">${p.status||''}</span></div>`).join('') || '<p class="muted">No projects yet.</p>';
+  }
+
+  async function listDocuments(){
+    const { data, error } = await supabase
+      .from('documents')
+      .select('id,name,storage_path,created_at')
+      .eq('account_id', accountId)
+      .order('created_at', { ascending:false });
+    if (error) { ui.docs.innerHTML = `<p class="muted">${error.message}</p>`; return; }
+    const items = await Promise.all((data||[]).map(async d=>{
+      try {
+        const { data: urlData } = await supabase.storage.from('client-docs').createSignedUrl(d.storage_path, 60*10);
+        return `<div class="row"><a href="${urlData?.signedUrl||'#'}">${d.name}</a><span class="muted">${new Date(d.created_at).toLocaleDateString()}</span></div>`
+      } catch { return `<div class="row">${d.name}</div>`; }
+    }));
+    ui.docs.innerHTML = items.join('') || '<p class="muted">No documents yet.</p>';
+  }
+
+  async function loadMessages(){
+    const { data, error } = await supabase
+      .from('messages')
+      .select('id,body,created_at,author_name')
+      .eq('account_id', accountId)
+      .order('created_at', { ascending:false })
+      .limit(100);
+    if (error) { ui.msgs.innerHTML = `<p class="muted">${error.message}</p>`; return; }
+    ui.msgs.innerHTML = (data||[]).map(m=>`<p><strong>${m.author_name||'User'}</strong> <span class="muted">${new Date(m.created_at).toLocaleString()}</span><br>${m.body}</p>`).join('');
+  }
+
+  // Events
+  document.getElementById('signout').addEventListener('click', async ()=>{
+    await supabase.auth.signOut();
+    window.location.href = 'portal.html';
+  });
+
+  document.getElementById('new-project').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('pname').value.trim();
+    if (!name) return;
+    const { error } = await supabase.from('projects').insert({ account_id: accountId, name, status: 'active' });
+    if (!error) { document.getElementById('pname').value = ''; listProjects(); }
+  });
+
+  document.getElementById('file-input').addEventListener('change', async (e)=>{
+    const f = e.target.files[0]; if (!f) return;
+    const path = `${accountId}/${Date.now()}_${f.name}`;  // prefix by account
+    const { error: upErr } = await supabase.storage.from('client-docs').upload(path, f, { upsert:false });
+    if (upErr) { alert(upErr.message); return; }
+    await supabase.from('documents').insert({ account_id: accountId, name: f.name, storage_path: path });
+    await listDocuments();
+    e.target.value = '';
+  });
+
+  document.getElementById('msg-form').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const t = document.getElementById('msg-text');
+    const body = t.value.trim(); if(!body) return;
+    const { error } = await supabase.from('messages').insert({ account_id: accountId, author_id: user.id, author_name: user.email, body });
+    if (!error) { t.value=''; }
+  });
+
+  // Realtime for account messages
+  let channel;
+  function joinRealtime(){
+    if (channel) supabase.removeChannel(channel);
+    channel = supabase.channel('msgs-' + accountId)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `account_id=eq.${accountId}` }, loadMessages)
+      .subscribe();
+  }
+
+  // Init
+  (async ()=>{
+    const ok = await requireSession();
+    if (!ok) return;
+    const haveAcct = await loadAccount();
+    if (!haveAcct) return;
+    ui.app.style.display = '';
+    await listProjects();
+    await listDocuments();
+    await loadMessages();
+    joinRealtime();
+  })();
+  </script>
+</body>
+</html>
