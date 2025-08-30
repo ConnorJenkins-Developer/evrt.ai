@@ -3,63 +3,59 @@
   <style>
     :root{
       --hdr-bg: rgba(7,18,27,.85);
-      --grid: rgba(255,255,255,.12);
-      --line: rgba(255,255,255,.08);
+      --line: rgba(255,255,255,.12);
+      --line-strong: rgba(255,255,255,.92);
       --neon:#6ee7ff; --accent:#63ffa5;
     }
-    .site-header{position:sticky;top:0;z-index:1000;background:var(--hdr-bg);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    .site-header{position:sticky;top:0;z-index:1000;background:var(--hdr-bg);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08)}
     .nav-wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px}
     .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
     .brand .logo{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--neon),var(--accent))}
     .brand span{font-weight:800;letter-spacing:.4px}
-    /* Desktop nav */
+
+    /* Desktop inline nav */
     .nav{display:flex;gap:10px;align-items:center}
-    .nav a{padding:8px 10px;border:1px solid var(--line);border-radius:10px;text-decoration:none}
+    .nav a{padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;text-decoration:none}
     .nav a:hover{border-color:rgba(110,231,255,.45)}
     .cta{background:linear-gradient(90deg,var(--neon),var(--accent));color:#061019;border:0;font-weight:800}
 
-    /* Mobile button */
-    .menu-btn{display:none;align-items:center;gap:8px;border:1px solid #fff; border-color:rgba(255,255,255,.9);
-      border-radius:10px;background:#0f141c;color:#fff;padding:8px 12px;font-weight:600}
+    /* Mobile toggle (CSS-only) */
+    #navToggle{position:absolute;left:-9999px;top:-9999px}
+    .menu-btn{
+      display:none;align-items:center;gap:8px;
+      background:#0f141c;color:#fff;padding:8px 12px;border-radius:10px;
+      border:1px solid var(--line-strong); /* thin white border */
+      font-weight:600; cursor:pointer; user-select:none;
+    }
     .menu-btn:focus{outline:2px solid var(--neon);outline-offset:2px}
+
+    /* Mobile panel */
+    .mnav{display:none;position:absolute;right:10px;top:58px;width:86vw;max-width:360px;
+      background:#0f141c;border:1px solid var(--line-strong);border-radius:12px;
+      box-shadow:0 16px 50px rgba(0,0,0,.45);padding:10px;z-index:1002}
+    .mnav a{display:block;padding:10px;border:1px solid var(--line);border-radius:10px;text-decoration:none;margin-bottom:8px}
+    .mnav a:last-child{margin-bottom:0}
+    .mnav a:hover{border-color:rgba(110,231,255,.45)}
+    .mnav .cta{text-align:center}
+
+    /* Click-off backdrop (label) */
+    .backdrop{
+      display:none;position:fixed;inset:0;background:rgba(6,10,15,.6);
+      backdrop-filter:blur(2px);z-index:1001;
+    }
+
+    /* When checked -> open menu & backdrop */
+    #navToggle:checked ~ .backdrop{display:block}
+    #navToggle:checked ~ .mnav{display:block}
 
     /* Breakpoint */
     @media(max-width:900px){
       .nav{display:none}
       .menu-btn{display:inline-flex}
+      /* Ensure header acts as anchoring context */
+      .site-header{position:sticky}
+      .nav-wrap{position:relative}
     }
-
-    /* Drawer */
-    .drawer{position:fixed;inset:0;display:none;z-index:1001}
-    .drawer.open{display:block}
-    .drawer .overlay{position:absolute;inset:0;background:rgba(6,10,15,.6);backdrop-filter:blur(4px)}
-    .drawer .panel{
-      position:absolute;right:0;top:0;height:100%;width:min(88vw,420px);
-      background:#07121b;border-left:1px solid var(--grid);box-shadow: -20px 0 60px rgba(0,0,0,.3);
-      display:flex;flex-direction:column;transform:translateX(100%);transition:transform .22s ease;
-    }
-    .drawer.open .panel{transform:translateX(0)}
-    .drawer header{
-      display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 12px;border-bottom:1px solid var(--line)
-    }
-    .drawer .close{border:1px solid var(--line);background:#0f141c;color:#fff;border-radius:10px;padding:8px 10px}
-    .drawer .content{padding:10px;overflow:auto}
-    .sec{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01))}
-    .sec summary{
-      list-style:none;cursor:pointer;user-select:none;
-      padding:12px 12px;border-bottom:1px dashed rgba(255,255,255,.14);display:flex;align-items:center;justify-content:space-between;gap:8px
-    }
-    .sec[open] summary{border-bottom:1px dashed rgba(255,255,255,.24)}
-    .sec summary::-webkit-details-marker{display:none}
-    .chev{transition:transform .2s ease}
-    .sec[open] .chev{transform:rotate(90deg)}
-    .links{display:grid;gap:8px;padding:10px}
-    .links a{display:block;padding:10px;border:1px solid var(--line);border-radius:10px;text-decoration:none}
-    .links a:hover{border-color:rgba(110,231,255,.45)}
-    .hr{height:1px;background:var(--line);margin:10px 0}
-    .drawer .foot{padding:10px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap}
-    .btn.neon{background:linear-gradient(90deg,var(--neon),var(--accent));color:#061019;border:0;font-weight:800;border-radius:10px;padding:10px 12px}
-    .btn{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#0f141c;color:#fff}
   </style>
 
   <div class="nav-wrap container">
@@ -67,7 +63,7 @@
       <i class="logo" aria-hidden="true"></i><span>EVRT</span>
     </a>
 
-    <!-- Desktop -->
+    <!-- Desktop nav -->
     <nav class="nav" aria-label="Primary">
       <a href="apps.html">Apps</a>
       <a href="social-ai.html">Social AI</a>
@@ -78,160 +74,58 @@
       <a href="projects.html">Projects</a>
       <a href="blog.html">Insights</a>
       <a href="pricing.html">Pricing</a>
+      <a href="cybersecurity.html">Security</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="contact.html">Contact</a>
       <a class="cta" data-cta="primary" href="portal.html">Start trial</a>
     </nav>
 
-    <!-- Mobile -->
-    <button id="menuToggle" class="menu-btn" aria-expanded="false" aria-controls="evrtDrawer">Menu</button>
+    <!-- Mobile: CSS-only toggle -->
+    <input type="checkbox" id="navToggle" aria-hidden="true"/>
+    <label for="navToggle" class="menu-btn" aria-controls="mobileCatalog" aria-expanded="false">Menu</label>
+    <label for="navToggle" class="backdrop" aria-hidden="true"></label>
+
+    <nav id="mobileCatalog" class="mnav" aria-label="Mobile catalog">
+      <a href="apps.html">Apps overview</a>
+      <a href="social-ai.html">Social AI</a>
+      <a href="ad-studio.html">Ad Studio</a>
+      <a href="adlab.html">Ad Lab</a>
+      <a href="dashboard.html">Dashboards</a>
+      <a href="consulting.html">Consulting</a>
+      <a href="industries.html">Industries</a>
+      <a href="projects.html">Projects & Case Studies</a>
+      <a href="blog.html">Insights</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="cybersecurity.html">Security</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="about.html">About</a>
+      <a href="press.html">Press</a>
+      <a href="careers.html">Careers</a>
+      <a href="contact.html">Contact</a>
+      <a class="cta" data-cta="primary" href="portal.html">Start trial</a>
+      <a class="cta" href="portal.html">Client portal</a>
+    </nav>
   </div>
 
-  <!-- Drawer -->
-  <aside id="evrtDrawer" class="drawer" aria-hidden="true">
-    <div class="overlay" data-close></div>
-    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
-      <header>
-        <div style="display:flex;align-items:center;gap:10px">
-          <i class="logo" style="width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,var(--neon),var(--accent))"></i>
-          <strong id="drawerTitle">Catalog</strong>
-        </div>
-        <button class="close" data-close aria-label="Close menu">Close</button>
-      </header>
-
-      <div class="content" id="drawerContent">
-        <details class="sec" open>
-          <summary>
-            <span>Products</span>
-            <span class="chev" aria-hidden="true">›</span>
-          </summary>
-          <div class="links">
-            <a href="apps.html">Apps overview</a>
-            <a href="social-ai.html">Social AI</a>
-            <a href="ad-studio.html">Ad Studio</a>
-            <a href="adlab.html">Ad Lab</a>
-            <a href="dashboard.html">Dashboards</a>
-          </div>
-        </details>
-
-        <details class="sec">
-          <summary>
-            <span>Solutions</span>
-            <span class="chev" aria-hidden="true">›</span>
-          </summary>
-          <div class="links">
-            <a href="consulting.html">Consulting</a>
-            <a href="industries.html">Industries</a>
-            <a href="projects.html">Projects & Case Studies</a>
-            <a href="pricing.html">Pricing</a>
-          </div>
-        </details>
-
-        <details class="sec">
-          <summary>
-            <span>Trust</span>
-            <span class="chev" aria-hidden="true">›</span>
-          </summary>
-          <div class="links">
-            <a href="cybersecurity.html">Cybersecurity</a>
-            <a href="privacy.html">Privacy</a>
-          </div>
-        </details>
-
-        <details class="sec">
-          <summary>
-            <span>Company</span>
-            <span class="chev" aria-hidden="true">›</span>
-          </summary>
-          <div class="links">
-            <a href="about.html">About</a>
-            <a href="press.html">Press</a>
-            <a href="careers.html">Careers</a>
-            <a href="contact.html">Contact</a>
-            <div class="hr"></div>
-            <a class="btn" href="blog.html">Insights</a>
-          </div>
-        </details>
-
-        <details class="sec">
-          <summary>
-            <span>Account</span>
-            <span class="chev" aria-hidden="true">›</span>
-          </summary>
-          <div class="links">
-            <a class="btn neon" data-cta="primary" href="portal.html">Start trial</a>
-            <a class="btn" href="portal.html">Client portal</a>
-          </div>
-        </details>
-      </div>
-
-      <div class="foot">
-        <a class="btn" href="pricing.html">See pricing</a>
-        <a class="btn" href="contact.html">Book briefing</a>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Keep CTA normalization -->
+  <!-- Keep CTA normalization site-wide (safe to include; no impact on toggle) -->
   <script src="assets/cta-normalize.js" defer></script>
 
   <script>
+    // Accessibility nicety: reflect expanded state without driving the toggle
     (function(){
-      const btn = document.getElementById('menuToggle');
-      const drawer = document.getElementById('evrtDrawer');
-      const panel = drawer?.querySelector('.panel');
-      const overlayEls = drawer?.querySelectorAll('[data-close]');
-      const focusablesSel = 'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
-      let lastFocus = null;
-
-      if(!btn || !drawer || !panel) return;
-
-      function openDrawer(){
-        lastFocus = document.activeElement;
-        drawer.classList.add('open');
-        drawer.setAttribute('aria-hidden','false');
-        btn.setAttribute('aria-expanded','true');
-        // Lock scroll
-        document.documentElement.style.overflow='hidden';
-        document.body.style.overflow='hidden';
-        // Focus first link
-        const f = panel.querySelector(focusablesSel);
-        setTimeout(()=> f?.focus(), 10);
-      }
-
-      function closeDrawer(){
-        drawer.classList.remove('open');
-        drawer.setAttribute('aria-hidden','true');
-        btn.setAttribute('aria-expanded','false');
-        document.documentElement.style.overflow='';
-        document.body.style.overflow='';
-        lastFocus?.focus();
-      }
-
-      btn.addEventListener('click', ()=> {
-        const open = drawer.classList.contains('open');
-        open ? closeDrawer() : openDrawer();
-      });
-
-      overlayEls.forEach(el => el.addEventListener('click', closeDrawer));
-      // Close on ESC
-      addEventListener('keydown', (e)=>{ if(e.key==='Escape' && drawer.classList.contains('open')) closeDrawer(); });
-      // Close when any link is clicked
-      drawer.addEventListener('click', (e)=>{
-        const t = e.target;
-        if(t && t.tagName === 'A') closeDrawer();
-      });
-      // Trap tab focus inside panel
-      drawer.addEventListener('keydown', (e)=>{
-        if(e.key !== 'Tab') return;
-        const f = panel.querySelectorAll(focusablesSel);
-        if(!f.length) return;
-        const first = f[0], last = f[f.length-1];
-        if(e.shiftKey && document.activeElement === first){ last.focus(); e.preventDefault(); }
-        else if(!e.shiftKey && document.activeElement === last){ first.focus(); e.preventDefault(); }
-      });
-      // Auto-close if resizing to desktop
-      addEventListener('resize', ()=>{
-        if(innerWidth > 900 && drawer.classList.contains('open')) closeDrawer();
-      });
+      const cb = document.getElementById('navToggle');
+      const btn = document.querySelector('.menu-btn');
+      if(!cb || !btn) return;
+      const sync = ()=> btn.setAttribute('aria-expanded', cb.checked ? 'true' : 'false');
+      cb.addEventListener('change', sync);
+      document.addEventListener('click', (e)=>{
+        // Close when a link in the mobile menu is tapped (no extra JS in partials needed)
+        const mnav = document.getElementById('mobileCatalog');
+        if(mnav && cb.checked && e.target.closest && e.target.closest('#mobileCatalog a')) {
+          cb.checked = false; sync();
+        }
+      }, {capture:true});
+      sync();
     })();
   </script>
 </header>
