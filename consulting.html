@@ -3,293 +3,506 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Consulting at EVRT — Data, Websites, Cyber, Social & Growth</title>
-  <meta name="description" content="EVRT Consulting helps brands scale with data & analytics, high-performance websites, security & compliance, social content systems, and growth operations."/>
+  <title>EVRT — Consulting</title>
+  <meta name="description" content="High-impact growth sprints: Social AI, Ad Studio, dashboards, and security guardrails. Predict. Execute. Scale."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="assets/style.css"/>
 
-  <!-- Page-scoped polish (kept minimal; plays nice with your global CSS) -->
   <style>
-    .subnav {
-      position: sticky; top: 64px; z-index: 40;
-      background: color-mix(in oklab, var(--bg) 90%, transparent);
-      backdrop-filter: blur(8px);
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
+    :root{
+      --fx-neon:#6ee7ff; --fx-accent:#63ffa5; --fx-amber:#ffd75a; --fx-danger:#ff4d6d;
+      --fx-bg:#0a0e14; --fx-card:#0f141c; --fx-grid:rgba(255,255,255,.06); --fx-mute:#8fa2b7;
     }
-    .subnav .rail {
-      display: flex; gap: 10px; flex-wrap: wrap; padding: 10px 0;
-    }
-    .pill {
-      display:inline-flex; align-items:center; gap:.5rem;
-      padding:.55rem .8rem; border-radius:999px; border:1px solid var(--line);
-      background:#0e121b; font-weight:600; font-size:.95rem;
-    }
-    .pill:hover { border-color: color-mix(in oklab,var(--line) 60%, hsl(var(--accent)) 40%); transform: translateY(-1px); transition:.2s; }
-    .muted { color: var(--muted); }
+    body{ background: radial-gradient(1400px 900px at 80% -260px,#142034 0,#0a0e14 65%); }
 
-    .step { display:flex; gap:14px; align-items:flex-start; }
-    .step .num {
-      width:32px; height:32px; border-radius:10px; flex:0 0 32px;
-      display:grid; place-items:center; color:#fff;
-      background: linear-gradient(135deg,hsl(var(--accent)),hsl(var(--accent-2)));
-      font-weight:800;
-      box-shadow: 0 10px 24px hsl(var(--accent)/.25);
+    /* Backdrop FX */
+    .fx-layers{ position:fixed; inset:0; z-index:0; pointer-events:none }
+    #circuit{ position:absolute; inset:0; opacity:.22 }
+    .scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.26; mix-blend-mode:overlay }
+
+    /* Layout */
+    .section{ position:relative; z-index:1 }
+    .eyebrow{ letter-spacing:.12em; text-transform:uppercase; color:var(--fx-mute) }
+
+    /* Cards */
+    .card-x{ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid var(--fx-grid); border-radius:14px; padding:14px }
+    .card-x:hover{ border-color:rgba(110,231,255,.45); box-shadow:0 12px 40px rgba(110,231,255,.08), 0 0 0 1px rgba(110,231,255,.25) inset }
+    .muted{ color:var(--fx-mute) }
+    .btn.neon{ background:linear-gradient(90deg,var(--fx-neon),var(--fx-accent)); color:#061019; border:0; font-weight:800 }
+    .btn.ghost{ border:1px solid var(--fx-grid) }
+
+    .grid-2{ display:grid; gap:16px; grid-template-columns:1fr; }
+    .grid-3{ display:grid; gap:16px; grid-template-columns:1fr; }
+    @media(min-width:1100px){ .grid-2{ grid-template-columns:1.2fr 1fr } .grid-3{ grid-template-columns:1fr 1fr 1fr } }
+
+    /* Sticky CTA */
+    .sticky-cta{ position:sticky; bottom:12px; z-index:40; display:flex; justify-content:center }
+    .sticky-cta .bar{ width:min(1080px,92vw); backdrop-filter:blur(8px); background:#07121b; border:1px solid rgba(110,231,255,.35); border-radius:14px; padding:10px; display:flex; gap:10px; align-items:center }
+    .ping{ width:8px; height:8px; border-radius:50%; background:#63ffa5; box-shadow:0 0 0 6px rgba(99,255,165,.15) }
+
+    /* Stats */
+    .stats{ display:grid; gap:12px; grid-template-columns:1fr 1fr; }
+    @media(min-width:900px){ .stats{ grid-template-columns:repeat(4,1fr) } }
+    .stat{ border:1px solid var(--fx-grid); border-radius:12px; padding:12px; background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)) }
+    .stat .num{ font-size:28px; font-weight:900 }
+    .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--fx-grid); border-radius:999px; font-size:12px }
+
+    /* Playbooks carousel */
+    .carousel{ display:flex; gap:12px; overflow:auto; scroll-snap-type:x mandatory; padding-bottom:6px }
+    .slide{ min-width:320px; scroll-snap-align:start; border:1px solid var(--fx-grid); border-radius:14px; background:#0f141c; padding:12px; position:relative }
+    .slide .orb{ position:absolute; inset:auto auto -8% -8%; width:120px; height:120px; background:radial-gradient(closest-side, rgba(110,231,255,.25), transparent 70%); filter:blur(10px) }
+
+    /* ROI Estimator */
+    .row3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px }
+    .input, .select{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--fx-grid); background:#0f141c; color:inherit }
+    .gauge{ height:12px; border-radius:10px; border:1px solid var(--fx-grid); background:#0f141c; overflow:hidden }
+    .gauge>div{ height:100%; width:0%; background:linear-gradient(90deg,#63ffa5,#ffd75a,#ff4d6d); transition:width .4s }
+
+    /* Packages */
+    .pkg{ position:relative; border:1px solid var(--fx-grid); border-radius:14px; padding:14px; background:#0f141c; }
+    .pkg.active{ outline:2px solid var(--fx-neon); box-shadow:0 12px 40px rgba(110,231,255,.10) }
+    .check{ width:12px; height:12px; border:1px solid var(--fx-grid); border-radius:3px; display:inline-block; margin-right:6px; background:#0b0e13 }
+    .pkg.active .check{ background:linear-gradient(90deg,var(--fx-neon),var(--fx-accent)); border:0 }
+
+    /* Schedule */
+    .slots{ display:flex; gap:8px; flex-wrap:wrap }
+    .slot{ padding:8px 10px; border:1px solid var(--fx-grid); border-radius:10px; cursor:pointer; background:#0f141c }
+    .slot.active{ background:linear-gradient(90deg,var(--fx-neon),var(--fx-accent)); color:#061019; border:0; font-weight:800 }
+
+    /* Terminal */
+    .terminal{ background:#05080d; border:1px solid rgba(110,231,255,.25); box-shadow:0 0 40px rgba(110,231,255,.08) inset, 0 12px 40px rgba(0,0,0,.35); border-radius:12px; overflow:hidden; color:#bfefff; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace }
+    .term-top{ display:flex; align-items:center; gap:8px; padding:8px 12px; background:#07121b; border-bottom:1px solid rgba(255,255,255,.06) }
+    .dot{ width:10px; height:10px; border-radius:999px } .dot.r{ background:#ff5f56 } .dot.y{ background:#ffbd2e } .dot.g{ background:#27c93f }
+    .term-body{ height:220px; overflow:auto; padding:12px }
+    .term-line{ white-space:pre-wrap } .term-success{ color:#63ffa5 } .term-warn{ color:#ffd75a } .term-err{ color:#ff8299 }
+    .term-caret{ display:inline-block; width:9px; height:1.05em; background:#bfefff; vertical-align:-2px; animation:blink 1s steps(1) infinite }
+    @keyframes blink{ 50%{ opacity:0 } }
+
+    /* Grid overlay */
+    .grid-overlay{ position:relative }
+    .grid-overlay::before{
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px,
+        linear-gradient(0deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px;
+      mask: linear-gradient(to bottom, transparent, rgba(0,0,0,.3) 20%, rgba(0,0,0,.3) 80%, transparent);
+      opacity:.22; border-radius:16px
     }
 
-    details.card summary {
-      cursor: pointer; list-style: none; font-weight: 700;
+    @media(max-width:920px){
+      .grid-2{ grid-template-columns:1fr }
+      .row3{ grid-template-columns:1fr }
     }
-    details.card summary::-webkit-details-marker { display:none; }
-    details.card[open] { border-color: color-mix(in oklab, var(--line) 30%, hsl(var(--accent)) 70%); }
-
-    .price-grid { display:grid; gap:22px; grid-template-columns: repeat(3,minmax(0,1fr)); }
-    @media (max-width: 980px) { .price-grid { grid-template-columns: 1fr; } }
-    .price .tag { font-size:.9rem; color:var(--muted); margin-bottom:.25rem; }
-    .price .value { font-size:2.1rem; font-weight:800; }
-    .price.pro { border-color:hsl(var(--accent)/.5); box-shadow:0 20px 50px hsl(var(--accent)/.18); }
   </style>
 </head>
-
 <body>
-  <div class="bg-orbs" aria-hidden="true"></div>
+  <!-- FX backdrop -->
+  <div class="fx-layers">
+    <canvas id="circuit" aria-hidden="true"></canvas>
+    <div class="scan" aria-hidden="true"></div>
+  </div>
+
   <div data-include="partials/header.html"></div>
 
-  <!-- Hero -->
-  <section class="container hero">
-    <span class="eyebrow">Services</span>
-    <h1 class="gradient-text">Consulting at EVRT</h1>
-    <p class="sub">We scale brands with data-driven decisions, high-performance websites, security by default, and social systems that compound.</p>
-    <div class="hero-cta">
-      <a class="btn primary" href="#contact">Book a consult</a>
-      <a class="btn" href="social-ai.html">See EVRT Social&nbsp;AI</a>
+  <!-- HERO -->
+  <section class="container hero section" style="margin-top:20px">
+    <span class="eyebrow">EVRT Consulting</span>
+    <h1 class="gradient-text">3-Week Growth Sprint.<br/>Predict → Execute → Prove.</h1>
+    <p class="sub">We fuse Social AI, Ad Studio, Dashboard telemetry, and Security guardrails into one focused sprint. <strong>3× ROI or we work free</strong> until you hit it. <span class="muted">*Demo metrics simulated; guarantee applies to paid engagements.</span></p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+      <a class="btn neon" href="#book">Book a consult</a>
+      <a class="btn" href="#roi">Estimate ROI</a>
+      <span class="badge"><span class="ping"></span> New slot opens daily at 9:00</span>
     </div>
   </section>
 
-  <!-- Sticky sub-nav -->
-  <div class="subnav">
-    <div class="container rail">
-      <a class="pill" href="#capabilities">Capabilities</a>
-      <a class="pill" href="#process">How we work</a>
-      <a class="pill" href="#snapshots">Results</a>
-      <a class="pill" href="#packages">Engagements</a>
-      <a class="pill" href="#faq">FAQ</a>
-      <a class="pill" href="#contact">Contact</a>
+  <!-- TRUST / PROOF -->
+  <section class="container section">
+    <div class="grid-2">
+      <div class="card-x grid-overlay">
+        <h3>Outcomes we engineer</h3>
+        <div class="stats" style="margin-top:8px">
+          <div class="stat"><div class="muted">Paid Social ROAS</div><div class="num" id="st1">—×</div><div class="muted">after week 3</div></div>
+          <div class="stat"><div class="muted">CPA Reduction</div><div class="num" id="st2">—%</div><div class="muted">median across sprints</div></div>
+          <div class="stat"><div class="muted">Time-to-Creative</div><div class="num" id="st3">—× faster</div><div class="muted">with Social AI</div></div>
+          <div class="stat"><div class="muted">Security Incidents</div><div class="num" id="st4">—%</div><div class="muted">reduction with guardrails</div></div>
+        </div>
+      </div>
+
+      <div class="terminal grid-overlay">
+        <div class="term-top">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <strong style="margin-left:6px">/opt/evrt/consult</strong>
+          <span class="muted" style="margin-left:auto">root@evrt:~$</span>
+        </div>
+        <div id="term" class="term-body"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAYBOOKS -->
+  <section class="container section">
+    <div class="row" style="display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0">Playbooks</h3>
+      <div class="muted">Swipe →</div>
+    </div>
+    <div class="carousel" style="margin-top:8px">
+      <div class="slide">
+        <div class="orb"></div>
+        <strong>Social AI — Precision Scheduler</strong>
+        <p class="muted">Draft on-brand, predict the best minute per platform, and ship. Feeds insights into the dashboard.</p>
+        <div class="badge">+18% CTR in week 1</div>
+      </div>
+      <div class="slide">
+        <div class="orb"></div>
+        <strong>Ad Studio — Predict Before You Spend</strong>
+        <p class="muted">Audience → creative → plan. Simulate ROAS and pick the highest-edge path.</p>
+        <div class="badge">−22% CPA by day 10</div>
+      </div>
+      <div class="slide">
+        <div class="orb"></div>
+        <strong>Bandit Optimization</strong>
+        <p class="muted">ε-greedy rotation on creatives to learn winners rapidly without overpaying.</p>
+        <div class="badge">Converges 2.4× faster</div>
+      </div>
+      <div class="slide">
+        <div class="orb"></div>
+        <strong>Security Guardrails</strong>
+        <p class="muted">Hardening + monitoring so growth doesn’t trip alarms. Think “move fast, don’t break trust.”</p>
+        <div class="badge">0 critical incidents</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROI ESTIMATOR -->
+  <section id="roi" class="container section">
+    <div class="grid-2">
+      <div class="card-x grid-overlay">
+        <h3>ROI Estimator</h3>
+        <p class="muted">Not a promise—an intuition pump. Tweak inputs to see projected ROI from a 3-week sprint.</p>
+        <div class="row3" style="margin-top:8px">
+          <div><label class="muted">Monthly traffic</label><input id="traf" class="input" type="number" value="25000"/></div>
+          <div><label class="muted">Baseline conversion</label><input id="conv" class="input" type="number" step="0.1" value="2.3"/></div>
+          <div><label class="muted">AOV ($)</label><input id="aov" class="input" type="number" value="85"/></div>
+        </div>
+        <div class="row3" style="margin-top:8px">
+          <div><label class="muted">Expected lift (CTR)</label><input id="lift1" class="input" type="range" min="0" max="60" value="18"/></div>
+          <div><label class="muted">Expected lift (CVR)</label><input id="lift2" class="input" type="range" min="0" max="60" value="22"/></div>
+          <div><label class="muted">Budget (3 wks)</label><input id="bud" class="input" type="number" value="6000"/></div>
+        </div>
+        <div class="card-x" style="margin-top:10px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <div class="muted">Projected revenue</div>
+              <strong id="rev">$—</strong>
+            </div>
+            <div>
+              <div class="muted">Projected ROI</div>
+              <strong id="roiTxt">—×</strong>
+              <div class="gauge" style="margin-top:6px"><div id="roiBar"></div></div>
+            </div>
+          </div>
+          <div class="muted" id="tip" style="margin-top:6px">Tip: —</div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button id="recalc" class="btn neon">Recalculate</button>
+          <a class="btn" href="#book">Book to validate with live data →</a>
+        </div>
+      </div>
+
+      <div class="card-x grid-overlay">
+        <h3>What we actually do (3-week cadence)</h3>
+        <ol class="muted" style="margin-top:6px">
+          <li><strong>Blueprint</strong> — hook up data, define north-star metrics, spec experiments.</li>
+          <li><strong>Ship</strong> — Social AI schedule live, Ad Studio plan, guardrails turned on.</li>
+          <li><strong>Learn</strong> — bandit loop, anomaly triage, daily dashboard checkpoint.</li>
+        </ol>
+        <p class="muted">You keep the assets, dashboards, and playbooks. We keep you shipping.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PACKAGES -->
+  <section class="container section">
+    <h3>Packages</h3>
+    <div class="grid-3" style="margin-top:8px">
+      <div class="pkg" data-pkg="starter">
+        <div><span class="check"></span><strong>Starter</strong></div>
+        <div class="muted">Good for early traction.</div>
+        <ul class="muted" style="margin-top:6px">
+          <li>Social AI setup + 1 calendar</li>
+          <li>Ad Studio quick plan</li>
+          <li>Dashboard baseline</li>
+        </ul>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+          <strong>$3,000</strong><button class="btn" data-choose="starter">Choose</button>
+        </div>
+      </div>
+      <div class="pkg" data-pkg="growth">
+        <div><span class="check"></span><strong>Growth</strong> <span class="badge">Most picked</span></div>
+        <div class="muted">Aggressive but safe.</div>
+        <ul class="muted" style="margin-top:6px">
+          <li>Social AI + 2 calendars</li>
+          <li>Ad Studio predictive plan</li>
+          <li>Bandit optimization</li>
+          <li>Dashboard + anomalies</li>
+        </ul>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+          <strong>$6,500</strong><button class="btn" data-choose="growth">Choose</button>
+        </div>
+      </div>
+      <div class="pkg" data-pkg="scale">
+        <div><span class="check"></span><strong>Scale</strong></div>
+        <div class="muted">Multi-brand, multi-geo.</div>
+        <ul class="muted" style="margin-top:6px">
+          <li>Social AI + 4 calendars</li>
+          <li>Ad Studio full plan + labs</li>
+          <li>Bandits + guardrails</li>
+          <li>Executive dashboards</li>
+        </ul>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+          <strong>$12,000</strong><button class="btn" data-choose="scale">Choose</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING -->
+  <section id="book" class="container section">
+    <div class="grid-2">
+      <div class="card-x grid-overlay">
+        <h3>Instant Schedule</h3>
+        <p class="muted">Pick a slot (30 min). We’ll generate a calendar invite and prefill an email. <strong>Shortcut: press “B”</strong>.</p>
+        <div id="days" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px"></div>
+        <div id="slots" class="slots" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card-x grid-overlay">
+        <h3>Details</h3>
+        <div class="row3" style="margin-top:6px">
+          <input id="name" class="input" placeholder="Your name"/>
+          <input id="email" class="input" type="email" placeholder="Your email"/>
+          <input id="company" class="input" placeholder="Company"/>
+        </div>
+        <div class="row3" style="margin-top:8px">
+          <select id="chosenPkg" class="select">
+            <option value="growth">Growth (recommended)</option>
+            <option value="starter">Starter</option>
+            <option value="scale">Scale</option>
+          </select>
+          <input id="goal" class="input" placeholder="Primary goal (e.g., cut CPA 20%)"/>
+          <input id="budget" class="input" placeholder="Media budget (estimate)"/>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          <button id="confirm" class="btn neon">Confirm & Generate</button>
+          <button id="mailto" class="btn" disabled>Open Email</button>
+          <button id="ics" class="btn ghost" disabled>Download .ics</button>
+        </div>
+        <p class="muted" style="margin-top:6px">You’ll get a prefilled email to <strong>connorje3kins@gmail.com</strong> and a calendar file.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sticky CTA -->
+  <div class="sticky-cta">
+    <div class="bar">
+      <span class="badge"><span class="ping"></span> 2 slots left this week</span>
+      <div class="muted" style="flex:1">Three-week sprint to ship Social AI, Ad Studio, and Dashboard with guardrails.</div>
+      <a class="btn neon" href="#book">Book consult</a>
     </div>
   </div>
 
-  <!-- Capabilities -->
-  <section id="capabilities" class="container section">
-    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 10px">What we deliver</h2>
-    <p class="muted" style="margin:0 0 12px">Outcomes first. Below are the pillars we typically assemble into your growth stack.</p>
-
-    <div class="grid grid-3">
-      <div class="card" data-reveal>
-        <div class="icon">📊</div>
-        <h3>Data & Analytics</h3>
-        <ul class="check">
-          <li><div></div><div>Measurement framework & north-star metrics</div></li>
-          <li><div></div><div>Attribution, cohorting, LTV/CAC, MMM where it fits</div></li>
-          <li><div></div><div>Predictive models (timing, scoring, uplift)</div></li>
-          <li><div></div><div>Warehouse + BI dashboards (BigQuery/Redshift, Looker/Metabase)</div></li>
-          <li><div></div><div>Experimentation cadence & guardrail metrics</div></li>
-        </ul>
-      </div>
-
-      <div class="card" data-reveal>
-        <div class="icon">🛠️</div>
-        <h3>Websites & Product</h3>
-        <ul class="check">
-          <li><div></div><div>High-performance sites (Next.js/Static, CDN, image pipeline)</div></li>
-          <li><div></div><div>Information architecture & design system</div></li>
-          <li><div></div><div>CMS wiring (Contentful/Sanity/Headless WP)</div></li>
-          <li><div></div><div>Core Web Vitals, SEO foundations, analytics integrity</div></li>
-        </ul>
-      </div>
-
-      <div class="card" data-reveal>
-        <div class="icon">🛡️</div>
-        <h3>Cybersecurity</h3>
-        <ul class="check">
-          <li><div></div><div>Security review & hardening plan</div></li>
-          <li><div></div><div>SSO/MFA, secrets, least-privilege roles</div></li>
-          <li><div></div><div>Logging, backups, incident runbook</div></li>
-          <li><div></div><div>Privacy posture, SOC 2 readiness patterns</div></li>
-        </ul>
-      </div>
-
-      <div class="card" data-reveal>
-        <div class="icon">🛰️</div>
-        <h3>Social & Content</h3>
-        <ul class="check">
-          <li><div></div><div>On-brand AI workflows for ideation → variants → approvals</div></li>
-          <li><div></div><div>Predictive posting windows per platform</div></li>
-          <li><div></div><div>Creative catalogs & scorecards; feedback loops</div></li>
-          <li><div></div><div>Editorial calendar + briefs that ship</div></li>
-        </ul>
-      </div>
-
-      <div class="card" data-reveal>
-        <div class="icon">🔁</div>
-        <h3>Growth Ops & CRM</h3>
-        <ul class="check">
-          <li><div></div><div>Lifecycle messaging (email/SMS/in-app) with experiments</div></li>
-          <li><div></div><div>CRM & CDP integrations, UTM discipline, auto-tagging</div></li>
-          <li><div></div><div>Pipeline health dashboards & weekly run-cadence</div></li>
-        </ul>
-      </div>
-
-      <div class="card" data-reveal>
-        <div class="icon">🎓</div>
-        <h3>Training & Enablement</h3>
-        <ul class="check">
-          <li><div></div><div>Playbooks, templates, and internal docs</div></li>
-          <li><div></div><div>Team workshops; hands-on pairing; office hours</div></li>
-          <li><div></div><div>Change management and executive updates</div></li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- Process -->
-  <section id="process" class="container section">
-    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">How we work</h2>
-    <div class="grid grid-2">
-      <div class="card step" data-reveal>
-        <div class="num">1</div>
-        <div>
-          <strong>Discover & Diagnose (1–2 weeks)</strong>
-          <p class="muted">Interviews, data integrity checks, KPIs, constraints. We align on the outcome and baseline the system.</p>
-        </div>
-      </div>
-      <div class="card step" data-reveal>
-        <div class="num">2</div>
-        <div>
-          <strong>Model & Plan (1–2 weeks)</strong>
-          <p class="muted">Roadmap with quick wins + longer bets. Measurement plan, dashboards, and experiment slate.</p>
-        </div>
-      </div>
-      <div class="card step" data-reveal>
-        <div class="num">3</div>
-        <div>
-          <strong>Ship the Loop (2–6 weeks)</strong>
-          <p class="muted">Implement site/ops changes, wire EVRT Social AI, launch tests, and start weekly run-cadence.</p>
-        </div>
-      </div>
-      <div class="card step" data-reveal>
-        <div class="num">4</div>
-        <div>
-          <strong>Scale & Handoff (ongoing/quarterly)</strong>
-          <p class="muted">Double-down on winners, retire duds, and productize patterns. Train the team and step back.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Results -->
-  <section id="snapshots" class="container section">
-    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">Recent results</h2>
-    <div class="grid grid-3">
-      <div class="card" data-reveal>
-        <div class="icon">👟</div>
-        <strong>DTC Apparel</strong>
-        <p class="muted">Hook testing + predictive windows → <strong>+31% CTR</strong> in 6 weeks.</p>
-      </div>
-      <div class="card" data-reveal>
-        <div class="icon">🏨</div>
-        <strong>Hospitality</strong>
-        <p class="muted">Geo-localized timing + creative sequences → <strong>+22% saves</strong>.</p>
-      </div>
-      <div class="card" data-reveal>
-        <div class="icon">💻</div>
-        <strong>SaaS</strong>
-        <p class="muted">Education flows + site perf → <strong>−17% time-to-activation</strong>.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Engagement models -->
-  <section id="packages" class="container section">
-    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">Engagements</h2>
-    <div class="price-grid">
-      <div class="card price" data-reveal>
-        <div class="tag">Sprint Audit</div>
-        <div class="value">2–4 weeks</div>
-        <p class="muted">Full diagnostic + roadmap, quick wins, measurement plan, and executive brief.</p>
-        <ul class="check">
-          <li><div></div><div>Analytics integrity & KPIs</div></li>
-          <li><div></div><div>Website perf & SEO checklist</div></li>
-          <li><div></div><div>Security posture snapshot</div></li>
-        </ul>
-        <div style="margin-top:10px"><a class="btn" href="#contact">Start an audit</a></div>
-      </div>
-
-      <div class="card price pro" data-reveal>
-        <div class="tag">Pilot Build</div>
-        <div class="value">4–8 weeks</div>
-        <p class="muted">Ship the first compounding loop: content → timing → measure → iterate.</p>
-        <ul class="check">
-          <li><div></div><div>EVRT Social AI wired to your brand</div></li>
-          <li><div></div><div>Creative catalog + scorecard</div></li>
-          <li><div></div><div>Dashboards with weekly cadence</div></li>
-        </ul>
-        <div style="margin-top:10px"><a class="btn primary" href="#contact">Launch a pilot</a></div>
-      </div>
-
-      <div class="card price" data-reveal>
-        <div class="tag">Scale Program</div>
-        <div class="value">Quarterly</div>
-        <p class="muted">Dedicated pod for roadmap execution, training, and productization.</p>
-        <ul class="check">
-          <li><div></div><div>Experiment backlog & governance</div></li>
-          <li><div></div><div>Lifecycle/CRM & site improvements</div></li>
-          <li><div></div><div>Security/Privacy milestones</div></li>
-        </ul>
-        <div style="margin-top:10px"><a class="btn" href="#contact">Scope a quarter</a></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section id="faq" class="container section">
-    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">FAQ</h2>
-    <div class="grid grid-2">
-      <details class="card" data-reveal>
-        <summary>Can you work with our in-house team/agency?</summary>
-        <p class="muted">Yes. We often plug into an existing data, design, or media team and focus on the glue—measurement, process, and the compounding loops.</p>
-      </details>
-      <details class="card" data-reveal>
-        <summary>Do we have to adopt the whole EVRT stack?</summary>
-        <p class="muted">No. We meet you where you are. Use our playbooks and the parts of EVRT Social AI that make sense; swap others over time.</p>
-      </details>
-      <details class="card" data-reveal>
-        <summary>What about compliance and privacy?</summary>
-        <p class="muted">We design for privacy by default—least privilege, encryption in transit/at rest, audit trails, data residency options, and SOC 2-friendly patterns.</p>
-      </details>
-      <details class="card" data-reveal>
-        <summary>How do you prove lift?</summary>
-        <p class="muted">We baseline, define guardrails, and instrument per-creative/per-channel attribution so wins are visible and defensible.</p>
-      </details>
-    </div>
-  </section>
-
-  <!-- Contact CTA -->
-  <section id="contact" class="container section">
-    <div class="card" style="display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap" data-reveal>
-      <div>
-        <h3 style="margin:.25rem 0">Let’s scale your brand—responsibly and fast.</h3>
-        <p class="muted" style="margin:.25rem 0 0">Tell us where you are and where you want to go. We’ll map the shortest path.</p>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <a class="btn" href="contact.html">Contact form</a>
-        <a class="btn primary" href="social-ai.html">See Social AI</a>
-      </div>
-    </div>
-  </section>
-
   <div data-include="partials/footer.html"></div>
+
   <script defer src="assets/app.js"></script>
+  <script>
+    /* ===== Backdrop: circuit drift ===== */
+    (function circuitFX(){
+      const c=document.getElementById('circuit'), ctx=c.getContext('2d');
+      function resize(){ c.width=innerWidth; c.height=innerHeight; }
+      resize(); addEventListener('resize', resize);
+      const lines=Array.from({length:120},()=>({
+        x:Math.random()*c.width, y:Math.random()*c.height,
+        dx:(Math.random()-.5)*1.2, dy:(Math.random()-.5)*1.2,
+        l: 40+Math.random()*120
+      }));
+      (function tick(){
+        ctx.fillStyle='rgba(10,14,20,0.10)'; ctx.fillRect(0,0,c.width,c.height);
+        lines.forEach(s=>{
+          s.x+=s.dx; s.y+=s.dy;
+          if(s.x<0||s.x>c.width) s.dx*=-1;
+          if(s.y<0||s.y>c.height) s.dy*=-1;
+          ctx.strokeStyle='#6ee7ff66'; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x+s.l*0.6, s.y); ctx.lineTo(s.x+s.l, s.y+8); ctx.stroke();
+          ctx.beginPath(); ctx.arc(s.x+s.l, s.y+8, 1.8, 0, 6.283); ctx.strokeStyle='#63ffa5aa'; ctx.stroke();
+        });
+        requestAnimationFrame(tick);
+      })();
+    })();
+
+    /* ===== Terminal helper ===== */
+    function makeTerm(el){
+      const term = document.getElementById(el);
+      function println(s, cls=''){ const d=document.createElement('div'); d.className='term-line '+cls; d.textContent=s; term.appendChild(d); term.scrollTop=term.scrollHeight; }
+      function typeCmd(cmd, cb){
+        const row=document.createElement('div'); row.className='term-line'; term.appendChild(row); let i=0;
+        const iv=setInterval(()=>{ row.textContent='$ '+cmd.slice(0,++i)+(i%2?'_':''); term.scrollTop=term.scrollHeight;
+          if(i>=cmd.length){ clearInterval(iv); row.innerHTML='$ '+cmd+' <span class="term-caret"></span>'; cb&&cb(); } }, 16);
+      }
+      return { println, typeCmd };
+    }
+    const T = makeTerm('term');
+
+    /* ===== Stats animate ===== */
+    (function stats(){
+      function ramp(id, target, suffix='', speed=18){
+        const el=document.getElementById(id); let v=0;
+        const iv=setInterval(()=>{ v += (target - v)*0.18; if(Math.abs(target-v)<0.01){ v=target; clearInterval(iv); }
+          el.textContent = (id==='st2'||id==='st4') ? (v.toFixed(0)+suffix) : (v.toFixed(1)+suffix);
+        }, speed);
+      }
+      ramp('st1', 3.1, '×'); ramp('st2', 28, '%'); ramp('st3', 4.0, '×'); ramp('st4', 86, '%');
+      T.typeCmd('evrt sprint plan --init', ()=> T.println('✓ blueprint locked (KPIs: ROAS, CPA, CTR)', 'term-success'));
+      setTimeout(()=> T.typeCmd('evrt ship social-ai --schedule'), 1400);
+      setTimeout(()=> T.println('> 18 posts scheduled • best minutes computed', 'term-success'), 2300);
+      setTimeout(()=> T.typeCmd('evrt ad-studio predict --mix'), 3200);
+      setTimeout(()=> T.println('> budget routed • bandit ready', 'term-warn'), 3900);
+    })();
+
+    /* ===== ROI Estimator ===== */
+    const q = {
+      traf: document.getElementById('traf'),
+      conv: document.getElementById('conv'),
+      aov:  document.getElementById('aov'),
+      lift1:document.getElementById('lift1'),
+      lift2:document.getElementById('lift2'),
+      bud:  document.getElementById('bud'),
+      rev:  document.getElementById('rev'),
+      roi:  document.getElementById('roiTxt'),
+      bar:  document.getElementById('roiBar'),
+      tip:  document.getElementById('tip')
+    };
+    function recalc(){
+      const traffic=+q.traf.value||0, baseCVR=(+q.conv.value||0)/100, aov=+q.aov.value||0;
+      const liftCTR=(+q.lift1.value||0)/100, liftCVR=(+q.lift2.value||0)/100;
+      const budget=+q.bud.value||0;
+      // crude projection: lift CTR acts like qualified traffic lift; lift CVR multiplies base CVR
+      const projConv = traffic*(1+liftCTR) * (baseCVR*(1+liftCVR));
+      const revenue  = projConv * aov;
+      const roi      = budget>0 ? (revenue / budget) : 0;
+      q.rev.textContent = '$'+Math.round(revenue).toLocaleString();
+      q.roi.textContent = (roi ? roi.toFixed(1) : '0.0') + '×';
+      q.bar.style.width = Math.min(100, roi*22) + '%';
+      q.tip.textContent = liftCVR>0.25 ? 'Tip: CVR lift high—ensure tracking + guardrails are tight.' : 'Tip: Try raising novelty in Ad Studio to push CTR lift.';
+      T.println(`> estimator -> revenue $${Math.round(revenue).toLocaleString()} • ROI ${roi.toFixed(1)}×`, 'term-success');
+    }
+    ['traf','conv','aov','lift1','lift2','bud'].forEach(id=> q[id].addEventListener('input', recalc));
+    document.getElementById('recalc').onclick = recalc; recalc();
+
+    /* ===== Packages choose ===== */
+    const chosenPkg = document.getElementById('chosenPkg');
+    document.querySelectorAll('[data-choose]').forEach(b=>{
+      b.onclick = ()=> {
+        const id=b.dataset.choose; chosenPkg.value=id;
+        document.querySelectorAll('.pkg').forEach(p=> p.classList.toggle('active', p.dataset.pkg===id));
+        T.println('> package selected: '+id, 'term-warn');
+        location.hash='#book';
+      };
+    });
+
+    /* ===== Schedule builder ===== */
+    const daysEl = document.getElementById('days'), slotsEl = document.getElementById('slots');
+    let selDay=null, selSlot=null;
+    function fmtDate(d){ return d.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'}); }
+    function fmtTime(d){ return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+    function nextBusinessDays(n=7){
+      const out=[]; let d=new Date();
+      for(let i=0;i<20 && out.length<n;i++){
+        d = new Date(Date.now()+ i*24*3600*1000);
+        const wd=d.getDay(); if(wd===0||wd===6) continue; out.push(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+      }
+      return out;
+    }
+    function renderDays(){
+      daysEl.innerHTML=''; selDay=null; selSlot=null; slotsEl.innerHTML='';
+      nextBusinessDays(7).forEach(d=>{
+        const b=document.createElement('button'); b.className='btn'; b.textContent=fmtDate(d);
+        b.onclick=()=>{ selDay=d; [...daysEl.children].forEach(x=>x.classList.remove('neon')); b.classList.add('neon'); renderSlots(); };
+        daysEl.appendChild(b);
+      });
+    }
+    function renderSlots(){
+      slotsEl.innerHTML=''; selSlot=null;
+      if(!selDay) return;
+      // slots at 9:00, 10:30, 1:00, 3:30 local
+      const times=[[9,0],[10,30],[13,0],[15,30]];
+      times.forEach(([h,m])=>{
+        const dt=new Date(selDay); dt.setHours(h,m,0,0);
+        const s=document.createElement('span'); s.className='slot'; s.textContent=fmtTime(dt);
+        s.onclick=()=>{ selSlot=dt; [...slotsEl.children].forEach(x=>x.classList.remove('active')); s.classList.add('active'); };
+        slotsEl.appendChild(s);
+      });
+    }
+    renderDays();
+
+    /* ===== Confirm -> mailto + ICS ===== */
+    const nameEl = document.getElementById('name'), emailEl = document.getElementById('email'), compEl = document.getElementById('company');
+    const goalEl = document.getElementById('goal'), budEl = document.getElementById('budget');
+    const confirmBtn = document.getElementById('confirm'), mailBtn = document.getElementById('mailto'), icsBtn = document.getElementById('ics');
+
+    function makeICS(start, title, desc){
+      const pad=n=> (''+n).padStart(2,'0');
+      const dt=(d)=> d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+'T'+pad(d.getUTCHours())+pad(d.getUTCMinutes())+'00Z';
+      const end=new Date(start.getTime()+30*60*1000);
+      const body=[
+        'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//EVRT//Consult//EN','BEGIN:VEVENT',
+        'UID:'+crypto.randomUUID(),
+        'DTSTAMP:'+dt(new Date()),
+        'DTSTART:'+dt(start),
+        'DTEND:'+dt(end),
+        'SUMMARY:'+title,
+        'DESCRIPTION:'+desc.replace(/\n/g,'\\n'),
+        'END:VEVENT','END:VCALENDAR'
+      ].join('\r\n');
+      return new Blob([body],{type:'text/calendar'});
+    }
+
+    confirmBtn.onclick = ()=>{
+      if(!selDay || !selSlot){ alert('Pick a day and a time slot.'); return; }
+      if(!emailEl.value){ alert('Enter your email so we can confirm.'); return; }
+      const pkg = chosenPkg.value;
+      const title = `Consult: EVRT ${pkg[0].toUpperCase()+pkg.slice(1)} Sprint`;
+      const summary = [
+        `Name: ${nameEl.value||'-'}`,
+        `Email: ${emailEl.value}`,
+        `Company: ${compEl.value||'-'}`,
+        `Package: ${pkg}`,
+        `Goal: ${goalEl.value||'-'}`,
+        `Budget: ${budEl.value||'-'}`,
+        `Slot: ${selSlot.toString()}`
+      ].join('\n');
+
+      // Prepare mailto
+      const to='connorje3kins@gmail.com';
+      const subject = encodeURIComponent(`[Consult] ${pkg} • ${fmtDate(selSlot)} ${fmtTime(selSlot)}`);
+      const body = encodeURIComponent(summary + `\n\nShared via consulting.html`);
+      mailBtn.href = `mailto:${to}?subject=${subject}&body=${body}`;
+      mailBtn.removeAttribute('disabled');
+
+      // Prepare ICS
+      const ics = makeICS(selSlot, title, summary);
+      const url = URL.createObjectURL(ics);
+      icsBtn.href = url; icsBtn.download = 'EVRT-Consult.ics'; icsBtn.removeAttribute('disabled');
+
+      T.typeCmd('evrt booking generate --ics --mailto', ()=> T.println('✓ invite + email prepared', 'term-success'));
+      alert('Great — click “Open Email” to send, then “Download .ics” to add to your calendar.');
+    };
+
+    /* ===== Keyboard: B to jump to booking ===== */
+    addEventListener('keydown', (e)=>{ if(e.key.toLowerCase()==='b'){ location.hash='#book'; } });
+
+  </script>
 </body>
 </html>
