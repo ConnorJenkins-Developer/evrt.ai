@@ -72,24 +72,22 @@
   <script>
   // ====== CONFIG (replace these) ======
   const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co"; // TODO
-  const SUPABASE_ANON_KEY = "public-anon-key";              // TODO
+  const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";        // TODO
   // ====================================
 
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  
-    // 🔧 NEW: turn magic-link tokens in the URL hash into a session
-async function bootstrapSessionFromHash() {
-  const hash = new URLSearchParams(window.location.hash.slice(1));
-  const access_token = hash.get("access_token");
-  const refresh_token = hash.get("refresh_token");
-  if (access_token && refresh_token) {
-    // Set session from tokens carried in the magic link
-    const { error } = await supabase.auth.setSession({ access_token, refresh_token });
-    // Clean the URL (remove the long token hash)
-    if (!error) history.replaceState({}, document.title, window.location.pathname);
+
+  // NEW: consume magic-link tokens in the URL hash so we don't bounce back to portal
+  async function bootstrapSessionFromHash() {
+    const hash = new URLSearchParams(window.location.hash.slice(1));
+    const access_token = hash.get("access_token");
+    const refresh_token = hash.get("refresh_token");
+    if (access_token && refresh_token) {
+      const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+      // Clean the long token hash from the URL
+      if (!error) history.replaceState({}, document.title, window.location.pathname);
+    }
   }
-}
-</script>
 
   const ui = {
     app: document.getElementById('app'),
@@ -106,7 +104,6 @@ async function bootstrapSessionFromHash() {
     const { data } = await supabase.auth.getSession();
     session = data.session;
     if (!session) {
-      // Not logged in → go to portal
       window.location.href = 'portal.html';
       return false;
     }
@@ -116,15 +113,25 @@ async function bootstrapSessionFromHash() {
   }
 
   async function loadAccount(){
-    // Simplest: pick first membership for now
-    const { data: ms, error } = await supabase.from('memberships').select('account_id, role').eq('user_id', user.id);
+    // Pick first membership for now
+    const { data: ms, error } = await supabase
+      .from('memberships')
+      .select('account_id, role')
+      .eq('user_id', user.id);
+
     if (error || !ms?.length) {
       alert('No account access. Ask EVRT to invite you.');
       return false;
     }
     accountId = ms[0].account_id;
-    // Optional: fetch account name
-    const { data: acct } = await supabase.from('accounts').select('name').eq('id', accountId).maybeSingle();
+
+    // Fetch account name
+    const { data: acct } = await supabase
+      .from('accounts')
+      .select('name')
+      .eq('id', accountId)
+      .maybeSingle();
+
     accountName = acct?.name || accountId;
     ui.accountName.textContent = accountName;
     return true;
@@ -136,8 +143,11 @@ async function bootstrapSessionFromHash() {
       .select('id,name,status,updated_at')
       .eq('account_id', accountId)
       .order('updated_at', { ascending:false });
+
     if (error) { ui.projects.innerHTML = `<p class="muted">${error.message}</p>`; return; }
-    ui.projects.innerHTML = (data||[]).map(p=>`<div class="row"><strong>${p.name}</strong><span class="muted">${p.status||''}</span></div>`).join('') || '<p class="muted">No projects yet.</p>';
+    ui.projects.innerHTML =
+      (data||[]).map(p=>`<div class="row"><strong>${p.name}</strong><span class="muted">${p.status||''}</span></div>`).join('')
+      || '<p class="muted">No projects yet.</p>';
   }
 
   async function listDocuments(){
@@ -146,13 +156,20 @@ async function bootstrapSessionFromHash() {
       .select('id,name,storage_path,created_at')
       .eq('account_id', accountId)
       .order('created_at', { ascending:false });
+
     if (error) { ui.docs.innerHTML = `<p class="muted">${error.message}</p>`; return; }
+
     const items = await Promise.all((data||[]).map(async d=>{
       try {
-        const { data: urlData } = await supabase.storage.from('client-docs').createSignedUrl(d.storage_path, 60*10);
-        return `<div class="row"><a href="${urlData?.signedUrl||'#'}">${d.name}</a><span class="muted">${new Date(d.created_at).toLocaleDateString()}</span></div>`
-      } catch { return `<div class="row">${d.name}</div>`; }
+        const { data: urlData } = await supabase.storage
+          .from('client-docs')
+          .createSignedUrl(d.storage_path, 60*10);
+        return `<div class="row"><a href="${urlData?.signedUrl||'#'}">${d.name}</a><span class="muted">${new Date(d.created_at).toLocaleDateString()}</span></div>`;
+      } catch {
+        return `<div class="row">${d.name}</div>`;
+      }
     }));
+
     ui.docs.innerHTML = items.join('') || '<p class="muted">No documents yet.</p>';
   }
 
@@ -163,8 +180,12 @@ async function bootstrapSessionFromHash() {
       .eq('account_id', accountId)
       .order('created_at', { ascending:false })
       .limit(100);
+
     if (error) { ui.msgs.innerHTML = `<p class="muted">${error.message}</p>`; return; }
-    ui.msgs.innerHTML = (data||[]).map(m=>`<p><strong>${m.author_name||'User'}</strong> <span class="muted">${new Date(m.created_at).toLocaleString()}</span><br>${m.body}</p>`).join('');
+    ui.msgs.innerHTML = (data||[]).map(m=>`
+      <p><strong>${m.author_name||'User'}</strong>
+      <span class="muted">${new Date(m.created_at).toLocaleString()}</span><br>${m.body}</p>
+    `).join('');
   }
 
   // Events
@@ -177,7 +198,9 @@ async function bootstrapSessionFromHash() {
     e.preventDefault();
     const name = document.getElementById('pname').value.trim();
     if (!name) return;
-    const { error } = await supabase.from('projects').insert({ account_id: accountId, name, status: 'active' });
+    const { error } = await supabase
+      .from('projects')
+      .insert({ account_id: accountId, name, status: 'active' });
     if (!error) { document.getElementById('pname').value = ''; listProjects(); }
   });
 
@@ -195,7 +218,9 @@ async function bootstrapSessionFromHash() {
     e.preventDefault();
     const t = document.getElementById('msg-text');
     const body = t.value.trim(); if(!body) return;
-    const { error } = await supabase.from('messages').insert({ account_id: accountId, author_id: user.id, author_name: user.email, body });
+    const { error } = await supabase
+      .from('messages')
+      .insert({ account_id: accountId, author_id: user.id, author_name: user.email, body });
     if (!error) { t.value=''; }
   });
 
@@ -208,11 +233,12 @@ async function bootstrapSessionFromHash() {
       .subscribe();
   }
 
-  // Init
+  // Init (handles magic-link tokens first so we don't auto-redirect)
   (async ()=>{
-    const ok = await requireSession();
+    await bootstrapSessionFromHash();          // 1) set session from #access_token if present
+    const ok = await requireSession();         // 2) require a session or go to portal
     if (!ok) return;
-    const haveAcct = await loadAccount();
+    const haveAcct = await loadAccount();      // 3) load current account
     if (!haveAcct) return;
     ui.app.style.display = '';
     await listProjects();
