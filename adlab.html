@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EVRT — Ad Demo Lab</title>
+  <meta name="description" content="Prototype ad studio for creatives, audience, and predicted performance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    .badge{position:fixed;top:10px;right:10px;background:#ffd54d;color:#222;padding:6px 10px;border-radius:999px;font-weight:700;z-index:9}
+    .grid-3{display:grid;gap:16px}
+    @media(min-width:1000px){.grid-3{grid-template-columns:1.2fr 1fr 1fr}}
+    .drop{border:1px dashed rgba(255,255,255,.2);border-radius:12px;padding:16px;text-align:center}
+    .preview{width:100%;aspect-ratio:1/1;border-radius:12px;object-fit:cover;background:#0f141c;border:1px solid rgba(255,255,255,.08)}
+    .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:4px 10px;margin:4px 6px 0 0}
+    .pill button{background:transparent;border:none;color:#9fb3c8;cursor:pointer}
+    .row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+    .row:last-child{border-bottom:none}
+    .muted-danger{color:#f66}
+    .score{font-size:42px;font-weight:800;line-height:1}
+    .mini{font-size:12px;color:#9fb3c8}
+    .cta-sugg li{margin:0 0 6px 18px}
+    .meter{height:10px;background:#0f141c;border:1px solid rgba(255,255,255,.12);border-radius:8px;overflow:hidden}
+    .meter > div{height:100%;background:linear-gradient(90deg,#6ee7ff,#63ffa5)}
+  </style>
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true"></div>
+  <div data-include="partials/header.html"></div>
+
+  <div class="badge">MOCK — No Login Needed</div>
+
+  <section class="container hero">
+    <span class="eyebrow">EVRT</span>
+    <h1 class="gradient-text">Ad Demo Lab</h1>
+    <p class="sub">Upload a creative, craft copy, pick an audience, and see a predicted score. Save scenarios, export JSON, and iterate fast.</p>
+  </section>
+
+  <section class="container section grid-3">
+    <!-- LEFT: Creative & Copy -->
+    <div class="card" data-reveal>
+      <h3>1) Creative & Copy</h3>
+      <div class="drop" id="drop">
+        <input id="file" type="file" accept="image/*" style="display:none"/>
+        <img id="img" class="preview" alt="preview"/>
+        <p class="muted" style="margin-top:8px">Drop image here or <button id="pick" class="btn" type="button">Choose</button></p>
+      </div>
+      <div class="grid" style="gap:10px;margin-top:10px">
+        <input id="headline" placeholder="Headline (e.g., Grow ROAS 32% with EVRT)"/>
+        <textarea id="primary" placeholder="Primary text / body caption" rows="4"></textarea>
+        <input id="cta" placeholder="CTA (e.g., Get Started)"/>
+        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
+          <select id="objective">
+            <option value="conversions">Conversions</option>
+            <option value="leads">Leads</option>
+            <option value="traffic">Traffic</option>
+            <option value="reach">Reach</option>
+            <option value="video_views">Video views</option>
+          </select>
+          <input id="budget" type="number" min="5" value="100" placeholder="Daily budget ($)"/>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h4 style="margin:0 0 6px">Variant Generator</h4>
+        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
+          <button class="btn" type="button" id="gen-3h">+3 Headlines</button>
+          <button class="btn" type="button" id="gen-3b">+3 Bodies</button>
+        </div>
+        <div id="variants" class="muted" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- MIDDLE: Audience Builder -->
+    <div class="card" data-reveal>
+      <h3>2) Audience</h3>
+      <div class="grid" style="gap:8px">
+        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
+          <input id="locations" placeholder="Locations (comma separated: Austin, TX; Chicago, IL)"/>
+          <input id="languages" placeholder="Languages (comma separated)"/>
+        </div>
+        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
+          <div>
+            <label class="mini">Age Min</label>
+            <input id="age-min" type="number" min="13" max="65" value="25"/>
+          </div>
+          <div>
+            <label class="mini">Age Max</label>
+            <input id="age-max" type="number" min="13" max="65" value="54"/>
+          </div>
+        </div>
+        <div>
+          <label class="mini">Gender</label>
+          <div style="display:flex; gap:10px; margin-top:4px">
+            <label><input type="checkbox" name="gender" value="male" checked/> Male</label>
+            <label><input type="checkbox" name="gender" value="female" checked/> Female</label>
+            <label><input type="checkbox" name="gender" value="unknown"/> Unspecified</label>
+          </div>
+        </div>
+        <div>
+          <label class="mini">Interests / Behaviors</label>
+          <input id="interest-input" placeholder="Type and press Enter (e.g., SaaS, e‑commerce, fitness)"/>
+          <div id="interests" style="margin-top:6px"></div>
+        </div>
+        <div>
+          <label class="mini">Keywords</label>
+          <input id="keyword-input" placeholder="Type and press Enter (e.g., keyword research, hootsuite, semrush)"/>
+          <div id="keywords" style="margin-top:6px"></div>
+        </div>
+        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
+          <select id="platforms" multiple size="5">
+            <option>Meta (FB/IG)</option>
+            <option>TikTok</option>
+            <option>Google (Search/Display)</option>
+            <option>LinkedIn</option>
+            <option>X (Twitter)</option>
+          </select>
+          <select id="placements" multiple size="5">
+            <option>Feed</option>
+            <option>Stories/Reels</option>
+            <option>In‑Stream</option>
+            <option>Search</option>
+            <option>Right Column</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Prediction & Insights -->
+    <div class="card" data-reveal>
+      <h3>3) Prediction</h3>
+      <div class="row">
+        <div>
+          <div class="mini">Predicted Performance</div>
+          <div class="score"><span id="score">—</span>/100</div>
+        </div>
+        <div>
+          <div class="mini">Expected CPA</div>
+          <div style="font-size:22px;font-weight:700">$<span id="cpa">—</span></div>
+        </div>
+      </div>
+      <div class="meter" style="margin:8px 0 12px"><div id="meter" style="width:0%"></div></div>
+      <div class="mini">Why this score</div>
+      <ul id="reasons" class="cta-sugg"></ul>
+
+      <div class="card" style="margin-top:12px">
+        <h4 style="margin:0 0 6px">Actions</h4>
+        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
+          <button class="btn" type="button" id="save">Save Scenario</button>
+          <button class="btn" type="button" id="export">Export JSON</button>
+        </div>
+        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px; margin-top:8px">
+          <button class="btn" type="button" id="reset">Reset</button>
+          <a class="btn" href="app.html">Back to App</a>
+        </div>
+        <p class="muted" style="margin-top:6px">Saved scenarios are stored locally for now. We’ll wire this to your backend later.</p>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h4 style="margin:0 0 6px">Saved Scenarios</h4>
+        <div id="scenarios"></div>
+      </div>
+    </div>
+  </section>
+
+  <div data-include="partials/footer.html"></div>
+
+  <script defer src="assets/app.js"></script>
+  <script>
+  // --- Local state ---
+  const state = {
+    imageData: '',
+    headline: '',
+    primary: '',
+    cta: '',
+    objective: 'conversions',
+    budget: 100,
+    locations: [],
+    languages: [],
+    age: { min: 25, max: 54 },
+    genders: ['male','female'],
+    interests: [],
+    keywords: [],
+    platforms: ['Meta (FB/IG)'],
+    placements: ['Feed']
+  };
+
+  // --- Helpers ---
+  const $ = (id)=>document.getElementById(id);
+  const byId = (id)=>document.getElementById(id);
+  function pills(containerId, items){
+    const c = $(containerId); c.innerHTML = '';
+    items.forEach((t,i)=>{
+      const el = document.createElement('span'); el.className='pill'; el.innerHTML = `<span>${t}</span> <button data-i="${i}">×</button>`;
+      el.querySelector('button').onclick = ()=>{ items.splice(i,1); pills(containerId, items); recompute(); };
+      c.appendChild(el);
+    });
+  }
+  function toList(str){ return str.split(',').map(s=>s.trim()).filter(Boolean); }
+  function download(filename, text){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'application/json'})); a.download=filename; a.click(); }
+
+  // --- Variant generation (lightweight heuristics) ---
+  function generateHeadlines(h){
+    const base = h || state.headline || 'Boost ROI with EVRT';
+    const verbs = ['Boost','Increase','Scale','Supercharge','Elevate','Maximize'];
+    const offers = ['ROI','ROAS','Leads','Revenue','Pipeline'];
+    const ctas = ['Today','Now','This Week','Fast'];
+    return [
+      base,
+      `${verbs[Math.floor(Math.random()*verbs.length)]} ${offers[Math.floor(Math.random()*offers.length)]} ${ctas[Math.floor(Math.random()*ctas.length)]}`,
+      base.replace(/\b(Boost|Grow|Increase)\b/i,'Maximize'),
+      `Cut CPA by ${10+Math.floor(Math.random()*40)}% with EVRT`,
+      `From Spend to Outcomes: ${offers[Math.floor(Math.random()*offers.length)]}`
+    ].slice(0,3);
+  }
+  function generateBodies(text){
+    const t = text || state.primary || 'EVRT predicts performance in real time and optimizes your media mix to grow ROAS.';
+    return [
+      t,
+      t + ' Try it free for 14 days.',
+      t.replace(/\b(grow|boost|increase)\b/gi,'maximize')
+    ].slice(0,3);
+  }
+
+  // --- Prediction heuristic (replace with real model later) ---
+  function scorePrediction(s){
+    let score = 50; const reasons = [];
+
+    // Headline length (5–12 words sweet spot)
+    const hWords = (s.headline||'').trim().split(/\s+/).filter(Boolean).length;
+    if (hWords>=5 && hWords<=12){ score += 10; reasons.push('Headline length is optimal (5–12 words).'); }
+    else if (hWords>0){ score += 3; reasons.push('Headline OK but consider 5–12 words.'); }
+    else { reasons.push('Add a headline.'); }
+
+    // Primary length (30–120 words sweet spot)
+    const pLen = (s.primary||'').length; // chars
+    if (pLen>=80 && pLen<=320){ score += 10; reasons.push('Body text length looks good.'); }
+    else if (pLen>0){ score += 4; reasons.push('Body text present; consider 80–320 chars.'); }
+    else { reasons.push('Add body text.'); }
+
+    // CTA presence
+    if ((s.cta||'').length>0){ score += 6; reasons.push('CTA present.'); } else { reasons.push('Consider a clear CTA.'); }
+
+    // Image present + aspect ratio
+    if (s.imageData){
+      score += 8; reasons.push('Creative uploaded.');
+      // rough guess: if portrait/square better on mobile placements
+      if (s.placements.includes('Stories/Reels')){ score += 3; reasons.push('Portrait creative suits Stories/Reels.'); }
+    } else { reasons.push('Upload a creative for higher predicted CTR.'); }
+
+    // Audience definition breadth
+    const interestCount = s.interests.length; const kwCount = s.keywords.length;
+    if (interestCount+kwCount>=3){ score += 8; reasons.push('Targeting signals defined.'); }
+    else if (interestCount+kwCount>=1){ score += 4; reasons.push('Some targeting present; consider 3+.'); }
+    else { reasons.push('Add interests/keywords to improve match quality.'); }
+
+    // Budget alignment to objective
+    if (s.objective==='conversions' && s.budget>=50){ score += 4; reasons.push('Budget aligns with conversion objective.'); }
+    if (s.objective==='reach' && s.budget>=20){ score += 3; }
+
+    // Platform diversity (2+)
+    const plat = s.platforms.length; if (plat>=2){ score += 4; reasons.push('Multi-platform mix improves reach.'); }
+
+    // Age span sanity
+    if (s.age.min < s.age.max){ score += 2; } else { reasons.push('Fix age range.'); }
+
+    // Clamp
+    score = Math.max(0, Math.min(100, score));
+
+    // Simple CPA guess from score & budget
+    const baseCpa = 45; // arbitrary
+    const cpa = Math.max(4, Math.round((baseCpa * (90/(score||1))) * 100) / 100);
+
+    return { score, cpa, reasons };
+  }
+
+  function recompute(){
+    const { score, cpa, reasons } = scorePrediction(state);
+    byId('score').textContent = score.toString();
+    byId('cpa').textContent = cpa.toString();
+    byId('meter').style.width = score + '%';
+    const ul = byId('reasons'); ul.innerHTML='';
+    reasons.forEach(r=>{ const li=document.createElement('li'); li.textContent=r; ul.appendChild(li); });
+    persistDraft();
+  }
+
+  // --- Persist draft locally ---
+  const DRAFT_KEY = 'evrt_adlab_draft_v1';
+  function persistDraft(){ localStorage.setItem(DRAFT_KEY, JSON.stringify(state)); }
+  function loadDraft(){ try{ return JSON.parse(localStorage.getItem(DRAFT_KEY)||'null') }catch{return null} }
+
+  // --- Scenario save/load ---
+  const SC_KEY = 'evrt_adlab_scenarios_v1';
+  function loadScenarios(){ try{ return JSON.parse(localStorage.getItem(SC_KEY)||'[]') }catch{return []} }
+  function saveScenario(s){ const list = loadScenarios(); list.unshift({ id: Date.now(), ...s }); localStorage.setItem(SC_KEY, JSON.stringify(list)); renderScenarios(); }
+  function renderScenarios(){
+    const box = byId('scenarios'); const list = loadScenarios();
+    if (!list.length){ box.innerHTML = '<p class="muted">No saved scenarios yet.</p>'; return; }
+    box.innerHTML = list.map(sc=>`<div class="row"><div><strong>${sc.headline||'Untitled'}</strong><div class="mini">${(sc.locations||[]).join(', ')||'Any'}</div></div><div><button class="btn" data-load="${sc.id}">Load</button> <button class="btn" data-del="${sc.id}">Delete</button></div></div>`).join('');
+    box.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{ const id=+b.dataset.load; const found = list.find(x=>x.id===id); if(found){ Object.assign(state, found); hydrateUI(); recompute(); }});
+    box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ const id=+b.dataset.del; const rest = list.filter(x=>x.id!==id); localStorage.setItem(SC_KEY, JSON.stringify(rest)); renderScenarios(); });
+  }
+
+  // --- UI bindings ---
+  function hydrateUI(){
+    byId('headline').value = state.headline;
+    byId('primary').value = state.primary;
+    byId('cta').value = state.cta;
+    byId('objective').value = state.objective;
+    byId('budget').value = state.budget;
+    byId('locations').value = state.locations.join(', ');
+    byId('languages').value = state.languages.join(', ');
+    byId('age-min').value = state.age.min;
+    byId('age-max').value = state.age.max;
+    document.querySelectorAll('input[name="gender"]').forEach(cb=>{ cb.checked = state.genders.includes(cb.value); });
+    // pills
+    pills('interests', state.interests);
+    pills('keywords', state.keywords);
+    // selects
+    const platSel = byId('platforms'); [...platSel.options].forEach(o=> o.selected = state.platforms.includes(o.value));
+    const plcSel = byId('placements'); [...plcSel.options].forEach(o=> o.selected = state.placements.includes(o.value));
+    // image
+    if (state.imageData) { byId('img').src = state.imageData; } else { byId('img').removeAttribute('src'); }
+  }
+
+  function bindInputs(){
+    byId('headline').oninput = e=>{ state.headline=e.target.value; recompute(); };
+    byId('primary').oninput = e=>{ state.primary=e.target.value; recompute(); };
+    byId('cta').oninput = e=>{ state.cta=e.target.value; recompute(); };
+    byId('objective').onchange = e=>{ state.objective=e.target.value; recompute(); };
+    byId('budget').oninput = e=>{ state.budget=+e.target.value||0; recompute(); };
+
+    byId('locations').onchange = e=>{ state.locations = toList(e.target.value); recompute(); };
+    byId('languages').onchange = e=>{ state.languages = toList(e.target.value); recompute(); };
+    byId('age-min').oninput = e=>{ state.age.min = +e.target.value||13; recompute(); };
+    byId('age-max').oninput = e=>{ state.age.max = +e.target.value||65; recompute(); };
+    document.querySelectorAll('input[name="gender"]').forEach(cb=> cb.onchange = ()=>{
+      state.genders = [...document.querySelectorAll('input[name="gender"]:checked')].map(x=>x.value);
+      recompute();
+    });
+
+    byId('interest-input').addEventListener('keydown', e=>{
+      if (e.key==='Enter'){ e.preventDefault(); const v=e.target.value.trim(); if(v && !state.interests.includes(v)){ state.interests.push(v); pills('interests', state.interests); e.target.value=''; recompute(); } }
+    });
+    byId('keyword-input').addEventListener('keydown', e=>{
+      if (e.key==='Enter'){ e.preventDefault(); const v=e.target.value.trim(); if(v && !state.keywords.includes(v)){ state.keywords.push(v); pills('keywords', state.keywords); e.target.value=''; recompute(); } }
+    });
+
+    byId('platforms').onchange = e=>{ state.platforms = [...e.target.selectedOptions].map(o=>o.value); recompute(); };
+    byId('placements').onchange = e=>{ state.placements = [...e.target.selectedOptions].map(o=>o.value); recompute(); };
+
+    // Image pick/drag
+    byId('pick').onclick = ()=> byId('file').click();
+    byId('file').onchange = handleFile;
+    const drop = byId('drop');
+    ;['dragenter','dragover'].forEach(ev=> drop.addEventListener(ev, (e)=>{e.preventDefault(); drop.style.background='rgba(255,255,255,.03)'; }));
+    ;['dragleave','drop'].forEach(ev=> drop.addEventListener(ev, (e)=>{e.preventDefault(); drop.style.background='transparent'; }));
+    drop.addEventListener('drop', (e)=>{ const f=e.dataTransfer.files?.[0]; if(f) loadImage(f); });
+
+    // Variants
+    byId('gen-3h').onclick = ()=>{
+      const arr = generateHeadlines();
+      byId('variants').innerHTML = '<div class="mini">Headlines</div>' + arr.map(h=>`<div class="row"><span>${h}</span><button class="btn" data-useh>Use</button></div>`).join('');
+      byId('variants').querySelectorAll('[data-useh]').forEach((b,i)=> b.onclick=()=>{ state.headline = arr[i]; hydrateUI(); recompute(); });
+    };
+    byId('gen-3b').onclick = ()=>{
+      const arr = generateBodies();
+      byId('variants').innerHTML = '<div class="mini">Bodies</div>' + arr.map(h=>`<div class="row"><span>${h}</span><button class="btn" data-useb>Use</button></div>`).join('');
+      byId('variants').querySelectorAll('[data-useb]').forEach((b,i)=> b.onclick=()=>{ state.primary = arr[i]; hydrateUI(); recompute(); });
+    };
+
+    // Actions
+    byId('save').onclick = ()=>{ saveScenario(JSON.parse(JSON.stringify(state))); };
+    byId('export').onclick = ()=>{ download('ad_scenario.json', JSON.stringify({ ...state, prediction: scorePrediction(state) }, null, 2)); };
+    byId('reset').onclick = ()=>{ localStorage.removeItem(DRAFT_KEY); Object.assign(state, { imageData:'', headline:'', primary:'', cta:'', objective:'conversions', budget:100, locations:[], languages:[], age:{min:25,max:54}, genders:['male','female'], interests:[], keywords:[], platforms:['Meta (FB/IG)'], placements:['Feed'] }); hydrateUI(); recompute(); };
+  }
+
+  function handleFile(e){ const f=e.target.files?.[0]; if (f) loadImage(f); }
+  function loadImage(f){ const r=new FileReader(); r.onload=()=>{ state.imageData=r.result; hydrateUI(); recompute(); }; r.readAsDataURL(f); }
+
+  // --- Boot ---
+  (async ()=>{
+    const draft = loadDraft(); if (draft) Object.assign(state, draft);
+    hydrateUI(); bindInputs(); renderScenarios(); recompute();
+  })();
+  </script>
+</body>
+</html>
