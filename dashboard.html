@@ -3,367 +3,596 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Live Demo — EVRT Social AI</title>
-  <meta name="description" content="Interactive demo of EVRT Social AI: compose, predict, analyze."/>
+  <title>EVRT — Dashboard</title>
+  <meta name="description" content="Real-time KPIs, performance, audience, pipeline, and alerts. Cinematic, predictive, and alive."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="assets/style.css"/>
-  <!-- Chart.js for the activity curve -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+
   <style>
-    /* Page-specific polish (kept local to this file) */
-    .page-grid{display:grid;gap:18px;grid-template-columns:1.2fr .8fr}
-    @media (max-width:1100px){.page-grid{grid-template-columns:1fr}}
-    .panel{display:flex;flex-direction:column;gap:12px}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap}
-    .tabs .tab{padding:.55rem .8rem;border-radius:999px;border:1px solid var(--line);cursor:pointer}
-    .tabs .tab[aria-selected="true"]{background:linear-gradient(90deg,hsl(var(--accent)/.18),hsl(var(--accent-2)/.18))}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .input, .select, textarea.input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#0e121b;color:var(--text)}
-    .pill{border:1px solid var(--line);border-radius:999px;padding:.4rem .6rem}
-    .muted-sm{color:var(--muted);font-size:.9rem}
-    .list{display:grid;gap:10px}
-    .variant{border:1px dashed var(--line);border-radius:12px;padding:12px}
-    .flex{display:flex;gap:10px}
-    .flex-1{flex:1}
-    .right{justify-content:flex-end}
+    :root{
+      --db-neon:#6ee7ff; --db-accent:#63ffa5; --db-amber:#ffd75a; --db-danger:#ff4d6d;
+      --db-bg:#0a0e14; --db-card:#0f141c; --db-grid:rgba(255,255,255,.06); --db-mute:#8fa2b7;
+    }
+    body{ background: radial-gradient(1400px 900px at 80% -260px,#142034 0,#0a0e14 65%); }
+    /* Backdrop */
+    .db-layers{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+    #matrix{ position:absolute; inset:0; opacity:.22; }
+    .scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.25; mix-blend-mode:overlay; }
 
-    /* Chat area */
-    .chat{display:grid;gap:12px}
-    .chat-msg{border:1px solid var(--line);border-radius:12px;padding:12px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02))}
-    .chat-msg.ai{border-image:linear-gradient(90deg,hsl(var(--accent)/.5),hsl(var(--accent-2)/.5)) 1;border-width:1px;border-style:solid}
-    .typing{opacity:.8}
+    .db-section{ position:relative; z-index:1; }
+    .eyebrow{ letter-spacing:.12em; text-transform:uppercase; color:var(--db-mute); }
 
-    /* Tour overlay */
-    .tour-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);display:none;z-index:70}
-    .tour-card{position:fixed;max-width:420px;border-radius:14px;border:1px solid var(--line);padding:16px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));z-index:80;box-shadow:var(--glow)}
-    .tour-spotlight{position:fixed;border-radius:14px;box-shadow:0 0 0 9999px rgba(0,0,0,.6), 0 0 0 2px hsl(var(--accent));z-index:75;pointer-events:none}
-    .tour-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
-    .hidden{display:none !important}
+    /* Cards */
+    .card-x{ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid var(--db-grid); border-radius:14px; padding:14px; }
+    .card-x:hover{ border-color:rgba(110,231,255,.45); box-shadow:0 12px 40px rgba(110,231,255,.08), 0 0 0 1px rgba(110,231,255,.25) inset; }
+    .mini{ color:var(--db-mute); font-size:12px; }
+
+    /* Layout */
+    .grid-2{ display:grid; gap:16px; grid-template-columns:1fr; }
+    .grid-3{ display:grid; gap:16px; grid-template-columns:1fr; }
+    @media(min-width:1100px){ .grid-2{ grid-template-columns:1.2fr 1fr; } .grid-3{ grid-template-columns:1fr 1fr 1fr; } }
+    .kpis{ display:grid; gap:12px; grid-template-columns:1fr 1fr; }
+    @media(min-width:900px){ .kpis{ grid-template-columns:repeat(6,1fr); } }
+
+    /* KPI */
+    .kpi{ position:relative; border:1px solid var(--db-grid); border-radius:12px; padding:10px; background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); }
+    .kpi h4{ margin:0 0 2px 0; font-size:13px; color:var(--db-mute); }
+    .kpi .val{ font-size:22px; font-weight:900; letter-spacing:.2px }
+    .kpi .delta{ font-size:12px; }
+    .kpi canvas{ width:100%; height:38px; display:block; margin-top:6px; border-radius:10px; background:#0f141c; }
+
+    /* Tabs */
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; }
+    .tab{ padding:8px 12px; border-radius:12px; border:1px solid var(--db-grid); cursor:pointer; user-select:none; }
+    .tab.active{ background:linear-gradient(90deg,var(--db-neon),var(--db-accent)); color:#061019; border:0; font-weight:800; }
+    .panel{ display:none; } .panel.active{ display:block; }
+
+    /* Charts */
+    canvas.chart{ width:100%; height:260px; border:1px solid var(--db-grid); border-radius:12px; background:#0f141c; }
+    .legend{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px }
+    .pill{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--db-grid); border-radius:999px; }
+    .sw{ width:10px; height:10px; border-radius:3px; background:#6ee7ff }
+
+    /* Audience grid */
+    .geo-grid{ display:grid; grid-template-columns:repeat(12, 1fr); gap:4px; }
+    .geo-cell{ padding-top:100%; position:relative; border-radius:6px; border:1px solid var(--db-grid); background:#0f141c; }
+    .geo-cell > span{ position:absolute; inset:0; display:grid; place-items:center; font-size:10px; color:var(--db-mute); }
+    .bar{ height:10px; border-radius:999px; border:1px solid var(--db-grid); background:#0f141c; overflow:hidden; }
+    .bar>div{ height:100%; width:0%; background:linear-gradient(90deg,#63ffa5,#ffd75a,#ff4d6d); transition:width .4s }
+
+    /* Funnel */
+    .funnel{ display:grid; gap:8px; }
+    .f-step{ display:flex; align-items:center; gap:8px; }
+    .f-step .label{ width:110px; font-size:12px; color:var(--db-mute) }
+    .f-step .bar{ flex:1; }
+
+    /* Cohort */
+    .cohort{ border:1px solid var(--db-grid); border-radius:12px; overflow:hidden; }
+    .cohort canvas{ width:100%; height:200px; display:block; background:#0f141c; }
+
+    /* Alerts / Tasks */
+    .rows .row{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.06) }
+    .rows .row:last-child{ border-bottom:0 }
+    .rows .row .actions{ display:flex; gap:6px }
+    .btn.neon{ background:linear-gradient(90deg,var(--db-neon),var(--db-accent)); color:#061019; border:0; font-weight:800; }
+
+    /* Terminal */
+    .terminal{ background:#05080d;border:1px solid rgba(110,231,255,.25); box-shadow:0 0 40px rgba(110,231,255,.08) inset, 0 12px 40px rgba(0,0,0,.35); border-radius:12px; overflow:hidden; color:#bfefff; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .term-top{ display:flex; align-items:center; gap:8px; padding:8px 12px; background:#07121b; border-bottom:1px solid rgba(255,255,255,.06); }
+    .dot{ width:10px; height:10px; border-radius:999px; } .dot.r{ background:#ff5f56 } .dot.y{ background:#ffbd2e } .dot.g{ background:#27c93f }
+    .term-body{ height:220px; overflow:auto; padding:12px; }
+    .term-line{ white-space:pre-wrap } .term-success{ color:#63ffa5 } .term-warn{ color:#ffd75a } .term-err{ color:#ff8299 }
+    .term-caret{ display:inline-block; width:9px; height:1.05em; background:#bfefff; vertical-align:-2px; animation:blink 1s steps(1) infinite }
+    @keyframes blink{ 50%{ opacity:0 } }
+
+    /* Grid overlay decoration */
+    .grid-overlay{ position:relative; }
+    .grid-overlay::before{
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px,
+        linear-gradient(0deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px;
+      mask: linear-gradient(to bottom, transparent, rgba(0,0,0,.3) 20%, rgba(0,0,0,.3) 80%, transparent);
+      opacity:.25; border-radius:16px;
+    }
+
+    @media(max-width:920px){
+      .kpis{ grid-template-columns:1fr 1fr; }
+      .grid-2{ grid-template-columns:1fr; }
+      .grid-3{ grid-template-columns:1fr; }
+    }
   </style>
 </head>
 <body>
-  <div class="bg-orbs" aria-hidden="true"></div>
-  <div data-include="partials/header.html"></div>
-
-  <section class="container hero">
-    <span class="eyebrow">Interactive</span>
-    <h1 class="gradient-text">EVRT Social AI — Live Demo</h1>
-    <p class="sub">Compose on-brand posts, pick the best minute to publish, and preview analytics — no login, no API keys.</p>
-    <div class="hero-cta">
-      <button class="btn primary" id="startTour">Start guided tour</button>
-      <a class="btn outline" href="social-ai.html">Product overview</a>
-    </div>
-  </section>
-
-  <section class="container section page-grid">
-    <!-- LEFT: Composer + Chat -->
-    <div class="panel">
-      <div class="card" data-reveal id="composeCard" data-tour="Compose your message; AI will generate 3 on-brand variants with hooks, CTAs, and hashtags.">
-        <div class="row"><h3 style="margin:.2rem 0">Composer</h3><span class="pill muted-sm">AI variants</span></div>
-        <div class="row">
-          <select class="select" id="brand">
-            <option>EVRT (Default Tone)</option>
-            <option>Bold / Challenger</option>
-            <option>Formal / Enterprise</option>
-            <option>Playful / DTC</option>
-          </select>
-          <div class="row">
-            <label class="pill"><input type="checkbox" id="ig" checked/> IG</label>
-            <label class="pill"><input type="checkbox" id="li" checked/> LinkedIn</label>
-            <label class="pill"><input type="checkbox" id="x"  checked/> X</label>
-            <label class="pill"><input type="checkbox" id="tt" /> TikTok</label>
-          </div>
-        </div>
-        <textarea class="input" rows="4" id="brief" placeholder="What are we announcing? Goals, audience, vibe…"></textarea>
-        <div class="row right">
-          <button class="btn glow" id="gen">Generate variants</button>
-        </div>
-        <div class="list" id="variants"></div>
-      </div>
-
-      <div class="card" data-reveal id="chatCard" data-tour="Ask the assistant anything — it ‘streams’ replies so it feels alive.">
-        <div class="row"><h3 style="margin:.2rem 0">Assistant</h3><span class="pill muted-sm">Live feel</span></div>
-        <div class="chat" id="chat"></div>
-        <div class="row">
-          <input class="input flex-1" id="chatInput" placeholder="Ask for alt hooks, different tone, or analytics reasoning…"/>
-          <button class="btn" id="chatSend">Send</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT: Predictive Timing + Analytics -->
-    <div class="panel">
-      <div class="card" data-reveal id="predictCard" data-tour="We model audience activity per platform and surface the next best minutes by timezone.">
-        <div class="row"><h3 style="margin:.2rem 0">Predictive Timing</h3><span class="pill muted-sm">Best minute</span></div>
-        <div class="row">
-          <select class="select" id="platform">
-            <option value="Instagram">Instagram</option>
-            <option value="LinkedIn" selected>LinkedIn</option>
-            <option value="X">X</option>
-            <option value="TikTok">TikTok</option>
-          </select>
-          <select class="select" id="timezone">
-            <option value="0">UTC</option>
-            <option value="-5">ET (UTC-5)</option>
-            <option value="-8">PT (UTC-8)</option>
-            <option value="1">CET (UTC+1)</option>
-            <option value="5.5">IST (UTC+5:30)</option>
-          </select>
-          <button class="btn" id="predict">Predict</button>
-        </div>
-        <canvas id="activity" height="160" style="background:rgba(255,255,255,.02);border-radius:12px;border:1px solid var(--line)"></canvas>
-        <div id="bestTimes" class="row" style="flex-wrap:wrap"></div>
-      </div>
-
-      <div class="card" data-reveal id="analyticsCard" data-tour="Closed-loop analytics: see how variants and timing choices correlate with lift over your baseline.">
-        <div class="row"><h3 style="margin:.2rem 0">Analytics Snapshot</h3><span class="pill muted-sm">Closed loop</span></div>
-        <div class="grid grid-3">
-          <div class="kpi"><div style="font-weight:800;font-size:1.4rem">+28%</div><div class="muted">CTR vs. baseline</div></div>
-          <div class="kpi"><div style="font-weight:800;font-size:1.4rem">-22%</div><div class="muted">Time-to-publish</div></div>
-          <div class="kpi"><div style="font-weight:800;font-size:1.4rem">+16%</div><div class="muted">Consistency</div></div>
-        </div>
-        <p class="muted-sm" style="margin:.6rem 0 0">* Demo data — methodology: activity curve × creative score × recency decay.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- TOUR OVERLAY -->
-  <div class="tour-overlay" id="tourMask"></div>
-  <div class="tour-spotlight hidden" id="tourSpot"></div>
-  <div class="tour-card hidden" id="tourCard">
-    <div id="tourText" class="muted"></div>
-    <div class="tour-actions">
-      <button class="btn ghost" id="tourSkip">Skip</button>
-      <button class="btn" id="tourPrev">Back</button>
-      <button class="btn primary" id="tourNext">Next</button>
-    </div>
+  <!-- Background FX -->
+  <div class="db-layers">
+    <canvas id="matrix" aria-hidden="true"></canvas>
+    <div class="scan" aria-hidden="true"></div>
   </div>
 
+  <div data-include="partials/header.html"></div>
+
+  <!-- HERO -->
+  <section class="container hero db-section" style="margin-top:20px">
+    <span class="eyebrow">EVRT Command Center</span>
+    <h1 class="gradient-text">Dashboard.<br/>Predict, monitor, act.</h1>
+    <p class="sub">Real-time KPIs, cohort health, audience signals, and anomaly alerts. This is a simulated demo—feel the flow.</p>
+    <div class="tabs" style="margin-top:10px">
+      <button class="tab active" data-tab="ov">Overview</button>
+      <button class="tab" data-tab="perf">Performance</button>
+      <button class="tab" data-tab="aud">Audience</button>
+      <button class="tab" data-tab="pipe">Pipeline</button>
+      <button class="tab" data-tab="alerts">Alerts</button>
+      <label style="margin-left:auto;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--db-grid);padding:8px 10px;border-radius:12px;cursor:pointer">
+        <input type="checkbox" id="overclock"/> Overclock <span class="mini">⚠︎</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- PANELS -->
+  <section class="container section db-section">
+    <!-- ========== OVERVIEW ========== -->
+    <div id="panel-ov" class="panel active">
+      <div class="card-x grid-overlay">
+        <h3>Key metrics</h3>
+        <div class="kpis" id="kpis" style="margin-top:8px">
+          <!-- six KPI cards populated by JS -->
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:16px">
+        <div class="card-x grid-overlay">
+          <h3>Live sessions & conversions</h3>
+          <canvas id="ts-main" class="chart" width="700" height="260"></canvas>
+          <div class="legend">
+            <span class="pill"><span class="sw" style="background:#6ee7ff"></span>Sessions</span>
+            <span class="pill"><span class="sw" style="background:#63ffa5"></span>Conversions</span>
+            <span class="pill"><span class="sw" style="background:#ffd75a"></span>Revenue</span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+            <button id="btn-surge" class="btn ghost">Simulate surge</button>
+            <button id="btn-reset-ts" class="btn">Reset</button>
+          </div>
+        </div>
+
+        <div class="terminal grid-overlay">
+          <div class="term-top">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <strong style="margin-left:6px">/opt/evrt/dashboard</strong>
+            <span class="muted" style="margin-left:auto">root@evrt:~$</span>
+          </div>
+          <div id="term" class="term-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== PERFORMANCE ========== -->
+    <div id="panel-perf" class="panel">
+      <div class="grid-2">
+        <div class="card-x grid-overlay">
+          <h3>Channel Performance</h3>
+          <canvas id="ts-channels" class="chart" width="700" height="260"></canvas>
+          <div class="legend">
+            <span class="pill"><span class="sw" style="background:#6ee7ff"></span>Meta</span>
+            <span class="pill"><span class="sw" style="background:#63ffa5"></span>Google</span>
+            <span class="pill"><span class="sw" style="background:#ffd75a"></span>TikTok</span>
+            <span class="pill"><span class="sw" style="background:#ff4d6d"></span>LinkedIn</span>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+            <button id="btn-opt" class="btn neon">Auto-allocate</button>
+            <button id="btn-rand" class="btn">Randomize</button>
+          </div>
+        </div>
+
+        <div class="card-x grid-overlay">
+          <h3>ROAS gauge</h3>
+          <div class="bar"><div id="roasBar"></div></div>
+          <div class="mini" style="margin-top:6px">ROAS: <strong id="roasTxt">—×</strong> • CPA: <strong>$<span id="cpaTxt">—</span></strong> • CTR: <strong id="ctrTxt">—%</strong></div>
+          <p class="mini" style="margin-top:8px">Tip: spikes often hit at 9–11am and 6–8pm local. Pair with Social AI scheduler.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== AUDIENCE ========== -->
+    <div id="panel-aud" class="panel">
+      <div class="grid-2">
+        <div class="card-x grid-overlay">
+          <h3>Demographics</h3>
+          <div class="rows" id="demoRows" style="margin-top:6px">
+            <!-- Age/gender bars -->
+          </div>
+        </div>
+        <div class="card-x grid-overlay">
+          <h3>Device / Platform</h3>
+          <canvas id="pie-dev" class="chart" width="560" height="260"></canvas>
+          <div class="legend" id="devLegend"></div>
+        </div>
+      </div>
+
+      <div class="card-x grid-overlay" style="margin-top:16px">
+        <h3>Geo Pulse</h3>
+        <p class="mini">Not a map—an activity grid. Brighter = more sessions. Click a cell to “zoom” that market.</p>
+        <div id="geoGrid" class="geo-grid" style="margin-top:6px"></div>
+      </div>
+    </div>
+
+    <!-- ========== PIPELINE ========== -->
+    <div id="panel-pipe" class="panel">
+      <div class="grid-2">
+        <div class="card-x grid-overlay">
+          <h3>Conversion Funnel</h3>
+          <div id="funnel" class="funnel" style="margin-top:6px"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+            <button id="btn-funnel" class="btn neon">Recompute</button>
+            <button id="btn-funnel-reset" class="btn">Reset</button>
+          </div>
+        </div>
+
+        <div class="card-x grid-overlay cohort">
+          <h3 style="padding:0 14px 6px">Cohort Retention</h3>
+          <canvas id="cohort" width="560" height="200"></canvas>
+          <div class="mini" style="padding:0 14px 10px">Rows = weekly cohorts; Columns = week N. Click a cell to annotate.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ALERTS ========== -->
+    <div id="panel-alerts" class="panel">
+      <div class="grid-2">
+        <div class="card-x grid-overlay">
+          <h3>Anomalies & Tasks</h3>
+          <div id="alertRows" class="rows" style="margin-top:6px"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <button id="btn-add-task" class="btn">Add task</button>
+            <button id="btn-export" class="btn neon">Export JSON snapshot</button>
+          </div>
+        </div>
+
+        <div class="terminal grid-overlay">
+          <div class="term-top">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <strong style="margin-left:6px">/opt/evrt/monitor</strong>
+            <span class="muted" style="margin-left:auto">root@evrt:~$</span>
+          </div>
+          <div id="term2" class="term-body"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <div data-include="partials/footer.html"></div>
+
   <script defer src="assets/app.js"></script>
-
   <script>
-  // --------- DEMO STATE ---------
-  const rnd = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
-  const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
-
-  // Synthetic activity curves per platform (0..23 hours local)
-  const baseCurves = {
-    "LinkedIn":  [2,2,2,2,2,3,6,9,12,10,8,7,6,5,5,5,6,9,12,8,4,3,2,2],
-    "Instagram": [1,1,1,2,2,3,6,10,12,9,7,6,6,6,6,7,9,12,13,10,7,5,3,2],
-    "X":         [2,2,2,2,3,5,8,10,10,8,7,7,8,9,9,9,10,12,12,10,7,4,3,2],
-    "TikTok":    [1,1,1,1,2,4,7,10,12,12,10,8,7,7,8,10,12,13,12,9,6,4,2,1]
-  };
-  function shiftedCurve(platform, tzShift=0){
-    const curve = baseCurves[platform] || baseCurves["LinkedIn"];
-    const out = Array.from({length:24},(_,i)=>curve[(i-(-tzShift)+24)%24]); // shift by tz
-    // add light noise for demo realism
-    return out.map(v=>v + Math.round((Math.random()-0.5)*2));
-  }
-  function topMinutes(curve){
-    // find top 3 hours, then map to :15, :30, :45 variants
-    const hours = curve.map((v,i)=>({h:i, v}));
-    hours.sort((a,b)=>b.v-a.v);
-    const picks = hours.slice(0,3).map((o,idx)=>({
-      label: `${String(o.h).padStart(2,'0')}:${['15','30','45'][idx]}`,
-      score: o.v
-    }));
-    return picks;
-  }
-
-  // --------- COMPOSER VARIANTS ---------
-  const brandVoices = {
-    "EVRT (Default Tone)": (t)=>[
-      ["Hook",   "Level up your growth engine with predictive timing that meets your audience where they are."],
-      ["Value",  "Draft on-brand content, auto-test hooks, and schedule across channels — in minutes."],
-      ["CTA",    "Ship faster. Learn faster. Repeat."]
-    ],
-    "Bold / Challenger": (t)=>[
-      ["Hook",   "Stop guessing. Start compounding."],
-      ["Value",  "Your competitors post at random. You’ll post at the best minute — every time."],
-      ["CTA",    "Turn attention into outcomes."]
-    ],
-    "Formal / Enterprise": (t)=>[
-      ["Hook",   "Operationalize content with predictive intelligence."],
-      ["Value",  "Governance-ready drafting, approvals, and closed-loop analytics across teams."],
-      ["CTA",    "Standardize excellence."]
-    ],
-    "Playful / DTC": (t)=>[
-      ["Hook",   "Hooks > hope. Timing > luck."],
-      ["Value",  "Make scroll-stoppers and hit the moment your people actually show up."],
-      ["CTA",    "Let’s make your feed unskippable."]
-    ]
-  };
-  function hashtags(brief){
-    const core = ["#EVRT","#SocialAI","#Predictive","#CreatorOps","#Growth","##"];
-    const extra = brief.toLowerCase().includes("launch") ? ["#ProductLaunch","#NowLive"] :
-                  brief.toLowerCase().includes("event")  ? ["#Event","#SaveTheDate"] :
-                  ["#AI","##"];
-    return [...core.slice(0,3), ...extra].filter(t=>t!=="##").join(" ");
-  }
-  function buildVariants(voiceName, brief){
-    const tmpl = brandVoices[voiceName] || brandVoices["EVRT (Default Tone)"];
-    const parts = tmpl(brief);
-    const inflect = (arr, spice)=> arr.map(([k,v])=>[k, v.replace("content","content "+spice)]);
-    const v1 = parts;
-    const v2 = inflect(parts,"/creative");
-    const v3 = inflect(parts,"— crafted with guardrails");
-    const tagz = hashtags(brief);
-    const toText = (arr)=>[
-      arr[0][1],
-      arr[1][1],
-      arr[2][1],
-      tagz
-    ].join(" ");
-    return [toText(v1), toText(v2), toText(v3)];
-  }
-
-  // --------- STREAMING CHAT (fake but feels real) ---------
-  const chatEl = document.getElementById("chat");
-  function addChat(role, text, stream=false){
-    const div = document.createElement("div");
-    div.className = "chat-msg " + (role==="ai" ? "ai" : "");
-    if(!stream){ div.textContent = text; chatEl.appendChild(div); return div; }
-    chatEl.appendChild(div);
-    (async ()=>{
-      for(let i=0;i<text.length;i++){
-        div.textContent = text.slice(0,i+1) + (i%4===0?"\u258B":"");
-        await sleep(10+Math.random()*12);
-      }
-      div.textContent = text;
+    /* ===== Matrix backdrop ===== */
+    (function matrix(){
+      const c = document.getElementById('matrix'); const ctx = c.getContext('2d');
+      function resize(){ c.width = innerWidth; c.height = innerHeight; }
+      resize(); addEventListener('resize', resize);
+      const chars = 'アカサタナハ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$#@!*%&';
+      const cols = ()=>Math.floor(c.width / 14); let drops = Array(cols()).fill(0).map(()=>Math.random()*c.height/14);
+      ctx.font = '14px monospace';
+      let speed = 1;
+      document.getElementById('overclock').addEventListener('change', (e)=> speed = e.target.checked ? 1.9 : 1);
+      (function step(){
+        ctx.fillStyle = 'rgba(10,14,20,'+(0.06*speed)+')'; ctx.fillRect(0,0,c.width,c.height);
+        ctx.fillStyle = '#6ee7ff'; ctx.shadowColor = '#6ee7ff88'; ctx.shadowBlur = 8;
+        for(let i=0;i<drops.length;i++){ const x = i*14, y = drops[i]*14; const ch = chars[Math.floor(Math.random()*chars.length)];
+          ctx.fillText(ch,x,y); if(y > c.height && Math.random()>0.975) drops[i]=0; drops[i]+=speed; }
+        requestAnimationFrame(step);
+      })();
     })();
-    return div;
-  }
 
-  // --------- UI HOOKS ---------
-  const variantsEl = document.getElementById("variants");
-  document.getElementById("gen").addEventListener("click", ()=>{
-    const voice = document.getElementById("brand").value;
-    const brief = (document.getElementById("brief").value || "Announcing EVRT Social AI — compose, predict, analyze.").trim();
-    variantsEl.innerHTML = "";
-    const vs = buildVariants(voice, brief);
-    vs.forEach((txt,i)=>{
-      const wrap = document.createElement("div");
-      wrap.className = "variant";
-      wrap.innerHTML = `<strong>Variant ${i+1}</strong><p class="muted-sm" style="margin:.4rem 0">${txt}</p>
-        <div class="row right"><button class="btn" data-sched="${i}">Schedule →</button></div>`;
-      variantsEl.appendChild(wrap);
+    /* ===== Tabs ===== */
+    document.querySelectorAll('.tab').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+      });
     });
-    // auto nudge chat
-    addChat("ai","I generated three on-brand variants. Pick one and I’ll predict the best minute for each selected channel.", true);
-  });
 
-  document.addEventListener("click",(e)=>{
-    const btn = e.target.closest("button[data-sched]");
-    if(!btn) return;
-    const which = Number(btn.dataset.sched)+1;
-    addChat("ai",`Queued Variant ${which} for scheduling. You can tweak copy or request alternates by tone.`, true);
-  });
+    /* ===== Terminal helpers ===== */
+    function makeTerm(el){
+      const term = document.getElementById(el);
+      function println(s, cls=''){ const d=document.createElement('div'); d.className='term-line '+cls; d.textContent=s; term.appendChild(d); term.scrollTop=term.scrollHeight; }
+      function typeCmd(cmd, cb){
+        const row=document.createElement('div'); row.className='term-line'; term.appendChild(row); let i=0;
+        const iv=setInterval(()=>{ row.textContent='$ '+cmd.slice(0,++i)+(i%2?'_':''); term.scrollTop=term.scrollHeight;
+          if(i>=cmd.length){ clearInterval(iv); row.innerHTML='$ '+cmd+' <span class="term-caret"></span>'; cb&&cb(); } }, 16);
+      }
+      return { println, typeCmd };
+    }
+    const T = makeTerm('term'), T2 = makeTerm('term2');
 
-  // chat send
-  document.getElementById("chatSend").addEventListener("click", async ()=>{
-    const inp = document.getElementById("chatInput");
-    const q = (inp.value||"").trim();
-    if(!q) return;
-    addChat("user", q);
-    inp.value="";
-    await sleep(150);
-    const answer = [
-      "Here are 3 alternative hooks and the reasoning behind them:",
-      "• Curiosity gap (benefit-first, avoid jargon).",
-      "• Proof-point opener (small win with % lift).",
-      "• Objection-handled CTA (clear next action).",
-      "Want me to swap tone to Formal or Challenger?"
-    ].join("\n");
-    addChat("ai", answer, true);
-  });
+    /* ===== Utilities ===== */
+    function seeded(seed){ let x=seed; return ()=> (x = Math.sin(x) * 10000) - Math.floor(x); }
+    function rand(a,b){ return a + Math.random()*(b-a); }
+    function download(name, text, type='text/plain'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); }
 
-  // --------- PREDICTIVE TIMING ---------
-  let chart;
-  function renderChart(platform="LinkedIn", tz="0"){
-    const tzShift = Number(tz);
-    const curve = shiftedCurve(platform, tzShift);
-    const labels = Array.from({length:24},(_,i)=>String(i).padStart(2,'0')+":00");
-    const data = {
-      labels,
-      datasets:[{
-        label:`${platform} audience activity`,
-        data: curve,
-        tension:.35,
-        fill: true,
-        borderWidth:2
-      }]
+    /* ===== KPIs ===== */
+    const kpiDefs = [
+      { key:'mrr', label:'MRR', fmt:v=>'$'+v.toLocaleString(), base:42000, drift:[-2,3] },
+      { key:'leads', label:'Leads', fmt:v=>v.toLocaleString(), base:640, drift:[-4,5] },
+      { key:'roas', label:'ROAS', fmt:v=>v.toFixed(1)+'×', base:2.4, drift:[-0.05,0.08] },
+      { key:'cpa', label:'CPA', fmt:v=>'$'+v.toFixed(2), base:14.2, drift:[-0.20,0.20], invert:true },
+      { key:'ctr', label:'CTR', fmt:v=>v.toFixed(1)+'%', base:2.6, drift:[-0.10,0.18] },
+      { key:'sessions', label:'Sessions', fmt:v=>v.toLocaleString(), base:12800, drift:[-50,80] },
+    ];
+    function drawSpark(canvas, data, color){
+      const ctx=canvas.getContext('2d'), W=canvas.width=canvas.clientWidth, H=canvas.height=canvas.clientHeight;
+      const min=Math.min(...data), max=Math.max(...data), pad=6;
+      ctx.clearRect(0,0,W,H); ctx.fillStyle='#0f141c'; ctx.fillRect(0,0,W,H);
+      ctx.strokeStyle='rgba(255,255,255,.08)'; for(let i=0;i<3;i++){ ctx.beginPath(); ctx.moveTo(0,(H/(3))*i); ctx.lineTo(W,(H/(3))*i); ctx.stroke(); }
+      ctx.beginPath(); data.forEach((v,i)=>{ const x = i*(W/(data.length-1)); const y = H - ((v-min)/(max-min||1))*(H-pad*2) - pad; i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+      ctx.strokeStyle=color; ctx.lineWidth=2; ctx.shadowBlur=8; ctx.shadowColor=color+'88'; ctx.stroke(); ctx.shadowBlur=0;
+    }
+    function buildKPI(){
+      const box = document.getElementById('kpis'); box.innerHTML='';
+      const seriesSeed = seeded(9.17);
+      kpiDefs.forEach((k,i)=>{
+        const wrap = document.createElement('div'); wrap.className='kpi';
+        const spark = document.createElement('canvas');
+        const vals = Array.from({length:24}, (_,t)=> k.base + (i%2? t*0.3 : -t*0.15) + (seriesSeed()* (k.key==='mrr'?600: (k.key==='sessions'?400: (k.key==='roas'?0.2:10)))) );
+        const last = vals[vals.length-1]; const prev = vals[vals.length-2]||last; const delta = last - prev;
+        wrap.innerHTML = `<h4>${k.label}</h4><div class="val" id="kval-${k.key}">${k.fmt(k.base)}</div><div class="delta" id="kdel-${k.key}">${delta>=0?'▲':'▼'} ${k.fmt(Math.abs(delta))}</div>`;
+        wrap.appendChild(spark);
+        box.appendChild(wrap);
+        drawSpark(spark, vals, i===2?'#63ffa5':(i===3?'#ff4d6d':(i===4?'#ffd75a':'#6ee7ff')));
+      });
+    }
+    buildKPI();
+
+    /* KPI live tick */
+    (function kpiTick(){
+      const over = document.getElementById('overclock');
+      function step(){
+        kpiDefs.forEach(k=>{
+          const el = document.getElementById('kval-'+k.key);
+          const del = document.getElementById('kdel-'+k.key);
+          const drift = rand(k.drift[0], k.drift[1]) * (over.checked? 2.1 : 1);
+          k.base = Math.max( k.invert? 2 : 0, k.base + drift );
+          el.textContent = k.fmt(k.base);
+          del.textContent = (drift>=0?'▲ ':'▼ ') + k.fmt(Math.abs(drift));
+        });
+        setTimeout(step, over.checked? 450: 1100);
+      }
+      step();
+    })();
+
+    /* ===== Time series: sessions/conv/rev ===== */
+    const tsMain = document.getElementById('ts-main'); const ctxMain = tsMain.getContext('2d');
+    let ts = []; let t=0; let surge=0;
+    function tickTS(){
+      const over = document.getElementById('overclock').checked;
+      const sess = 120 + Math.sin(t/6)*22 + Math.random()*18 + surge;
+      const conv = Math.max(2, sess*(0.028 + Math.sin(t/18)*0.004 + (Math.random()-0.5)*0.002));
+      const rev  = conv * (12 + Math.random()*6);
+      ts.push({sess, conv, rev}); if(ts.length>120) ts.shift(); t++;
+      drawTS();
+      setTimeout(tickTS, over? 240: 540);
+    }
+    function drawTS(){
+      const W=tsMain.width=tsMain.clientWidth, H=tsMain.height=tsMain.clientHeight;
+      ctxMain.clearRect(0,0,W,H); ctxMain.fillStyle='#0f141c'; ctxMain.fillRect(0,0,W,H);
+      ctxMain.strokeStyle='rgba(255,255,255,.08)'; for(let i=0;i<5;i++){ ctxMain.beginPath(); ctxMain.moveTo(40, 20+i*(H-60)/4); ctxMain.lineTo(W-20, 20+i*(H-60)/4); ctxMain.stroke(); }
+      const padL=40, padB=28;
+      function plot(key,color,scale=1){
+        const min=0, max=Math.max(...ts.map(d=>d[key]))||1;
+        ctxMain.beginPath(); ts.forEach((d,i)=>{ const x = padL + i*( (W-padL-16)/Math.max(1,ts.length-1)); const y = H-padB - ((d[key]-min)/(max-min))* (H-60); i?ctxMain.lineTo(x,y):ctxMain.moveTo(x,y); });
+        ctxMain.strokeStyle=color; ctxMain.lineWidth=2; ctxMain.shadowBlur=10; ctxMain.shadowColor=color+'66'; ctxMain.stroke(); ctxMain.shadowBlur=0;
+      }
+      plot('sess','#6ee7ff'); plot('conv','#63ffa5'); plot('rev','#ffd75a');
+    }
+    document.getElementById('btn-surge').onclick = ()=>{ surge = 80; setTimeout(()=> surge=0, 5000); T.typeCmd('evrt traffic surge --duration 5s', ()=> T.println('> traffic spike injected', 'term-warn')); };
+    document.getElementById('btn-reset-ts').onclick = ()=>{ ts=[]; t=0; drawTS(); T.println('> time series reset', 'term-warn'); };
+    tickTS();
+
+    /* ===== Channels chart ===== */
+    const chCanvas = document.getElementById('ts-channels'); const chx = chCanvas.getContext('2d');
+    const channels = ['Meta','Google','TikTok','LinkedIn']; const series = [[],[],[],[]];
+    function stepCh(){
+      const over = document.getElementById('overclock').checked;
+      channels.forEach((_,i)=>{ const last = series[i].slice(-1)[0]|| rand(20,60); series[i].push( Math.max(4, last + rand(-6,8)*(over?1.8:1)) ); if(series[i].length>90) series[i].shift(); });
+      drawCh();
+      setTimeout(stepCh, over? 280 : 700);
+    }
+    function drawCh(){
+      const W=chCanvas.width=chCanvas.clientWidth, H=chCanvas.height=chCanvas.clientHeight;
+      chx.clearRect(0,0,W,H); chx.fillStyle='#0f141c'; chx.fillRect(0,0,W,H);
+      chx.strokeStyle='rgba(255,255,255,.08)'; for(let i=0;i<5;i++){ chx.beginPath(); chx.moveTo(36, 20+i*(H-60)/4); chx.lineTo(W-20, 20+i*(H-60)/4); chx.stroke(); }
+      const colors = ['#6ee7ff','#63ffa5','#ffd75a','#ff4d6d'];
+      series.forEach((arr,idx)=>{
+        chx.beginPath(); arr.forEach((v,i)=>{ const x=36 + i*( (W-60)/Math.max(1,arr.length-1) ); const y= H-28 - (H-60) * (v/100); i?chx.lineTo(x,y):chx.moveTo(x,y); });
+        chx.strokeStyle=colors[idx]; chx.lineWidth=2; chx.shadowBlur=9; chx.shadowColor=colors[idx]+'66'; chx.stroke(); chx.shadowBlur=0;
+      });
+      // update ROAS block
+      const roas = (1.6 + (series[0].slice(-1)[0]||0)/100 + (series[2].slice(-1)[0]||0)/180).toFixed(1);
+      const cpa  = (12 + (100-(series[1].slice(-1)[0]||0))/8).toFixed(2);
+      const ctr  = (2.0 + (series[0].slice(-1)[0]||0)/70).toFixed(1);
+      document.getElementById('roasTxt').textContent = roas+'×';
+      document.getElementById('cpaTxt').textContent  = cpa;
+      document.getElementById('ctrTxt').textContent  = ctr+'%';
+      document.getElementById('roasBar').style.width = Math.min(100, roas*22) + '%';
+    }
+    document.getElementById('btn-opt').onclick = ()=>{ // small nudge toward better ROAS mix
+      series[0].push((series[0].slice(-1)[0]||60)+6);
+      series[1].push((series[1].slice(-1)[0]||60)+3);
+      series[2].push((series[2].slice(-1)[0]||60)+2);
+      series[3].push((series[3].slice(-1)[0]||60)-2);
+      drawCh();
+      T.typeCmd('evrt allocate --optimize', ()=> T.println('✓ channels nudged to optimal mix', 'term-success'));
     };
-    const ctx = document.getElementById("activity").getContext("2d");
-    if(chart) chart.destroy();
-    chart = new Chart(ctx, {
-      type:"line",
-      data,
-      options:{
-        responsive:true,
-        plugins:{legend:{display:false}},
-        scales:{
-          x:{grid:{color:"rgba(255,255,255,.06)"}},
-          y:{grid:{color:"rgba(255,255,255,.06)"}, ticks:{precision:0}}
+    document.getElementById('btn-rand').onclick = ()=>{ series.forEach((arr)=> arr.push(rand(30,90))); drawCh(); };
+    stepCh();
+
+    /* ===== Audience: demographics bars ===== */
+    function barRow(label, id){
+      const row = document.createElement('div'); row.className='row f-step'; // reuse layout
+      row.innerHTML = `<div class="label">${label}</div><div class="bar"><div id="${id}"></div></div><div class="mini" id="${id}-txt">—%</div>`;
+      return row;
+    }
+    (function buildDemo(){
+      const box = document.getElementById('demoRows'); const rows = [
+        ['18–24','d1'], ['25–34','d2'], ['35–44','d3'], ['45–54','d4'], ['55+','d5'],
+        ['Male','g1'], ['Female','g2'], ['Non-binary','g3']
+      ];
+      rows.forEach(([label,id])=> box.appendChild(barRow(label,id)));
+      function tick(){
+        const over = document.getElementById('overclock').checked;
+        rows.forEach(([_,id],i)=>{
+          const v = Math.max(5, Math.min(92, (i<5? (30 + Math.sin((t+i)/8)*20 + rand(-6,8)) : (i===5?52: i===6?45:3) + rand(-3,3) )));
+          document.getElementById(id).style.width = v+'%';
+          document.getElementById(id+'-txt').textContent = v.toFixed(0)+'%';
+        });
+        setTimeout(tick, over? 700: 1400);
+      }
+      tick();
+    })();
+
+    /* ===== Audience: device pie ===== */
+    const pie = document.getElementById('pie-dev'); const ptx = pie.getContext('2d');
+    const dev = [{k:'iOS',c:'#6ee7ff',v:42},{k:'Android',c:'#63ffa5',v:38},{k:'Desktop',c:'#ffd75a',v:18},{k:'Other',c:'#ff4d6d',v:2}];
+    function drawPie(){
+      const W=pie.width=pie.clientWidth, H=pie.height=pie.clientHeight, cx=W/2, cy=H/2, R=Math.min(W,H)*0.32;
+      ptx.clearRect(0,0,W,H); ptx.fillStyle='#0f141c'; ptx.fillRect(0,0,W,H);
+      let start= -Math.PI/2;
+      dev.forEach(d=>{
+        const ang = (d.v/100)*Math.PI*2;
+        ptx.beginPath(); ptx.moveTo(cx,cy); ptx.arc(cx,cy,R,start,start+ang); ptx.closePath();
+        ptx.fillStyle = d.c; ptx.shadowBlur=12; ptx.shadowColor=d.c+'66'; ptx.fill(); ptx.shadowBlur=0;
+        start += ang;
+      });
+      // legend
+      const leg = document.getElementById('devLegend'); leg.innerHTML='';
+      dev.forEach(d=>{ const s=document.createElement('span'); s.className='pill'; s.innerHTML=`<span class="sw" style="background:${d.c}"></span>${d.k} • ${d.v}%`; leg.appendChild(s); });
+    }
+    drawPie();
+
+    /* ===== Audience: Geo pulse grid ===== */
+    const geo = [
+      'SEA','PDX','SFO','LAX','SLC','DEN','PHX','DAL','CHI','ATL','NYC','BOS',
+      'YVR','YYZ','MEX','BOG','LIM','SP','BA','MAD','PAR','BER','LDN','DUB'
+    ];
+    (function buildGeo(){
+      const grid = document.getElementById('geoGrid'); grid.innerHTML='';
+      geo.forEach(code=>{
+        const cell=document.createElement('div'); cell.className='geo-cell';
+        const span=document.createElement('span'); span.textContent=code; cell.appendChild(span);
+        grid.appendChild(cell);
+        cell.onclick = ()=>{ T.println('> geo zoom: '+code, 'term-success'); cell.style.boxShadow='0 0 0 2px #6ee7ff inset'; setTimeout(()=> cell.style.boxShadow='', 700); };
+      });
+      function tick(){
+        const cells=[...grid.children];
+        cells.forEach((c,i)=>{
+          const n = Math.max(0.05, Math.sin((t+i)/9)*0.5 + 0.5 + (Math.random()-0.5)*0.2);
+          c.style.background = `linear-gradient(180deg, rgba(110,231,255,${0.25*n}), rgba(99,255,165,${0.18*n}))`;
+        });
+        setTimeout(tick, 900);
+      }
+      tick();
+    })();
+
+    /* ===== Funnel ===== */
+    const fSteps = ['Visitors','Product Views','Add to Cart','Checkout','Purchase'];
+    function recomputeFunnel(){
+      const bas = 100; const rates=[0.62,0.38,0.56,0.78].map(r=> r + (Math.random()-0.5)*0.08);
+      const vals=[bas]; for(let i=0;i<rates.length;i++){ vals.push( Math.max(2, Math.round(vals[i]*rates[i])) ); }
+      const box = document.getElementById('funnel'); box.innerHTML='';
+      fSteps.forEach((s,i)=>{
+        const val = vals[i]; const pct = Math.round((val/bas)*100);
+        const row = document.createElement('div'); row.className='f-step';
+        row.innerHTML = `<div class="label">${s}</div><div class="bar"><div style="width:${pct}%; background:linear-gradient(90deg,#63ffa5,#ffd75a,#ff4d6d)"></div></div><div class="mini">${val}</div>`;
+        box.appendChild(row);
+      });
+      T2.println(`> funnel recomputed • conv: ${vals.at(-1)}/${bas}`, 'term-success');
+    }
+    document.getElementById('btn-funnel').onclick = recomputeFunnel;
+    document.getElementById('btn-funnel-reset').onclick = ()=>{ document.getElementById('funnel').innerHTML=''; T2.println('> funnel reset','term-warn'); };
+    recomputeFunnel();
+
+    /* ===== Cohort heatmap ===== */
+    const coh = document.getElementById('cohort'); const cctx = coh.getContext('2d');
+    const weeks=12, cohorts=7;
+    function drawCohort(){
+      const W=coh.width=coh.clientWidth, H=coh.height=coh.clientHeight;
+      cctx.clearRect(0,0,W,H); cctx.fillStyle='#0f141c'; cctx.fillRect(0,0,W,H);
+      const cw=W/weeks, ch=H/cohorts; const base=seeded(4.2);
+      for(let r=0;r<cohorts;r++){
+        for(let c=0;c<weeks;c++){
+          const v = Math.max(0, Math.min(1, 0.85 - 0.06*c + base()*0.25 - r*0.02));
+          const R=Math.floor(255*Math.max(0,(v-0.3)/0.7)), G=Math.floor(255*Math.min(1,v*1.2)), B=Math.floor(80*(1-v));
+          cctx.fillStyle=`rgba(${R},${G},${B},0.95)`;
+          cctx.fillRect(c*cw+1, r*ch+1, cw-2, ch-2);
         }
       }
+      // labels
+      cctx.fillStyle='#9fb3c8'; cctx.font='12px Inter,system-ui'; for(let c=0;c<weeks;c++){ cctx.fillText('W'+(c+1), c*cw+6, 12); }
+      for(let r=0;r<cohorts;r++){ cctx.fillText('C'+(r+1), 4, r*ch+14); }
+    }
+    coh.addEventListener('click', (e)=>{
+      const rect=coh.getBoundingClientRect(); const x=e.clientX-rect.left, y=e.clientY-rect.top;
+      const cw=coh.width/weeks, ch=coh.height/cohorts;
+      const c=Math.floor(x/cw), r=Math.floor(y/ch);
+      T2.println(`> cohort note: C${r+1}, W${c+1}`, 'term-warn');
+      cctx.strokeStyle='white'; cctx.lineWidth=2; cctx.strokeRect(c*cw+1, r*ch+1, cw-2, ch-2);
     });
-    // Surface best minutes
-    const best = topMinutes(curve);
-    const container = document.getElementById("bestTimes");
-    container.innerHTML = "";
-    best.forEach((b,i)=>{
-      const tag = document.createElement("span");
-      tag.className = "tag";
-      tag.textContent = `#${i+1} • ${b.label} local`;
-      container.appendChild(tag);
-    });
-  }
-  document.getElementById("predict").addEventListener("click", ()=>{
-    const p = document.getElementById("platform").value;
-    const t = document.getElementById("timezone").value;
-    renderChart(p,t);
-    addChat("ai",`For ${p}, your next best minutes are highlighted. Want me to align the schedule across IG/LinkedIn/X?`, true);
-  });
-  // initial chart
-  window.addEventListener("load", ()=>renderChart("LinkedIn","0"));
+    drawCohort();
 
-  // --------- GUIDED TOUR ---------
-  const steps = Array.from(document.querySelectorAll("[data-tour]")).map(el=>({
-    el, text: el.getAttribute("data-tour")
-  }));
-  let idx = 0;
-  const spot = document.getElementById("tourSpot");
-  const card = document.getElementById("tourCard");
-  const mask = document.getElementById("tourMask");
-  function placeStep(i){
-    const {el, text} = steps[i];
-    const r = el.getBoundingClientRect();
-    const pad = 8;
-    spot.style.left = (window.scrollX + r.left - pad) + "px";
-    spot.style.top = (window.scrollY + r.top - pad) + "px";
-    spot.style.width = (r.width + pad*2) + "px";
-    spot.style.height = (r.height + pad*2) + "px";
-    spot.classList.remove("hidden");
-    card.classList.remove("hidden");
-    mask.style.display="block";
-    document.getElementById("tourText").textContent = text;
-    // place card below or above
-    const belowTop = window.scrollY + r.bottom + 16;
-    const aboveTop = window.scrollY + r.top - card.offsetHeight - 16;
-    const useBelow = (belowTop + card.offsetHeight < window.scrollY + window.innerHeight);
-    card.style.left = (window.scrollX + r.left) + "px";
-    card.style.top  = (useBelow ? belowTop : Math.max(aboveTop, window.scrollY + 12)) + "px";
-    window.scrollTo({top: Math.max(r.top + window.scrollY - 80,0), behavior:"smooth"});
-  }
-  function endTour(){ mask.style.display="none"; spot.classList.add("hidden"); card.classList.add("hidden") }
-  document.getElementById("startTour").addEventListener("click", ()=>{ idx=0; placeStep(idx) });
-  document.getElementById("tourNext").addEventListener("click", ()=>{ idx=Math.min(idx+1, steps.length-1); placeStep(idx) });
-  document.getElementById("tourPrev").addEventListener("click", ()=>{ idx=Math.max(idx-1, 0); placeStep(idx) });
-  document.getElementById("tourSkip").addEventListener("click", endTour);
-  window.addEventListener("resize", ()=>{ if(mask.style.display==="block") placeStep(idx) });
+    /* ===== Alerts & Tasks ===== */
+    const alertSeeds = [
+      ['Spend drift detected','Rebalance Google → Meta','warn'],
+      ['Tracking degradation','Pixel lag on /thank-you','err'],
+      ['Creative fatigue risk','Rotate ad set A','warn'],
+      ['Audience overlap high','Tighten geo for LAL 2%','warn'],
+      ['All clear','Guardrails nominal','ok'],
+    ];
+    function buildAlerts(){
+      const box=document.getElementById('alertRows'); box.innerHTML='';
+      alertSeeds.forEach((a,i)=>{
+        const row=document.createElement('div'); row.className='row';
+        row.innerHTML=`<div><strong>${a[0]}</strong><div class="mini">${a[1]}</div></div>
+                       <div class="actions">
+                         <button class="btn" data-ack="${i}">Resolve</button>
+                         <button class="btn ghost" data-mute="${i}">Mute</button>
+                       </div>`;
+        box.appendChild(row);
+      });
+      box.querySelectorAll('[data-ack]').forEach(b=> b.onclick=()=>{ T2.println('✓ resolved: '+alertSeeds[b.dataset.ack][0], 'term-success'); b.closest('.row').remove(); });
+      box.querySelectorAll('[data-mute]').forEach(b=> b.onclick=()=>{ T2.println('> muted: '+alertSeeds[b.dataset.mute][0], 'term-warn'); b.closest('.row').style.opacity=.5; });
+    }
+    buildAlerts();
+    document.getElementById('btn-add-task').onclick = ()=>{
+      const box=document.getElementById('alertRows'); const row=document.createElement('div'); row.className='row';
+      row.innerHTML=`<input class="input" placeholder="Describe a task…"/><div class="actions"><button class="btn">Add</button></div>`;
+      box.prepend(row);
+    };
+    document.getElementById('btn-export').onclick = ()=>{
+      const snapshot = {
+        ts, channels: series, kpis: Object.fromEntries(kpiDefs.map(k=>[k.key,k.base])),
+        demo: Array.from(document.querySelectorAll('#demoRows .mini')).map(n=>n.textContent),
+        dev, alerts: alertSeeds
+      };
+      download('evrt_dashboard_snapshot.json', JSON.stringify(snapshot,null,2), 'application/json');
+      T2.println('✓ exported snapshot JSON', 'term-success');
+    };
+
+    /* ===== Terminal vibes ===== */
+    (function vibes(){
+      const seq = [
+        ()=> T.typeCmd('evrt monitor pull --kpis', ()=> T.println('> kpis refreshed', 'term-success')),
+        ()=> T.typeCmd('evrt predict --timeseries', ()=> T.println('> windows: 9:10–9:30, 6:05–6:30', 'term-success')),
+        ()=> T.typeCmd('evrt guardrails scan', ()=> T.println('> anomalies: 1 fatigue, 1 drift', 'term-warn')),
+      ];
+      let i=0; (function loop(){ seq[i](); i=(i+1)%seq.length; setTimeout(loop, 5200); })();
+    })();
+
+    /* ===== Resize charts on viewport changes ===== */
+    addEventListener('resize', ()=>{ drawTS(); drawCh(); drawPie(); drawCohort(); });
+
   </script>
 </body>
 </html>
