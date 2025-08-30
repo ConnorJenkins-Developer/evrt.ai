@@ -1,32 +1,66 @@
 <!-- partials/header.html -->
 <header class="site-header" role="banner">
+  <!-- Skip link for accessibility -->
+  <a href="#main" class="skip">Skip to content</a>
+
   <style>
+    /* ---- Scope everything under .site-header to avoid style bleed ---- */
     .site-header{
       --hdr-bg: rgba(7,18,27,.85);
       --hdr-line: rgba(255,255,255,.12);
       --hdr-line-strong: rgba(255,255,255,.92);
+      --neon: var(--evrt-neon, #6ee7ff);
+      --accent: var(--evrt-accent, #63ffa5);
       position:sticky;top:0;z-index:1000;background:var(--hdr-bg);
       backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08)
     }
-    .site-header .nav-wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px}
+    .site-header .skip{
+      position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;
+    }
+    .site-header .skip:focus{
+      position:fixed;left:12px;top:12px;width:auto;height:auto;z-index:1100;
+      padding:8px 12px;border-radius:8px;background:#0f141c;color:#fff;
+      border:1px solid var(--hdr-line-strong);
+    }
+    .site-header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px}
     .site-header .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-    .site-header .brand .logo{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg, var(--neon, #6ee7ff), var(--accent, #63ffa5))}
-    .site-header .brand span{font-weight:800;letter-spacing:.4px}
+    .site-header .brand .logo{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg, var(--neon), var(--accent))}
+    .site-header .brand span{font-weight:800;letter-spacing:.4px;color:#fff}
 
-    /* Desktop nav */
-    .site-header .nav{display:flex;gap:10px;align-items:center}
-    .site-header .nav a{padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px;text-decoration:none}
-    .site-header .nav a:hover{border-color:rgba(110,231,255,.45)}
-    .site-header .cta{background:linear-gradient(90deg, var(--neon, #6ee7ff), var(--accent, #63ffa5));color:#061019;border:0;font-weight:800}
+    /* Desktop nav (mega kept simple) */
+    .site-header .nav{display:flex;gap:6px;align-items:center}
+    .site-header .nav > .group{position:relative}
+    .site-header .nav > .group > summary{
+      list-style:none;cursor:pointer;user-select:none;color:#fff;
+      padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px
+    }
+    .site-header .nav > .group > summary::-webkit-details-marker{display:none}
+    .site-header .nav > .group[open] > summary{border-color:rgba(110,231,255,.45)}
+    .site-header .menu{position:absolute;left:0;top:44px;min-width:280px;display:grid;gap:8px;
+      background:#0f141c;border:1px solid var(--hdr-line-strong);border-radius:12px;
+      padding:10px;box-shadow:0 16px 50px rgba(0,0,0,.45);z-index:1001}
+    .site-header .menu a{display:block;color:#fff;text-decoration:none;padding:10px;border:1px solid var(--hdr-line);border-radius:10px}
+    .site-header .menu a:hover{border-color:rgba(110,231,255,.45)}
+    .site-header .cta{
+      background:linear-gradient(90deg, var(--neon), var(--accent));
+      color:#061019;border:0;font-weight:800;border-radius:10px;padding:8px 12px;margin-left:6px;text-decoration:none
+    }
 
-    /* Mobile toggle (CSS-only) */
+    /* Hover open for desktop, remains keyboard-accessible via <details> */
+    @media (hover:hover){
+      .site-header .group:hover .menu{display:grid}
+      .site-header .group:not(:hover) .menu{display:none}
+      .site-header .group[open] .menu{display:grid}
+    }
+
+    /* Mobile toggle */
     .site-header #navToggle{position:absolute;left:-9999px;top:-9999px}
     .site-header .menu-btn{
       display:none;align-items:center;gap:8px;background:#0f141c;color:#fff;
       padding:8px 12px;border-radius:10px;border:1px solid var(--hdr-line-strong);
       font-weight:600;cursor:pointer;user-select:none
     }
-    .site-header .menu-btn:focus{outline:2px solid var(--neon, #6ee7ff);outline-offset:2px}
+    .site-header .menu-btn:focus{outline:2px solid var(--neon);outline-offset:2px}
 
     /* Mobile catalog */
     .site-header .mnav{
@@ -36,12 +70,12 @@
     }
     .site-header .mnav .sec{padding:10px 0;border-top:1px solid var(--hdr-line)}
     .site-header .mnav .sec:first-child{border-top:0}
-    .site-header .mnav .sec-title{font-weight:800;letter-spacing:.02em;margin-bottom:6px}
-    .site-header .mnav a{display:block;padding:8px 10px;border:1px solid var(--hdr-line);border-radius:10px;text-decoration:none;margin:6px 0}
+    .site-header .mnav .sec-title{font-weight:800;letter-spacing:.02em;margin-bottom:6px;color:#fff}
+    .site-header .mnav a{display:block;padding:10px;border:1px solid var(--hdr-line);border-radius:10px;text-decoration:none;margin:6px 0;color:#fff}
     .site-header .mnav a:hover{border-color:rgba(110,231,255,.45)}
     .site-header .mnav .cta-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
     .site-header .mnav .cta-row .btn{border:1px solid var(--hdr-line-strong);border-radius:10px;padding:10px 12px;background:#0f141c;color:#fff}
-    .site-header .mnav .cta-row .neon{background:linear-gradient(90deg, var(--neon, #6ee7ff), var(--accent, #63ffa5));color:#061019;border:0;font-weight:800}
+    .site-header .mnav .cta-row .neon{background:linear-gradient(90deg, var(--neon), var(--accent));color:#061019;border:0;font-weight:800}
 
     /* Backdrop */
     .site-header .backdrop{display:none;position:fixed;inset:0;background:rgba(6,10,15,.6);backdrop-filter:blur(2px);z-index:1001}
@@ -50,41 +84,75 @@
     .site-header #navToggle:checked ~ .backdrop{display:block}
     .site-header #navToggle:checked ~ .mnav{display:block}
 
-    @media(max-width:900px){
+    /* Breakpoint */
+    @media(max-width:980px){
       .site-header .nav{display:none}
       .site-header .menu-btn{display:inline-flex}
-      .site-header .nav-wrap{position:relative}
+      .site-header .wrap{position:relative}
     }
   </style>
 
-  <div class="nav-wrap container">
+  <div class="wrap container">
     <a class="brand" href="index.html" aria-label="EVRT Home">
       <i class="logo" aria-hidden="true"></i><span>EVRT</span>
     </a>
 
-    <!-- Desktop nav -->
+    <!-- Desktop: 5-category menu with dropdowns -->
     <nav class="nav" aria-label="Primary">
-      <a href="apps.html">Apps</a>
-      <a href="social-ai.html">Social AI</a>
-      <a href="ad-studio.html">Ad Studio</a>
-      <a href="adlab.html">Ad Lab</a>
-      <a href="dashboard.html">Dashboards</a>
-      <a href="consulting.html">Consulting</a>
-      <a href="projects.html">Projects</a>
-      <a href="blog.html">Insights</a>
-      <a href="pricing.html">Pricing</a>
-      <a href="cybersecurity.html">Security</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="contact.html">Contact</a>
+      <details class="group">
+        <summary>Products</summary>
+        <div class="menu" role="menu">
+          <a href="apps.html">Apps overview</a>
+          <a href="social-ai.html">Social AI</a>
+          <a href="ad-studio.html">Ad Studio</a>
+          <a href="adlab.html">Ad Lab</a>
+          <a href="dashboard.html">Dashboards</a>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>Solutions</summary>
+        <div class="menu" role="menu">
+          <a href="consulting.html">Consulting</a>
+          <a href="industries.html">Industries</a>
+          <a href="projects.html">Projects & Case Studies</a>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>Resources</summary>
+        <div class="menu" role="menu">
+          <a href="blog.html">Insights</a>
+          <a href="pricing.html">Pricing</a>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>Trust</summary>
+        <div class="menu" role="menu">
+          <a href="cybersecurity.html">Cybersecurity</a>
+          <a href="privacy.html">Privacy</a>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>Company</summary>
+        <div class="menu" role="menu">
+          <a href="about.html">About</a>
+          <a href="press.html">Press</a>
+          <a href="careers.html">Careers</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </details>
+
       <a class="cta" href="portal.html">Start trial</a>
     </nav>
 
-    <!-- Mobile: CSS-only toggle -->
+    <!-- Mobile: compact Menu with same categories -->
     <input type="checkbox" id="navToggle" aria-hidden="true"/>
     <label for="navToggle" class="menu-btn" aria-controls="mobileCatalog" aria-expanded="false">Menu</label>
     <label for="navToggle" class="backdrop" aria-hidden="true"></label>
 
-    <!-- 5 categories + sub-links -->
     <nav id="mobileCatalog" class="mnav" aria-label="Mobile catalog">
       <div class="sec">
         <div class="sec-title">Products</div>
@@ -101,14 +169,14 @@
         <a href="projects.html">Projects & Case Studies</a>
       </div>
       <div class="sec">
-        <div class="sec-title">Trust</div>
-        <a href="cybersecurity.html">Cybersecurity</a>
-        <a href="privacy.html">Privacy</a>
-      </div>
-      <div class="sec">
         <div class="sec-title">Resources</div>
         <a href="blog.html">Insights</a>
         <a href="pricing.html">Pricing</a>
+      </div>
+      <div class="sec">
+        <div class="sec-title">Trust</div>
+        <a href="cybersecurity.html">Cybersecurity</a>
+        <a href="privacy.html">Privacy</a>
       </div>
       <div class="sec">
         <div class="sec-title">Company</div>
@@ -126,6 +194,4 @@
       </div>
     </nav>
   </div>
-
-  <!-- No inline scripts here on purpose -->
 </header>
