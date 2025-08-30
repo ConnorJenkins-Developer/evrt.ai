@@ -34,62 +34,38 @@
   <div data-include="partials/footer.html"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="assets/app.js"></script>
-  <script>
-    // ==================== CONFIG (REPLACE THESE) ====================
-    const SUPABASE_URL = "https://onhkipsguouxsraxsxfq.supabase.co";    // TODO
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uaGtpcHNndW91eHNyYXhzeGZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1MTM2MTgsImV4cCI6MjA3MjA4OTYxOH0.FaOVD9FfW8Cy7mgyDIsNoSL8LLliV-L4V--I5rbHlFs";           // TODO
-    const REDIRECT = "https://connorjenkins-developer.github.io/evrt-site/app.html";
-    // Make sure REDIRECT and this page are added in Supabase Auth → URL Configuration
-    // Site URL: https://connorjenkins-developer.github.io/evrt-site/
-    // Redirect allowlist: .../portal.html and .../app.html
-    // ===============================================================
+<script>
+const SUPABASE_URL = "https://onhkipsguouxsraxsxfq.supabase.co";        // TODO
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uaGtpcHNndW91eHNyYXhzeGZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY1MTM2MTgsImV4cCI6MjA3MjA4OTYxOH0.FaOVD9FfW8Cy7mgyDIsNoSL8LLliV-L4V--I5rbHlFs";               // TODO
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const $msg = document.getElementById('msg');
-    const $err = document.getElementById('err');
+// Build the redirect URL relative to THIS page.
+// If portal is at .../evrt-site/portal.html → redirect becomes .../evrt-site/app.html
+// If portal is at .../evrt.ai/portal.html    → redirect becomes .../evrt.ai/app.html
+const REDIRECT = new URL('app.html', window.location.href).toString();
 
-    // If already logged in, go straight to the app.
-    (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        window.location.href = "app.html";
-        return;
-      }
-      // Show any error returned by Supabase (e.g., invalid redirect)
-      const params = new URLSearchParams(window.location.search);
-      const errDesc = params.get("error_description");
-      if (errDesc) $err.textContent = errDesc;
-    })();
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Send magic link
-    document.getElementById('login').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      $err.textContent = "";
-      const email = document.getElementById('email').value.trim();
-      if (!email) return;
+(async () => {
+  const { data:{ session } } = await supabase.auth.getSession();
+  if (session) { window.location.href = "app.html"; return; }
 
-      $msg.textContent = "Sending link…";
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: REDIRECT, // absolute URL avoids path mistakes on GitHub Pages
-          shouldCreateUser: true
-        }
-      });
+  // surface any Supabase error passed back in querystring
+  const err = new URLSearchParams(location.search).get("error_description");
+  if (err) console.warn(err);
+})();
 
-      if (error) {
-        $msg.textContent = "";
-        $err.textContent = "Error: " + error.message;
-      } else {
-        $msg.textContent = "Check your email and click the link to finish signing in.";
-      }
-    });
+document.getElementById('login').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: REDIRECT, shouldCreateUser: true }
+  });
+  document.getElementById('msg').textContent =
+    error ? ("Error: " + error.message) : "Check your email and click the link.";
+});
 
-    // If the user signs in from another tab and comes back, redirect.
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") window.location.href = "app.html";
-    });
-  </script>
-</body>
-</html>
+supabase.auth.onAuthStateChange((event)=>{
+  if (event === "SIGNED_IN") window.location.href = "app.html";
+});
+</script>
