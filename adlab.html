@@ -1,167 +1,334 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>EVRT — Ad Demo Lab</title>
-  <meta name="description" content="Prototype ad studio for creatives, audience, and predicted performance." />
+  <meta name="description" content="Creative collider, probabilistic predictor, multi-armed bandit arena, anomaly radar, and export/share. Simulated. Alien-grade vibes."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/style.css"/>
+
   <style>
-    .badge{position:fixed;top:10px;right:10px;background:#ffd54d;color:#222;padding:6px 10px;border-radius:999px;font-weight:700;z-index:9}
-    .grid-3{display:grid;gap:16px}
-    @media(min-width:1000px){.grid-3{grid-template-columns:1.2fr 1fr 1fr}}
-    .drop{border:1px dashed rgba(255,255,255,.2);border-radius:12px;padding:16px;text-align:center}
-    .preview{width:100%;aspect-ratio:1/1;border-radius:12px;object-fit:cover;background:#0f141c;border:1px solid rgba(255,255,255,.08)}
-    .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:4px 10px;margin:4px 6px 0 0}
-    .pill button{background:transparent;border:none;color:#9fb3c8;cursor:pointer}
-    .row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-    .row:last-child{border-bottom:none}
-    .muted-danger{color:#f66}
-    .score{font-size:42px;font-weight:800;line-height:1}
-    .mini{font-size:12px;color:#9fb3c8}
-    .cta-sugg li{margin:0 0 6px 18px}
-    .meter{height:10px;background:#0f141c;border:1px solid rgba(255,255,255,.12);border-radius:8px;overflow:hidden}
-    .meter > div{height:100%;background:linear-gradient(90deg,#6ee7ff,#63ffa5)}
+    :root{
+      --lab-neon:#6ee7ff; --lab-accent:#63ffa5; --lab-amber:#ffd75a; --lab-danger:#ff4d6d;
+      --lab-bg:#0a0e14; --lab-card:#0f141c; --lab-grid:rgba(255,255,255,.06); --lab-mute:#8fa2b7;
+    }
+    body{ background: radial-gradient(1400px 900px at 80% -260px,#142034 0,#0a0e14 65%); }
+    /* Backdrop */
+    .lab-layers{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+    #warp{ position:absolute; inset:0; opacity:.25 }
+    .scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.26; mix-blend-mode:overlay; }
+
+    .lab-section{ position:relative; z-index:1; }
+    .eyebrow{ letter-spacing:.12em; text-transform:uppercase; color:var(--lab-mute); }
+
+    /* Tabs */
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; }
+    .tab{ padding:8px 12px; border-radius:12px; border:1px solid var(--lab-grid); cursor:pointer; user-select:none; }
+    .tab.active{ background:linear-gradient(90deg,var(--lab-neon),var(--lab-accent)); color:#061019; border:0; font-weight:800; }
+    .panel{ display:none; } .panel.active{ display:block; }
+
+    /* Cards & inputs */
+    .card-x{ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid var(--lab-grid); border-radius:14px; padding:14px; }
+    .card-x:hover{ border-color:rgba(110,231,255,.45); box-shadow:0 12px 40px rgba(110,231,255,.08), 0 0 0 1px rgba(110,231,255,.25) inset; }
+    .mini{ color:var(--lab-mute); font-size:12px; }
+    .input,.select,.textarea{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--lab-grid); background:#0f141c; color:inherit; }
+    .textarea{ min-height:100px; resize:vertical; }
+    .btn.neon{ background:linear-gradient(90deg,var(--lab-neon),var(--lab-accent)); color:#061019; border:0; font-weight:800; }
+    .btn.ghost{ border:1px solid var(--lab-grid); }
+    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .row3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+    .grid-2{ display:grid; gap:16px; grid-template-columns:1fr; }
+    .grid-3{ display:grid; gap:16px; grid-template-columns:1fr; }
+    @media(min-width:1000px){ .grid-2{ grid-template-columns: 1.1fr 1fr; } }
+    @media(min-width:1100px){ .grid-3{ grid-template-columns: 1fr 1fr 1fr; } }
+
+    /* Terminal */
+    .terminal{ background:#05080d;border:1px solid rgba(110,231,255,.25); box-shadow:0 0 40px rgba(110,231,255,.08) inset, 0 12px 40px rgba(0,0,0,.35); border-radius:12px; overflow:hidden; color:#bfefff; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .term-top{ display:flex; align-items:center; gap:8px; padding:8px 12px; background:#07121b; border-bottom:1px solid rgba(255,255,255,.06); }
+    .dot{ width:10px; height:10px; border-radius:999px; } .dot.r{ background:#ff5f56 } .dot.y{ background:#ffbd2e } .dot.g{ background:#27c93f }
+    .term-body{ height:260px; overflow:auto; padding:12px; }
+    .term-line{ white-space:pre-wrap } .term-success{ color:#63ffa5 } .term-warn{ color:#ffd75a } .term-err{ color:#ff8299 }
+    .term-caret{ display:inline-block; width:9px; height:1.05em; background:#bfefff; vertical-align:-2px; animation:blink 1s steps(1) infinite }
+    @keyframes blink{ 50%{ opacity:0 } }
+
+    /* Collider */
+    .preview{ border:1px solid rgba(255,255,255,.1); border-radius:12px; background:#0d131c; padding:12px; }
+    .p-img{ height:160px; border-radius:10px; background:#0b0e13; display:grid; place-items:center; color:#8fb; border:1px dashed rgba(255,255,255,.12); }
+    .mut{ color:var(--lab-mute); }
+    .variants{ display:grid; gap:10px; grid-template-columns:1fr; }
+    @media(min-width:900px){ .variants{ grid-template-columns:repeat(3,1fr); } }
+    .variant{ border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:10px; background:#0d131c; position:relative; overflow:hidden }
+    .tag{ position:absolute; top:8px; right:8px; background:#061019; border:1px solid rgba(255,255,255,.12); padding:2px 8px; border-radius:999px; font-size:11px; color:#bfefff }
+    .spark{ position:absolute; inset:auto auto -6px -6px; width:80px; height:80px; background:radial-gradient(closest-side, rgba(110,231,255,.45), transparent 70%); filter:blur(8px); transform:translate(var(--x,0),var(--y,0)) }
+
+    /* Predictor */
+    .gauge{ height:12px; border-radius:10px; border:1px solid var(--lab-grid); background:#0f141c; overflow:hidden; }
+    .gauge > div{ height:100%; width:0%; background:linear-gradient(90deg,#63ffa5,#ffd75a,#ff4d6d); transition:width .5s ease; }
+    #heat{ width:100%; height:280px; border:1px solid var(--lab-grid); border-radius:12px; background:#0f141c; }
+
+    /* Bandit */
+    #arena{ width:100%; height:260px; border:1px solid var(--lab-grid); border-radius:12px; background:#0f141c; }
+    .legend{ display:flex; gap:10px; flex-wrap:wrap; }
+    .pill{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--lab-grid); border-radius:999px; }
+    .sw{ display:inline-block; width:10px; height:10px; border-radius:3px; background:#6ee7ff }
+
+    /* Radar */
+    #radar{ width:100%; height:300px; border:1px solid var(--lab-grid); border-radius:12px; background:#0f141c; }
+    .alerts .row{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.06) }
+    .alerts .row:last-child{ border-bottom:0 }
+
+    /* Export */
+    .mono{ font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    /* Mobile */
+    @media(max-width:920px){ .row2,.row3{ grid-template-columns:1fr } .grid-2{ grid-template-columns:1fr } .grid-3{ grid-template-columns:1fr } }
   </style>
 </head>
 <body>
-  <div class="bg-orbs" aria-hidden="true"></div>
+  <!-- Backdrop (alien warp) -->
+  <div class="lab-layers">
+    <canvas id="warp" aria-hidden="true"></canvas>
+    <div class="scan" aria-hidden="true"></div>
+  </div>
+
   <div data-include="partials/header.html"></div>
 
-  <div class="badge">MOCK — No Login Needed</div>
-
-  <section class="container hero">
-    <span class="eyebrow">EVRT</span>
-    <h1 class="gradient-text">Ad Demo Lab</h1>
-    <p class="sub">Upload a creative, craft copy, pick an audience, and see a predicted score. Save scenarios, export JSON, and iterate fast.</p>
+  <!-- HERO -->
+  <section class="container hero lab-section" style="margin-top:20px">
+    <span class="eyebrow">EVRT — Ad Demo Lab</span>
+    <h1 class="gradient-text">Enter the Lab.<br/>Break the guessing loop.</h1>
+    <p class="sub">Collide creatives, bend probabilities, let the bandit learn, and watch the radar for anomalies. This is a simulated sandbox—fast, visceral, and a little scary.</p>
+    <div class="tabs" style="margin-top:10px">
+      <button class="tab active" data-tab="col">1) Collider</button>
+      <button class="tab" data-tab="pre">2) Predictor Core</button>
+      <button class="tab" data-tab="ban">3) Bandit Arena</button>
+      <button class="tab" data-tab="rad">4) Anomaly Radar</button>
+      <button class="tab" data-tab="exp">5) Export & Share</button>
+      <label style="margin-left:auto;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--lab-grid);padding:8px 10px;border-radius:12px;cursor:pointer">
+        <input type="checkbox" id="overclock"/> Overclock <span class="mini">⚠︎</span>
+      </label>
+    </div>
   </section>
 
-  <section class="container section grid-3">
-    <!-- LEFT: Creative & Copy -->
-    <div class="card" data-reveal>
-      <h3>1) Creative & Copy</h3>
-      <div class="drop" id="drop">
-        <input id="file" type="file" accept="image/*" style="display:none"/>
-        <img id="img" class="preview" alt="preview"/>
-        <p class="muted" style="margin-top:8px">Drop image here or <button id="pick" class="btn" type="button">Choose</button></p>
-      </div>
-      <div class="grid" style="gap:10px;margin-top:10px">
-        <input id="headline" placeholder="Headline (e.g., Grow ROAS 32% with EVRT)"/>
-        <textarea id="primary" placeholder="Primary text / body caption" rows="4"></textarea>
-        <input id="cta" placeholder="CTA (e.g., Get Started)"/>
-        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
-          <select id="objective">
-            <option value="conversions">Conversions</option>
-            <option value="leads">Leads</option>
-            <option value="traffic">Traffic</option>
-            <option value="reach">Reach</option>
-            <option value="video_views">Video views</option>
-          </select>
-          <input id="budget" type="number" min="5" value="100" placeholder="Daily budget ($)"/>
-        </div>
-      </div>
+  <!-- PANELS -->
+  <section class="container section lab-section">
+    <!-- ========== COLLIDER ========== -->
+    <div id="panel-col" class="panel active">
+      <div class="grid-2">
+        <div class="card-x">
+          <h3>Creative Collider</h3>
+          <p class="mini">Drop a visual, set headline/body, then spawn variants. The collider “mutates” semantics (simulated) and projects CTR bias.</p>
+          <div class="row3" style="margin-top:6px">
+            <label class="input" style="display:flex;align-items:center;gap:10px;cursor:pointer">
+              <input id="img" type="file" accept="image/*" style="display:none"/>
+              <span>Upload creative</span><span class="mini">PNG/JPG</span>
+            </label>
+            <input id="headline" class="input" placeholder="Headline (e.g., Predict CTR before you spend)"/>
+            <input id="body" class="input" placeholder="Body/Hook (e.g., Creative variants + predictive timing)"/>
+          </div>
+          <div class="row3" style="margin-top:8px">
+            <input id="brand" class="input" placeholder="Brand (e.g., EVRT)" value="EVRT"/>
+            <select id="tone" class="select"><option>Professional</option><option>Bold</option><option>Playful</option><option>Inquisitive</option></select>
+            <input id="cta" class="input" placeholder="CTA (e.g., Get started)" value="Get started"/>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <button id="btn-mutate" class="btn neon">Spawn 6 variants</button>
+            <button id="btn-clear-col" class="btn">Reset</button>
+            <span class="mini">Drag a variant into the Bandit Arena later.</span>
+          </div>
 
-      <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 6px">Variant Generator</h4>
-        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
-          <button class="btn" type="button" id="gen-3h">+3 Headlines</button>
-          <button class="btn" type="button" id="gen-3b">+3 Bodies</button>
+          <div class="variants" id="variants" style="margin-top:12px"></div>
         </div>
-        <div id="variants" class="muted" style="margin-top:8px"></div>
-      </div>
-    </div>
 
-    <!-- MIDDLE: Audience Builder -->
-    <div class="card" data-reveal>
-      <h3>2) Audience</h3>
-      <div class="grid" style="gap:8px">
-        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
-          <input id="locations" placeholder="Locations (comma separated: Austin, TX; Chicago, IL)"/>
-          <input id="languages" placeholder="Languages (comma separated)"/>
-        </div>
-        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
-          <div>
-            <label class="mini">Age Min</label>
-            <input id="age-min" type="number" min="13" max="65" value="25"/>
+        <div class="card-x">
+          <h3>Master Preview</h3>
+          <div class="preview">
+            <div id="prev" class="p-img">No image</div>
+            <div style="margin-top:8px">
+              <strong id="prev-h">Your headline</strong>
+              <p class="mut" id="prev-b">Your body copy / hook.</p>
+            </div>
+            <div class="gauge" style="margin-top:8px"><div id="biasBar"></div></div>
+            <div class="mini">CTR bias (simulated): <strong id="bias">—%</strong></div>
           </div>
-          <div>
-            <label class="mini">Age Max</label>
-            <input id="age-max" type="number" min="13" max="65" value="54"/>
+
+          <div class="terminal" style="margin-top:12px">
+            <div class="term-top">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <strong style="margin-left:6px">/opt/evrt/adlab</strong>
+              <span class="muted" style="margin-left:auto">root@evrt:~$</span>
+            </div>
+            <div id="term-col" class="term-body"></div>
           </div>
-        </div>
-        <div>
-          <label class="mini">Gender</label>
-          <div style="display:flex; gap:10px; margin-top:4px">
-            <label><input type="checkbox" name="gender" value="male" checked/> Male</label>
-            <label><input type="checkbox" name="gender" value="female" checked/> Female</label>
-            <label><input type="checkbox" name="gender" value="unknown"/> Unspecified</label>
-          </div>
-        </div>
-        <div>
-          <label class="mini">Interests / Behaviors</label>
-          <input id="interest-input" placeholder="Type and press Enter (e.g., SaaS, e‑commerce, fitness)"/>
-          <div id="interests" style="margin-top:6px"></div>
-        </div>
-        <div>
-          <label class="mini">Keywords</label>
-          <input id="keyword-input" placeholder="Type and press Enter (e.g., keyword research, hootsuite, semrush)"/>
-          <div id="keywords" style="margin-top:6px"></div>
-        </div>
-        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
-          <select id="platforms" multiple size="5">
-            <option>Meta (FB/IG)</option>
-            <option>TikTok</option>
-            <option>Google (Search/Display)</option>
-            <option>LinkedIn</option>
-            <option>X (Twitter)</option>
-          </select>
-          <select id="placements" multiple size="5">
-            <option>Feed</option>
-            <option>Stories/Reels</option>
-            <option>In‑Stream</option>
-            <option>Search</option>
-            <option>Right Column</option>
-          </select>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: Prediction & Insights -->
-    <div class="card" data-reveal>
-      <h3>3) Prediction</h3>
-      <div class="row">
-        <div>
-          <div class="mini">Predicted Performance</div>
-          <div class="score"><span id="score">—</span>/100</div>
+    <!-- ========== PREDICTOR CORE ========== -->
+    <div id="panel-pre" class="panel">
+      <div class="grid-2">
+        <div class="card-x">
+          <h3>Predictor Core</h3>
+          <p class="mini">Twist the knobs. The core simulates CTR/CVR/CPA/ROAS and paints the decision field.</p>
+          <div class="row3" style="margin-top:6px">
+            <div><label class="mini">Budget</label><input id="p-budget" class="input" type="number" value="2500"/></div>
+            <div><label class="mini">Novelty</label><input id="p-novelty" class="input" type="range" min="0" max="100" value="62"/></div>
+            <div><label class="mini">Target Tightness</label><input id="p-tight" class="input" type="range" min="0" max="100" value="58"/></div>
+          </div>
+          <div class="row3" style="margin-top:8px">
+            <div><label class="mini">Cadence (posts/day)</label><input id="p-cadence" class="input" type="number" value="3"/></div>
+            <div><label class="mini">Placement Mix</label>
+              <select id="p-mix" class="select"><option>Feeds+Reels</option><option>Stories-only</option><option>Search/YouTube</option><option>Mixed</option></select>
+            </div>
+            <div><label class="mini">Risk Guard</label>
+              <select id="p-guard" class="select"><option>Balanced</option><option>Aggressive</option><option>Conservative</option></select>
+            </div>
+          </div>
+
+          <div class="row2" style="margin-top:10px">
+            <div class="card-x">
+              <div class="mini">Predictions</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+                <div><div class="mini">CTR</div><strong id="pp-ctr">—%</strong></div>
+                <div><div class="mini">CVR</div><strong id="pp-cvr">—%</strong></div>
+                <div><div class="mini">CPA</div><strong>$<span id="pp-cpa">—</span></strong></div>
+                <div><div class="mini">ROAS</div><strong id="pp-roas">—×</strong></div>
+              </div>
+              <div class="gauge" style="margin-top:8px"><div id="pp-roasBar"></div></div>
+              <div class="mini" id="pp-tip" style="margin-top:6px">Tip: —</div>
+            </div>
+            <div class="card-x">
+              <div class="mini">Decision Field</div>
+              <canvas id="heat" width="600" height="280" aria-label="Decision heatmap"></canvas>
+              <div class="mini" style="margin-top:6px">Brighter = better ROI for (Novelty × Tightness). The white dot marks your current setting.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <button id="btn-pp" class="btn neon">Recompute</button>
+            <button id="btn-pp-auto" class="btn ghost">Auto-scan</button>
+          </div>
         </div>
-        <div>
-          <div class="mini">Expected CPA</div>
-          <div style="font-size:22px;font-weight:700">$<span id="cpa">—</span></div>
+
+        <div class="terminal">
+          <div class="term-top">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <strong style="margin-left:6px">/opt/evrt/predictor</strong>
+            <span class="muted" style="margin-left:auto">root@evrt:~$</span>
+          </div>
+          <div id="term-pre" class="term-body"></div>
         </div>
       </div>
-      <div class="meter" style="margin:8px 0 12px"><div id="meter" style="width:0%"></div></div>
-      <div class="mini">Why this score</div>
-      <ul id="reasons" class="cta-sugg"></ul>
+    </div>
 
-      <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 6px">Actions</h4>
-        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px">
-          <button class="btn" type="button" id="save">Save Scenario</button>
-          <button class="btn" type="button" id="export">Export JSON</button>
+    <!-- ========== BANDIT ARENA ========== -->
+    <div id="panel-ban" class="panel">
+      <div class="grid-2">
+        <div class="card-x">
+          <h3>Bandit Arena (ε-greedy)</h3>
+          <p class="mini">Drag 3 variants here (A/B/C). We’ll simulate impressions, learn the best arm, and show regret.</p>
+
+          <div class="row3" style="margin-top:6px">
+            <div class="card-x">
+              <div class="mini">Arm A</div>
+              <textarea id="armA" class="textarea" placeholder="Drop/paste Variant A"></textarea>
+              <div class="mini">CTR prior</div><input id="priorA" class="input" type="number" min="0.1" max="10" step="0.1" value="2.2"/>
+            </div>
+            <div class="card-x">
+              <div class="mini">Arm B</div>
+              <textarea id="armB" class="textarea" placeholder="Drop/paste Variant B"></textarea>
+              <div class="mini">CTR prior</div><input id="priorB" class="input" type="number" min="0.1" max="10" step="0.1" value="2.8"/>
+            </div>
+            <div class="card-x">
+              <div class="mini">Arm C</div>
+              <textarea id="armC" class="textarea" placeholder="Drop/paste Variant C"></textarea>
+              <div class="mini">CTR prior</div><input id="priorC" class="input" type="number" min="0.1" max="10" step="0.1" value="3.1"/>
+            </div>
+          </div>
+
+          <div class="row3" style="margin-top:8px">
+            <div><label class="mini">ε (explore rate)</label><input id="eps" class="input" type="range" min="0" max="100" value="15"/></div>
+            <div><label class="mini">Impressions/step</label><input id="impStep" class="input" type="number" value="800"/></div>
+            <div><label class="mini">Steps</label><input id="steps" class="input" type="number" value="24"/></div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <button id="btn-run" class="btn neon">Run</button>
+            <button id="btn-pause" class="btn">Pause</button>
+            <button id="btn-reset" class="btn ghost">Reset</button>
+            <span class="mini">Regret: <strong id="regret">0</strong></span>
+          </div>
+
+          <div style="margin-top:10px">
+            <canvas id="arena" width="640" height="260"></canvas>
+            <div class="legend" style="margin-top:8px">
+              <span class="pill"><span class="sw" style="background:#6ee7ff"></span>A</span>
+              <span class="pill"><span class="sw" style="background:#63ffa5"></span>B</span>
+              <span class="pill"><span class="sw" style="background:#ffd75a"></span>C</span>
+            </div>
+          </div>
         </div>
-        <div class="grid" style="grid-template-columns:1fr 1fr; gap:8px; margin-top:8px">
-          <button class="btn" type="button" id="reset">Reset</button>
-          <a class="btn" href="app.html">Back to App</a>
+
+        <div class="terminal">
+          <div class="term-top">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <strong style="margin-left:6px">/opt/evrt/arena</strong>
+            <span class="muted" style="margin-left:auto">root@evrt:~$</span>
+          </div>
+          <div id="term-ban" class="term-body"></div>
         </div>
-        <p class="muted" style="margin-top:6px">Saved scenarios are stored locally for now. We’ll wire this to your backend later.</p>
       </div>
+    </div>
 
-      <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 6px">Saved Scenarios</h4>
-        <div id="scenarios"></div>
+    <!-- ========== ANOMALY RADAR ========== -->
+    <div id="panel-rad" class="panel">
+      <div class="grid-2">
+        <div class="card-x">
+          <h3>Anomaly Radar</h3>
+          <p class="mini">Pulsing risk fields (simulated): brand safety, fatigue, spend drift, tracking health, audience overlap.</p>
+          <canvas id="radar" width="640" height="300"></canvas>
+          <div class="alerts" id="alerts" style="margin-top:10px"></div>
+        </div>
+
+        <div class="terminal">
+          <div class="term-top">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <strong style="margin-left:6px">/opt/evrt/radar</strong>
+            <span class="muted" style="margin-left:auto">root@evrt:~$</span>
+          </div>
+          <div id="term-rad" class="term-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== EXPORT ========== -->
+    <div id="panel-exp" class="panel">
+      <div class="grid-2">
+        <div class="card-x">
+          <h3>Export & Share</h3>
+          <p class="mini">Download a JSON of your lab state or copy a shareable link (base64 in URL hash). All client-side.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+            <button id="btn-json" class="btn neon">Download JSON</button>
+            <button id="btn-share" class="btn">Copy Share Link</button>
+            <span class="mini">Seed: <span id="seed" class="mono">—</span></span>
+          </div>
+          <div class="card-x" style="margin-top:10px">
+            <div class="mini">Disclaimer</div>
+            <p class="mut">This is a simulation for demo purposes. Metrics are synthetic and not guarantees. Always test with live data.</p>
+          </div>
+        </div>
+
+        <div class="terminal">
+          <div class="term-top">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <strong style="margin-left:6px">/opt/evrt/export</strong>
+            <span class="muted" style="margin-left:auto">root@evrt:~$</span>
+          </div>
+          <div id="term-exp" class="term-body"></div>
+        </div>
       </div>
     </div>
   </section>
@@ -170,222 +337,293 @@
 
   <script defer src="assets/app.js"></script>
   <script>
-  // --- Local state ---
-  const state = {
-    imageData: '',
-    headline: '',
-    primary: '',
-    cta: '',
-    objective: 'conversions',
-    budget: 100,
-    locations: [],
-    languages: [],
-    age: { min: 25, max: 54 },
-    genders: ['male','female'],
-    interests: [],
-    keywords: [],
-    platforms: ['Meta (FB/IG)'],
-    placements: ['Feed']
-  };
+    /* ===== Warp background (alien starfield) ===== */
+    (function warp(){
+      const c = document.getElementById('warp'); const ctx = c.getContext('2d');
+      function resize(){ c.width = innerWidth; c.height = innerHeight; }
+      resize(); addEventListener('resize', resize);
+      const N = 260, stars = [];
+      for(let i=0;i<N;i++){ stars.push({x:(Math.random()-0.5)*2, y:(Math.random()-0.5)*2, z: Math.random()*1}); }
+      let speed = 0.006;
+      const over = document.getElementById('overclock');
+      over.addEventListener('change', ()=> speed = over.checked ? 0.014 : 0.006);
+      (function tick(){
+        ctx.fillStyle = 'rgba(10,14,20,0.12)'; ctx.fillRect(0,0,c.width,c.height);
+        for(const s of stars){
+          s.z -= speed; if(s.z<=0.001){ s.x=(Math.random()-0.5)*2; s.y=(Math.random()-0.5)*2; s.z=1; }
+          const sx = (s.x/s.z)*c.width*0.25 + c.width/2;
+          const sy = (s.y/s.z)*c.height*0.25 + c.height/2;
+          const r = Math.max(0.5, (1-s.z)*2.4);
+          ctx.beginPath(); ctx.fillStyle='#6ee7ff'; ctx.globalAlpha = Math.max(.12, 1-s.z);
+          ctx.arc(sx, sy, r, 0, 6.283); ctx.fill();
+          ctx.globalAlpha=1;
+        }
+        requestAnimationFrame(tick);
+      })();
+    })();
 
-  // --- Helpers ---
-  const $ = (id)=>document.getElementById(id);
-  const byId = (id)=>document.getElementById(id);
-  function pills(containerId, items){
-    const c = $(containerId); c.innerHTML = '';
-    items.forEach((t,i)=>{
-      const el = document.createElement('span'); el.className='pill'; el.innerHTML = `<span>${t}</span> <button data-i="${i}">×</button>`;
-      el.querySelector('button').onclick = ()=>{ items.splice(i,1); pills(containerId, items); recompute(); };
-      c.appendChild(el);
-    });
-  }
-  function toList(str){ return str.split(',').map(s=>s.trim()).filter(Boolean); }
-  function download(filename, text){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'application/json'})); a.download=filename; a.click(); }
-
-  // --- Variant generation (lightweight heuristics) ---
-  function generateHeadlines(h){
-    const base = h || state.headline || 'Boost ROI with EVRT';
-    const verbs = ['Boost','Increase','Scale','Supercharge','Elevate','Maximize'];
-    const offers = ['ROI','ROAS','Leads','Revenue','Pipeline'];
-    const ctas = ['Today','Now','This Week','Fast'];
-    return [
-      base,
-      `${verbs[Math.floor(Math.random()*verbs.length)]} ${offers[Math.floor(Math.random()*offers.length)]} ${ctas[Math.floor(Math.random()*ctas.length)]}`,
-      base.replace(/\b(Boost|Grow|Increase)\b/i,'Maximize'),
-      `Cut CPA by ${10+Math.floor(Math.random()*40)}% with EVRT`,
-      `From Spend to Outcomes: ${offers[Math.floor(Math.random()*offers.length)]}`
-    ].slice(0,3);
-  }
-  function generateBodies(text){
-    const t = text || state.primary || 'EVRT predicts performance in real time and optimizes your media mix to grow ROAS.';
-    return [
-      t,
-      t + ' Try it free for 14 days.',
-      t.replace(/\b(grow|boost|increase)\b/gi,'maximize')
-    ].slice(0,3);
-  }
-
-  // --- Prediction heuristic (replace with real model later) ---
-  function scorePrediction(s){
-    let score = 50; const reasons = [];
-
-    // Headline length (5–12 words sweet spot)
-    const hWords = (s.headline||'').trim().split(/\s+/).filter(Boolean).length;
-    if (hWords>=5 && hWords<=12){ score += 10; reasons.push('Headline length is optimal (5–12 words).'); }
-    else if (hWords>0){ score += 3; reasons.push('Headline OK but consider 5–12 words.'); }
-    else { reasons.push('Add a headline.'); }
-
-    // Primary length (30–120 words sweet spot)
-    const pLen = (s.primary||'').length; // chars
-    if (pLen>=80 && pLen<=320){ score += 10; reasons.push('Body text length looks good.'); }
-    else if (pLen>0){ score += 4; reasons.push('Body text present; consider 80–320 chars.'); }
-    else { reasons.push('Add body text.'); }
-
-    // CTA presence
-    if ((s.cta||'').length>0){ score += 6; reasons.push('CTA present.'); } else { reasons.push('Consider a clear CTA.'); }
-
-    // Image present + aspect ratio
-    if (s.imageData){
-      score += 8; reasons.push('Creative uploaded.');
-      // rough guess: if portrait/square better on mobile placements
-      if (s.placements.includes('Stories/Reels')){ score += 3; reasons.push('Portrait creative suits Stories/Reels.'); }
-    } else { reasons.push('Upload a creative for higher predicted CTR.'); }
-
-    // Audience definition breadth
-    const interestCount = s.interests.length; const kwCount = s.keywords.length;
-    if (interestCount+kwCount>=3){ score += 8; reasons.push('Targeting signals defined.'); }
-    else if (interestCount+kwCount>=1){ score += 4; reasons.push('Some targeting present; consider 3+.'); }
-    else { reasons.push('Add interests/keywords to improve match quality.'); }
-
-    // Budget alignment to objective
-    if (s.objective==='conversions' && s.budget>=50){ score += 4; reasons.push('Budget aligns with conversion objective.'); }
-    if (s.objective==='reach' && s.budget>=20){ score += 3; }
-
-    // Platform diversity (2+)
-    const plat = s.platforms.length; if (plat>=2){ score += 4; reasons.push('Multi-platform mix improves reach.'); }
-
-    // Age span sanity
-    if (s.age.min < s.age.max){ score += 2; } else { reasons.push('Fix age range.'); }
-
-    // Clamp
-    score = Math.max(0, Math.min(100, score));
-
-    // Simple CPA guess from score & budget
-    const baseCpa = 45; // arbitrary
-    const cpa = Math.max(4, Math.round((baseCpa * (90/(score||1))) * 100) / 100);
-
-    return { score, cpa, reasons };
-  }
-
-  function recompute(){
-    const { score, cpa, reasons } = scorePrediction(state);
-    byId('score').textContent = score.toString();
-    byId('cpa').textContent = cpa.toString();
-    byId('meter').style.width = score + '%';
-    const ul = byId('reasons'); ul.innerHTML='';
-    reasons.forEach(r=>{ const li=document.createElement('li'); li.textContent=r; ul.appendChild(li); });
-    persistDraft();
-  }
-
-  // --- Persist draft locally ---
-  const DRAFT_KEY = 'evrt_adlab_draft_v1';
-  function persistDraft(){ localStorage.setItem(DRAFT_KEY, JSON.stringify(state)); }
-  function loadDraft(){ try{ return JSON.parse(localStorage.getItem(DRAFT_KEY)||'null') }catch{return null} }
-
-  // --- Scenario save/load ---
-  const SC_KEY = 'evrt_adlab_scenarios_v1';
-  function loadScenarios(){ try{ return JSON.parse(localStorage.getItem(SC_KEY)||'[]') }catch{return []} }
-  function saveScenario(s){ const list = loadScenarios(); list.unshift({ id: Date.now(), ...s }); localStorage.setItem(SC_KEY, JSON.stringify(list)); renderScenarios(); }
-  function renderScenarios(){
-    const box = byId('scenarios'); const list = loadScenarios();
-    if (!list.length){ box.innerHTML = '<p class="muted">No saved scenarios yet.</p>'; return; }
-    box.innerHTML = list.map(sc=>`<div class="row"><div><strong>${sc.headline||'Untitled'}</strong><div class="mini">${(sc.locations||[]).join(', ')||'Any'}</div></div><div><button class="btn" data-load="${sc.id}">Load</button> <button class="btn" data-del="${sc.id}">Delete</button></div></div>`).join('');
-    box.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{ const id=+b.dataset.load; const found = list.find(x=>x.id===id); if(found){ Object.assign(state, found); hydrateUI(); recompute(); }});
-    box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ const id=+b.dataset.del; const rest = list.filter(x=>x.id!==id); localStorage.setItem(SC_KEY, JSON.stringify(rest)); renderScenarios(); });
-  }
-
-  // --- UI bindings ---
-  function hydrateUI(){
-    byId('headline').value = state.headline;
-    byId('primary').value = state.primary;
-    byId('cta').value = state.cta;
-    byId('objective').value = state.objective;
-    byId('budget').value = state.budget;
-    byId('locations').value = state.locations.join(', ');
-    byId('languages').value = state.languages.join(', ');
-    byId('age-min').value = state.age.min;
-    byId('age-max').value = state.age.max;
-    document.querySelectorAll('input[name="gender"]').forEach(cb=>{ cb.checked = state.genders.includes(cb.value); });
-    // pills
-    pills('interests', state.interests);
-    pills('keywords', state.keywords);
-    // selects
-    const platSel = byId('platforms'); [...platSel.options].forEach(o=> o.selected = state.platforms.includes(o.value));
-    const plcSel = byId('placements'); [...plcSel.options].forEach(o=> o.selected = state.placements.includes(o.value));
-    // image
-    if (state.imageData) { byId('img').src = state.imageData; } else { byId('img').removeAttribute('src'); }
-  }
-
-  function bindInputs(){
-    byId('headline').oninput = e=>{ state.headline=e.target.value; recompute(); };
-    byId('primary').oninput = e=>{ state.primary=e.target.value; recompute(); };
-    byId('cta').oninput = e=>{ state.cta=e.target.value; recompute(); };
-    byId('objective').onchange = e=>{ state.objective=e.target.value; recompute(); };
-    byId('budget').oninput = e=>{ state.budget=+e.target.value||0; recompute(); };
-
-    byId('locations').onchange = e=>{ state.locations = toList(e.target.value); recompute(); };
-    byId('languages').onchange = e=>{ state.languages = toList(e.target.value); recompute(); };
-    byId('age-min').oninput = e=>{ state.age.min = +e.target.value||13; recompute(); };
-    byId('age-max').oninput = e=>{ state.age.max = +e.target.value||65; recompute(); };
-    document.querySelectorAll('input[name="gender"]').forEach(cb=> cb.onchange = ()=>{
-      state.genders = [...document.querySelectorAll('input[name="gender"]:checked')].map(x=>x.value);
-      recompute();
+    /* ===== Tabs ===== */
+    document.querySelectorAll('.tab').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+      });
     });
 
-    byId('interest-input').addEventListener('keydown', e=>{
-      if (e.key==='Enter'){ e.preventDefault(); const v=e.target.value.trim(); if(v && !state.interests.includes(v)){ state.interests.push(v); pills('interests', state.interests); e.target.value=''; recompute(); } }
+    /* ===== Terminal helpers ===== */
+    function makeTerm(el){
+      const term = document.getElementById(el);
+      function println(s, cls=''){ const d=document.createElement('div'); d.className='term-line '+cls; d.textContent=s; term.appendChild(d); term.scrollTop=term.scrollHeight; }
+      function typeCmd(cmd, cb){
+        const row=document.createElement('div'); row.className='term-line'; term.appendChild(row); let i=0;
+        const iv=setInterval(()=>{ row.textContent='$ '+cmd.slice(0,++i)+(i%2?'_':''); term.scrollTop=term.scrollHeight;
+          if(i>=cmd.length){ clearInterval(iv); row.innerHTML='$ '+cmd+' <span class="term-caret"></span>'; cb&&cb(); } }, 18);
+      }
+      return { println, typeCmd };
+    }
+    const TCOL = makeTerm('term-col'), TPRE = makeTerm('term-pre'), TBAN = makeTerm('term-ban'), TRAD = makeTerm('term-rad'), TEXP = makeTerm('term-exp');
+
+    /* ===== COLLIDER ===== */
+    const prev = document.getElementById('prev'), prevH = document.getElementById('prev-h'), prevB = document.getElementById('prev-b');
+    const biasBar = document.getElementById('biasBar'), biasTxt = document.getElementById('bias');
+    const headline = document.getElementById('headline'), body = document.getElementById('body'), brand = document.getElementById('brand'), tone = document.getElementById('tone'), cta = document.getElementById('cta');
+    function updateMaster(){
+      prevH.textContent = headline.value || 'Predict CTR before you spend';
+      prevB.textContent = (body.value || 'Creative variants + predictive timing.') + (cta.value? (' — '+cta.value):'');
+      const bias = Math.max(0, Math.min(100, (prevH.textContent.length%70) + (tone.value==='Bold'?12:0) + (/\d/.test(prevH.textContent)?10:0)));
+      biasBar.style.width = (bias)+'%'; biasTxt.textContent = (1.2 + bias/50).toFixed(1) + '%';
+    }
+    [headline, body, brand, tone, cta].forEach(el=> el.addEventListener('input', updateMaster));
+    document.getElementById('img').addEventListener('change', (e)=>{
+      const f = e.target.files[0]; if(!f) return;
+      const url = URL.createObjectURL(f);
+      prev.style.background = `center/cover no-repeat url("${url}")`; prev.textContent='';
+      TCOL.typeCmd('evrt collider attach --image', ()=> TCOL.println('✓ image attached (preview only)', 'term-success'));
     });
-    byId('keyword-input').addEventListener('keydown', e=>{
-      if (e.key==='Enter'){ e.preventDefault(); const v=e.target.value.trim(); if(v && !state.keywords.includes(v)){ state.keywords.push(v); pills('keywords', state.keywords); e.target.value=''; recompute(); } }
-    });
 
-    byId('platforms').onchange = e=>{ state.platforms = [...e.target.selectedOptions].map(o=>o.value); recompute(); };
-    byId('placements').onchange = e=>{ state.placements = [...e.target.selectedOptions].map(o=>o.value); recompute(); };
+    const variants = document.getElementById('variants');
+    function mutate(){
+      variants.innerHTML='';
+      const seeds = [
+        'Hook fast. Win big.', 'Less guess. More signal.', 'Predict before you spend.',
+        'Variants that compound.', 'Your next best action.', 'Cut CPA, keep quality.'
+      ];
+      for(let i=0;i<6;i++){
+        const v = document.createElement('div'); v.className='variant'; v.draggable=true;
+        const h = (brand.value||'EVRT') + ': ' + (seeds[(i+Math.floor(Math.random()*seeds.length))%seeds.length]);
+        const b = (tone.value==='Playful' ? '✨ ' : '') + (body.value || 'Creative variants + predictive timing.');
+        const bias = (Math.random()*2.8 + 1.2).toFixed(1);
+        v.innerHTML = `<span class="tag">${bias}% CTR bias</span><strong>${h}</strong><p class="mut">${b} — ${cta.value||'Learn more'}</p><div class="spark"></div>`;
+        // sparkle drift
+        const sp = v.querySelector('.spark'); let t=0; (function wig(){ t+=0.06; sp.style.setProperty('--x', (Math.sin(t+i)*16)+'px'); sp.style.setProperty('--y', (Math.cos(t*1.2+i)*12)+'px'); requestAnimationFrame(wig); })();
+        // drag payload
+        v.addEventListener('dragstart', ev=>{
+          ev.dataTransfer.setData('text/plain', JSON.stringify({h,b,ctr: +bias}));
+          TBAN.println('> dragged variant → Arena', 'term-warn');
+        });
+        variants.appendChild(v);
+      }
+      TCOL.typeCmd('evrt collider spawn --n 6', ()=> TCOL.println('✓ 6 variants spawned', 'term-success'));
+    }
+    document.getElementById('btn-mutate').onclick = mutate;
+    document.getElementById('btn-clear-col').onclick = ()=>{ variants.innerHTML=''; headline.value=''; body.value=''; cta.value=''; updateMaster(); };
 
-    // Image pick/drag
-    byId('pick').onclick = ()=> byId('file').click();
-    byId('file').onchange = handleFile;
-    const drop = byId('drop');
-    ;['dragenter','dragover'].forEach(ev=> drop.addEventListener(ev, (e)=>{e.preventDefault(); drop.style.background='rgba(255,255,255,.03)'; }));
-    ;['dragleave','drop'].forEach(ev=> drop.addEventListener(ev, (e)=>{e.preventDefault(); drop.style.background='transparent'; }));
-    drop.addEventListener('drop', (e)=>{ const f=e.dataTransfer.files?.[0]; if(f) loadImage(f); });
-
-    // Variants
-    byId('gen-3h').onclick = ()=>{
-      const arr = generateHeadlines();
-      byId('variants').innerHTML = '<div class="mini">Headlines</div>' + arr.map(h=>`<div class="row"><span>${h}</span><button class="btn" data-useh>Use</button></div>`).join('');
-      byId('variants').querySelectorAll('[data-useh]').forEach((b,i)=> b.onclick=()=>{ state.headline = arr[i]; hydrateUI(); recompute(); });
+    /* ===== PREDICTOR CORE ===== */
+    const pBudget = document.getElementById('p-budget'), pNovel = document.getElementById('p-novelty'), pTight = document.getElementById('p-tight'), pCad = document.getElementById('p-cadence'), pMix = document.getElementById('p-mix'), pGuard = document.getElementById('p-guard');
+    const pp = { ctr:document.getElementById('pp-ctr'), cvr:document.getElementById('pp-cvr'), cpa:document.getElementById('pp-cpa'), roas:document.getElementById('pp-roas'), roasBar:document.getElementById('pp-roasBar'), tip:document.getElementById('pp-tip') };
+    const heat = document.getElementById('heat'); const hctx = heat.getContext('2d');
+    function predictCore(){
+      const N = +pNovel.value/100, T = +pTight.value/100, B = +pBudget.value;
+      const mixBoost = ({'Feeds+Reels':1.0,'Stories-only':0.92,'Search/YouTube':1.06,'Mixed':1.03})[pMix.value];
+      const guard = ({Balanced:1.0, Aggressive:1.08, Conservative:0.92})[pGuard.value];
+      const ctr = (1.2 + 3.8*N*guard*mixBoost).toFixed(1);
+      const cvr = (1.0 + 2.6*T*mixBoost).toFixed(1);
+      const cpa = ( (14 - 6*N*0.6 + 4*(1-T)) * (1/guard) ).toFixed(2);
+      const roas = ( (1.6 + 2.4*N + 0.6*T) * mixBoost ).toFixed(1);
+      pp.ctr.textContent = ctr+'%'; pp.cvr.textContent = cvr+'%'; pp.cpa.textContent = cpa; pp.roas.textContent = roas+'×';
+      pp.roasBar.style.width = Math.min(100, roas*22) + '%';
+      pp.tip.textContent = (N>0.6? 'Lean into novelty; watch fatigue in 5–7 days.':'Add creative novelty; current mix is safe but slow.');
+      drawDecision(N, T);
+      TPRE.println(`> CTR ${ctr}% • CVR ${cvr}% • CPA $${cpa} • ROAS ${roas}×`, 'term-success');
+    }
+    function drawDecision(N,T){
+      const W=heat.width, H=heat.height; hctx.clearRect(0,0,W,H); hctx.fillStyle='#0f141c'; hctx.fillRect(0,0,W,H);
+      const cols=36, rows=18, cw=W/cols, ch=H/rows;
+      for(let y=0;y<rows;y++){
+        for(let x=0;x<cols;x++){
+          const n=x/(cols-1), t=y/(rows-1);
+          const val = Math.max(0, Math.min(1, 0.35 + 0.6*n + 0.4*t - 0.3*n*t + (Math.sin((x+y)*0.6)*0.05) ));
+          const r = Math.floor(255*Math.max(0, (val-0.3)/0.7));
+          const g = Math.floor(255*Math.min(1, val*1.2));
+          const b = Math.floor(80*(1-val));
+          hctx.fillStyle = `rgba(${r},${g},${b},0.95)`;
+          hctx.fillRect(x*cw, y*ch, cw, ch);
+        }
+      }
+      // cursor
+      hctx.strokeStyle='white'; hctx.lineWidth=2; hctx.beginPath(); hctx.arc(N*W, T*H, 8, 0, 6.283); hctx.stroke();
+    }
+    document.getElementById('btn-pp').onclick = predictCore;
+    document.getElementById('btn-pp-auto').onclick = ()=>{
+      let i=0; const loop = setInterval(()=>{ pNovel.value = (10 + (i*7)%90); pTight.value=(20 + (i*13)%80); predictCore(); if(++i>18) clearInterval(loop); }, 140);
+      TPRE.typeCmd('evrt predictor scan --grid', ()=> TPRE.println('✓ autoscan complete', 'term-success'));
     };
-    byId('gen-3b').onclick = ()=>{
-      const arr = generateBodies();
-      byId('variants').innerHTML = '<div class="mini">Bodies</div>' + arr.map(h=>`<div class="row"><span>${h}</span><button class="btn" data-useb>Use</button></div>`).join('');
-      byId('variants').querySelectorAll('[data-useb]').forEach((b,i)=> b.onclick=()=>{ state.primary = arr[i]; hydrateUI(); recompute(); });
+    [pBudget,pNovel,pTight,pCad,pMix,pGuard].forEach(el=> el.addEventListener('change', predictCore));
+    predictCore();
+
+    /* ===== BANDIT ARENA ===== */
+    const arena = document.getElementById('arena'); const actx = arena.getContext('2d');
+    const eps = document.getElementById('eps'), impStep = document.getElementById('impStep'), steps = document.getElementById('steps'), regretEl = document.getElementById('regret');
+    const priors = {A:document.getElementById('priorA'),B:document.getElementById('priorB'),C:document.getElementById('priorC')};
+    // allow drop from collider
+    ['armA','armB','armC'].forEach(id=>{
+      const el=document.getElementById(id);
+      el.addEventListener('dragover', e=> e.preventDefault());
+      el.addEventListener('drop', e=>{ e.preventDefault(); try{ const d=JSON.parse(e.dataTransfer.getData('text/plain')); el.value = d.h + ' — ' + d.b; if(d.ctr) priors[ id.slice(-1).toUpperCase() ].value = d.ctr; TBAN.println('> variant attached: '+id.toUpperCase(), 'term-success'); }catch{} });
+    });
+
+    let sim, paused=true, tStep=0, regret=0;
+    const series = {A:[],B:[],C:[]}; const colors = {A:'#6ee7ff', B:'#63ffa5', C:'#ffd75a'};
+    function resetArena(){
+      series.A.length=series.B.length=series.C.length=0; tStep=0; regret=0; regretEl.textContent='0'; drawArena();
+      TBAN.println('> arena reset', 'term-warn');
+    }
+    function drawArena(){
+      const W=arena.width, H=arena.height; actx.clearRect(0,0,W,H);
+      actx.fillStyle='#0f141c'; actx.fillRect(0,0,W,H);
+      actx.strokeStyle='rgba(255,255,255,.08)'; for(let i=0;i<5;i++){ actx.beginPath(); actx.moveTo(36, 20+i*(H-60)/4); actx.lineTo(W-20, 20+i*(H-60)/4); actx.stroke(); }
+      function plot(key, arr){
+        actx.strokeStyle = colors[key]; actx.lineWidth=2; actx.beginPath();
+        arr.forEach((v,i)=>{ const x = 36 + (i/Math.max(1,steps.value))* (W-60); const y = H-28 - (H-60) * (v/ (impStep.value* (i+1))); if(i===0) actx.moveTo(x,y); else actx.lineTo(x,y); });
+        actx.stroke();
+      }
+      plot('A', series.A); plot('B', series.B); plot('C', series.C);
+      actx.fillStyle='#9fb3c8'; actx.font='12px Inter,system-ui'; actx.fillText('Conversions per step (cumulative ratio)', 40, 16);
+    }
+    function runStep(){
+      const epsRate = +eps.value/100;
+      const arms = ['A','B','C'];
+      const pri = {A:+priors.A.value/100, B:+priors.B.value/100, C:+priors.C.value/100}; // probabilities
+      const means = arms.map(a=> (series[a].length? series[a].reduce((x,y)=>x+y,0)/ (impStep.value*series[a].length): pri[a]) );
+      let arm;
+      if(Math.random() < epsRate){ arm = arms[Math.floor(Math.random()*3)]; }
+      else{
+        const idx = means.indexOf(Math.max(...means)); arm = arms[idx];
+      }
+      const imps = +impStep.value;
+      const conv = binomial(imps, pri[arm]);
+      (series[arm].push( (series[arm].slice(-1)[0]||0) + conv ));
+      // compute regret (best arm vs chosen)
+      const bestP = Math.max(pri.A, pri.B, pri.C);
+      regret += Math.round((bestP - pri[arm]) * imps);
+      regretEl.textContent = regret.toLocaleString();
+      drawArena();
+      TBAN.println(`> step ${tStep+1}: ${arm} • conv ${conv} / ${imps}`, 'term-success');
+      tStep++;
+      if(tStep >= +steps.value){ pauseSim(); TBAN.println('✓ arena complete', 'term-success'); }
+    }
+    function binomial(n,p){ let k=0; for(let i=0;i<n;i++){ if(Math.random()<p) k++; } return k; }
+    function startSim(){ if(!sim){ paused=false; sim=setInterval(runStep, document.getElementById('overclock').checked? 140:260); TBAN.typeCmd('evrt arena run --eps '+(+eps.value/100).toFixed(2), ()=>{}); } }
+    function pauseSim(){ clearInterval(sim); sim=null; paused=true; TBAN.println('> paused', 'term-warn'); }
+    document.getElementById('btn-run').onclick = startSim;
+    document.getElementById('btn-pause').onclick = pauseSim;
+    document.getElementById('btn-reset').onclick = resetArena;
+    resetArena();
+
+    /* ===== RADAR ===== */
+    const radar = document.getElementById('radar'); const rctx = radar.getContext('2d');
+    const axes = ['Brand safety','Fatigue','Spend drift','Tracking health','Overlap'];
+    let rvals = [0.12,0.22,0.10,0.78,0.18]; // 0..1 (health for some, risk for others)
+    function drawRadar(){
+      const W=radar.width, H=radar.height, cx=W/2, cy=H/2, R=Math.min(W,H)*0.38;
+      rctx.clearRect(0,0,W,H);
+      rctx.fillStyle='#0f141c'; rctx.fillRect(0,0,W,H);
+      // grid
+      rctx.strokeStyle='rgba(255,255,255,.08)';
+      for(let g=1; g<=4; g++){ rctx.beginPath(); for(let i=0;i<axes.length;i++){ const a=(i/axes.length)*Math.PI*2; const x=cx+Math.cos(a)*R*g/4, y=cy+Math.sin(a)*R*g/4; if(i===0) rctx.moveTo(x,y); else rctx.lineTo(x,y);} rctx.closePath(); rctx.stroke(); }
+      // axes & labels
+      rctx.fillStyle='#9fb3c8'; rctx.font='12px Inter,system-ui'; rctx.textAlign='center';
+      for(let i=0;i<axes.length;i++){ const a=(i/axes.length)*Math.PI*2; rctx.beginPath(); rctx.moveTo(cx,cy); rctx.lineTo(cx+Math.cos(a)*R, cy+Math.sin(a)*R); rctx.stroke(); rctx.fillText(axes[i], cx+Math.cos(a)*(R+16), cy+Math.sin(a)*(R+16)); }
+      // polygon
+      rctx.beginPath(); for(let i=0;i<axes.length;i++){ const a=(i/axes.length)*Math.PI*2; const rr = R*(rvals[i]); const x=cx+Math.cos(a)*rr, y=cy+Math.sin(a)*rr; if(i===0) rctx.moveTo(x,y); else rctx.lineTo(x,y); }
+      rctx.closePath(); rctx.fillStyle='rgba(110,231,255,.22)'; rctx.strokeStyle='#6ee7ff'; rctx.lineWidth=2; rctx.fill(); rctx.stroke();
+    }
+    function pulseRadar(){
+      // random walk with bias: tracking health tends to stay high, fatigue creeps up with overclock
+      const over = document.getElementById('overclock').checked;
+      rvals = rvals.map((v,i)=>{
+        let drift = (Math.random()-0.5)*0.08;
+        if(i===3) drift = Math.min(drift, 0); // tracking health tends to drift down slowly
+        if(i===1 && over) drift += 0.05; // fatigue increases when overclocked
+        return Math.max(0.05, Math.min(0.95, v + drift));
+      });
+      drawRadar(); renderAlerts();
+    }
+    function renderAlerts(){
+      const el = document.getElementById('alerts'); el.innerHTML='';
+      const alerts = [];
+      if(rvals[1]>0.72) alerts.push(['Creative fatigue risk', 'Swap variants; freq cap ↑', 'warn']);
+      if(rvals[4]>0.66) alerts.push(['Audience overlap high', 'Tighten geo or interests', 'warn']);
+      if(rvals[2]>0.58) alerts.push(['Spend drift', 'Budget pacing off; reallocate', 'warn']);
+      if(rvals[3]<0.42) alerts.push(['Tracking degradation', 'Check pixels/UTM stream', 'err']);
+      if(rvals[0]<0.35) alerts.push(['Brand safety dip', 'Re-scan assets/keywords', 'warn']);
+      if(alerts.length===0) alerts.push(['All clear', 'Guardrails nominal', 'ok']);
+      alerts.forEach(a=>{
+        const row = document.createElement('div'); row.className='row';
+        row.innerHTML = `<span>${a[0]}</span><span class="mini">${a[1]}</span>`;
+        el.appendChild(row);
+      });
+      TRAD.println('> radar update • '+alerts[0][0], alerts[0][2]==='ok'?'term-success':alerts[0][2]==='err'?'term-err':'term-warn');
+    }
+    drawRadar(); setInterval(pulseRadar, 900);
+
+    /* ===== EXPORT / SHARE ===== */
+    function gatherState(){
+      return {
+        collider: { brand:brand.value, tone:tone.value, headline:headline.value, body:body.value, cta:cta.value },
+        predictor: { budget:+pBudget.value, novelty:+pNovel.value, tight:+pTight.value, cadence:+pCad.value, mix:pMix.value, guard:pGuard.value },
+        arena: {
+          eps:+eps.value, impStep:+impStep.value, steps:+steps.value,
+          priors: {A:+priors.A.value, B:+priors.B.value, C:+priors.C.value},
+          series
+        },
+        radar: { rvals }
+      };
+    }
+    function download(name, text, type='text/plain'){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); }
+    document.getElementById('btn-json').onclick = ()=>{ const state = gatherState(); download('evrt_adlab_state.json', JSON.stringify(state,null,2), 'application/json'); TEXP.println('✓ exported JSON', 'term-success'); };
+    document.getElementById('btn-share').onclick = ()=>{
+      const state = gatherState(); const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(state)))); const url = location.origin+location.pathname+'#'+b64;
+      navigator.clipboard.writeText(url).then(()=> TEXP.println('✓ share link copied', 'term-success'));
+      document.getElementById('seed').textContent = b64.slice(0,18)+'…';
     };
+    // restore from hash if present
+    (function restore(){
+      if(location.hash.length>2){
+        try{
+          const obj = JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1)))));
+          brand.value=obj.collider.brand||''; tone.value=obj.collider.tone||'Professional'; headline.value=obj.collider.headline||''; body.value=obj.collider.body||''; cta.value=obj.collider.cta||'';
+          pBudget.value=obj.predictor.budget||2500; pNovel.value=obj.predictor.novelty||50; pTight.value=obj.predictor.tight||50; pCad.value=obj.predictor.cadence||3; pMix.value=obj.predictor.mix||'Mixed'; pGuard.value=obj.predictor.guard||'Balanced';
+          eps.value=obj.arena.eps||15; impStep.value=obj.arena.impStep||800; steps.value=obj.arena.steps||24; priors.A.value=obj.arena.priors.A||2.2; priors.B.value=obj.arena.priors.B||2.8; priors.C.value=obj.arena.priors.C||3.1;
+          if(obj.arena.series){ series.A = obj.arena.series.A||[]; series.B=obj.arena.series.B||[]; series.C=obj.arena.series.C||[]; drawArena(); }
+          if(obj.radar?.rvals){ rvals=obj.radar.rvals; drawRadar(); }
+          updateMaster(); predictCore();
+          TEXP.println('> state restored from link', 'term-success');
+        }catch(e){ TEXP.println('! failed to restore state', 'term-err'); }
+      }
+    })();
 
-    // Actions
-    byId('save').onclick = ()=>{ saveScenario(JSON.parse(JSON.stringify(state))); };
-    byId('export').onclick = ()=>{ download('ad_scenario.json', JSON.stringify({ ...state, prediction: scorePrediction(state) }, null, 2)); };
-    byId('reset').onclick = ()=>{ localStorage.removeItem(DRAFT_KEY); Object.assign(state, { imageData:'', headline:'', primary:'', cta:'', objective:'conversions', budget:100, locations:[], languages:[], age:{min:25,max:54}, genders:['male','female'], interests:[], keywords:[], platforms:['Meta (FB/IG)'], placements:['Feed'] }); hydrateUI(); recompute(); };
-  }
-
-  function handleFile(e){ const f=e.target.files?.[0]; if (f) loadImage(f); }
-  function loadImage(f){ const r=new FileReader(); r.onload=()=>{ state.imageData=r.result; hydrateUI(); recompute(); }; r.readAsDataURL(f); }
-
-  // --- Boot ---
-  (async ()=>{
-    const draft = loadDraft(); if (draft) Object.assign(state, draft);
-    hydrateUI(); bindInputs(); renderScenarios(); recompute();
-  })();
+    /* ===== Kickoff defaults ===== */
+    (function kickoff(){
+      updateMaster();
+      TCOL.typeCmd('evrt collider ready', ()=> TCOL.println('> waiting for input', 'term-success'));
+      TPRE.typeCmd('evrt predictor warmup', ()=>{});
+      TBAN.typeCmd('evrt arena standby', ()=>{});
+      TRAD.typeCmd('evrt radar calibrate', ()=>{});
+      TEXP.typeCmd('evrt export online', ()=>{});
+    })();
   </script>
 </body>
 </html>
