@@ -1,35 +1,371 @@
-<!DOCTYPE html><html lang="en" data-theme="dark">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>About EVRT — EVRT</title>
-  <meta name="description" content="Outcomes-first. Product-minded. Privacy-respecting."/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>EVRT — About</title>
+  <meta name="description" content="Why EVRT exists: proof-driven growth, predictive systems, secure guardrails. Founder story, principles, and method."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
-  <link rel="icon" href="assets/favicon.svg">
-  <meta property="og:title" content="About EVRT — EVRT">
-  <meta property="og:description" content="Outcomes-first. Product-minded. Privacy-respecting.">
-  <meta property="og:image" content="assets/og-image.svg">
   <link rel="stylesheet" href="assets/style.css"/>
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="EVRT — About"/>
+  <meta property="og:description" content="Proof-driven growth. Predictive systems. Secure guardrails. Built by Connor Jenkins."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://connorjenkins-developer.github.io/evrt.ai/about.html"/>
+  <meta property="og:image" content="https://connorjenkins-developer.github.io/evrt.ai/assets/evrt-og.png"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+
+  <style>
+    :root{
+      --ab-neon:#6ee7ff; --ab-accent:#63ffa5; --ab-amber:#ffd75a; --ab-danger:#ff4d6d;
+      --ab-bg:#0a0e14; --ab-card:#0f141c; --ab-grid:rgba(255,255,255,.06); --ab-mute:#8fa2b7;
+    }
+    body{ background: radial-gradient(1400px 900px at 80% -260px,#142034 0,#0a0e14 65%); }
+
+    /* Backdrop */
+    .layers{ position:fixed; inset:0; z-index:0; pointer-events:none }
+    #halo{ position:absolute; inset:0; opacity:.26 }
+    .scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.26; mix-blend-mode:overlay }
+
+    /* Layout & UI */
+    .section{ position:relative; z-index:1 }
+    .eyebrow{ letter-spacing:.12em; text-transform:uppercase; color:var(--ab-mute) }
+    .muted{ color:var(--ab-mute) }
+    .row{ display:flex; justify-content:space-between; align-items:center; gap:10px }
+    .row.wrap{ flex-wrap:wrap }
+    .grid{ display:grid; gap:14px }
+    .grid-2{ display:grid; gap:14px; grid-template-columns:1fr; }
+    @media(min-width:980px){ .grid-2{ grid-template-columns:1.1fr 1fr } }
+    .card{ position:relative; border:1px solid var(--ab-grid); border-radius:16px; background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); padding:14px; overflow:hidden }
+    .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--ab-grid); border-radius:999px; font-size:12px }
+    .tag{ font-size:11px; padding:2px 8px; border:1px solid var(--ab-grid); border-radius:999px; color:var(--ab-mute) }
+    .tags{ display:flex; gap:6px; flex-wrap:wrap }
+
+    .btn.neon{ background:linear-gradient(90deg,var(--ab-neon),var(--ab-accent)); color:#061019; border:0; font-weight:800 }
+    .btn.ghost{ border:1px solid var(--ab-grid) }
+
+    /* Founder block */
+    .bio{ display:grid; grid-template-columns:84px 1fr; gap:12px; align-items:center }
+    .head{ width:84px; height:84px; border-radius:14px; border:1px solid var(--ab-grid); background:linear-gradient(180deg,#6ee7ff33,#63ffa533) }
+
+    /* Console */
+    .crt{ font-family:ui-monospace, Menlo, Consolas, monospace; background:#05080d; border:1px solid rgba(110,231,255,.35); border-radius:12px; color:#9fd1ff; padding:12px; min-height:120px }
+    .blink{ animation: blink 1s steps(1) infinite }
+    @keyframes blink{ 50% { opacity:0 } }
+
+    /* Counters */
+    .counters{ display:grid; gap:10px; grid-template-columns:1fr 1fr; }
+    @media(min-width:900px){ .counters{ grid-template-columns:repeat(4,1fr) } }
+    .count{ text-align:center; border:1px solid var(--ab-grid); border-radius:12px; padding:14px; background:#0f141c }
+    .count .num{ font-size:28px; font-weight:900 }
+
+    /* Timeline */
+    .timeline{ display:flex; gap:10px; overflow:auto; padding-bottom:6px }
+    .mile{ min-width:280px; border:1px solid var(--ab-grid); border-radius:12px; background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); padding:10px }
+
+    /* Sticky CTA */
+    .sticky-cta{ position:sticky; bottom:12px; z-index:40; display:flex; justify-content:center }
+    .sticky-cta .bar{ width:min(1080px,92vw); backdrop-filter:blur(8px); background:#07121b; border:1px solid rgba(110,231,255,.35); border-radius:14px; padding:10px; display:flex; gap:10px; align-items:center }
+    .ping{ width:8px; height:8px; border-radius:50%; background:#63ffa5; box-shadow:0 0 0 6px rgba(99,255,165,.15) }
+  </style>
 </head>
 <body>
-  <div class="bg-orbs" aria-hidden="true"></div>
+  <!-- Backdrop -->
+  <div class="layers">
+    <canvas id="halo" aria-hidden="true"></canvas>
+    <div class="scan" aria-hidden="true"></div>
+  </div>
+
   <div data-include="partials/header.html"></div>
 
-  <section class="container hero">
-    
-    <h1 class="gradient-text">About EVRT</h1>
-    <p class="sub">Outcomes-first. Product-minded. Privacy-respecting.</p>
-    <div class="hero-cta"></div>
+  <!-- HERO -->
+  <section class="container hero section" style="margin-top:20px">
+    <span class="eyebrow">About EVRT</span>
+    <h1 class="gradient-text">Proof-Driven Growth.<br/>Predictive Systems. Secure Guardrails.</h1>
+    <p class="sub">We build compounding advantages: **Social AI** that predicts the best minute to post, **Ad Studio** that simulates mixes before spend, **Ad Lab** that hunts winners, and **Dashboards/Security** that keep trust while you scale.</p>
+    <div class="tags" style="margin-top:10px">
+      <span class="tag">Predictive Scheduling</span><span class="tag">Bandit Exploration</span><span class="tag">ROAS Modeling</span><span class="tag">PII-Safe Telemetry</span><span class="tag">Guardrails</span>
+    </div>
   </section>
 
-  
-<section class="container section grid grid-2">
-  <div class="card" data-reveal><h3>Who we are</h3><p class="muted">A product + consulting studio shipping AI-forward systems for growth teams.</p></div>
-  <div class="card" data-reveal><h3>How we work</h3><p class="muted">Hypothesis → experiment → scale → productize.</p></div>
-</section>
+  <!-- FOUNDER -->
+  <section class="container section grid-2">
+    <div class="card">
+      <div class="row">
+        <h3 style="margin:0">Founder’s Note</h3>
+        <div class="tags"><span class="badge">EVRT</span><span class="badge">Proof > Promises</span></div>
+      </div>
+      <div class="bio" style="margin-top:10px">
+        <div class="head" id="headshot"></div>
+        <div>
+          <strong>Connor Jenkins</strong>
+          <div class="muted">Founder, EVRT</div>
+          <div class="tags" style="margin-top:6px"><span class="tag">Consultant</span><span class="tag">Data Analysis</span><span class="tag">Marketing</span><span class="tag">Software Dev</span></div>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:10px">
+        I started EVRT to collapse the gap between **strategy decks** and **real lift**. My background blends <strong>data analysis</strong>, <strong>marketing</strong>, and <strong>software development</strong>—so instead of “advice,” I ship working systems: predictors that time content to micro-peaks of attention, bandit engines that find winning angles fast, and dashboards with **security guardrails** so leaders can move quickly without breaking trust.
+      </p>
+      <p class="muted">If you’re optimizing in the dark, you’re guessing. We replace guessing with **measurable experiments** and ship outcomes you can screenshot.</p>
+      <div class="row wrap" style="margin-top:10px">
+        <button id="dlBio" class="btn">Download bio (.txt)</button>
+        <button id="dlCV" class="btn">Download resume (.pdf)</button>
+        <a class="btn neon" href="consulting.html">Book a consult</a>
+      </div>
+    </div>
 
+    <!-- Mission console -->
+    <div class="card">
+      <div class="row">
+        <h3 style="margin:0">Mission Console</h3>
+        <div class="muted">Status feed (demo)</div>
+      </div>
+      <pre id="console" class="crt" aria-live="polite"></pre>
+      <div class="row wrap" style="margin-top:8px">
+        <button id="replay" class="btn">Replay</button>
+        <span class="muted">Live logs in client portals during engagements.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRINCIPLES -->
+  <section class="container section">
+    <div class="row">
+      <h3 style="margin:0">Operating Principles</h3>
+      <div class="muted">The rules we don’t break.</div>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr; gap:12px; margin-top:8px">
+      <div class="card">
+        <strong>1) Proof before scale</strong>
+        <p class="muted">We pilot in days, validate with clear lift (CTR/CPA/ROAS), then scale. No hand-wavy “brand halo.”</p>
+      </div>
+      <div class="card">
+        <strong>2) Guardrails over gut feel</strong>
+        <p class="muted">Security and data hygiene are built-in. If a move risks trust, we automate the brake.</p>
+      </div>
+      <div class="card">
+        <strong>3) Predict then decide</strong>
+        <p class="muted">Predictive minute scheduling, mix modeling, and bandits make decisions obvious.</p>
+      </div>
+      <div class="card">
+        <strong>4) Time to insight matters</strong>
+        <p class="muted">Dashboards that surface winners in hours—not post-mortems weeks later.</p>
+      </div>
+      <div class="card">
+        <strong>5) Build once, compound forever</strong>
+        <p class="muted">Playbooks become software. Every engagement improves the engine.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHOD & COUNTERS -->
+  <section class="container section">
+    <div class="grid-2">
+      <div class="card">
+        <div class="row"><h3 style="margin:0">Method — EVRT Loop</h3><div class="muted">Blueprint → Launch → Learn → Prove</div></div>
+        <div class="timeline" style="margin-top:8px">
+          <div class="mile"><div class="badge">Blueprint</div><strong>Scope & Signals</strong><p class="muted">Define metrics, guardrails, and hypotheses.</p></div>
+          <div class="mile"><div class="badge">Launch</div><strong>Predict & Explore</strong><p class="muted">Best-minute scheduler + bandit rotation start learning.</p></div>
+          <div class="mile"><div class="badge">Learn</div><strong>Readouts</strong><p class="muted">Cohorts, anomalies, creative deltas, spend efficiency.</p></div>
+          <div class="mile"><div class="badge">Prove</div><strong>Lift & Scale</strong><p class="muted">Freeze winners; publish case with evidence.</p></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row"><h3 style="margin:0">Credibility Snapshot</h3><div class="muted">Demo counters</div></div>
+        <div class="counters" style="margin-top:8px">
+          <div class="count"><div class="num" data-k="clients">0</div><div class="muted">clients served</div></div>
+          <div class="count"><div class="num" data-k="lift">0×</div><div class="muted">median ROAS lift</div></div>
+          <div class="count"><div class="num" data-k="weeks">0</div><div class="muted">weeks to first win</div></div>
+          <div class="count"><div class="num" data-k="incidents">0</div><div class="muted">critical incidents</div></div>
+        </div>
+        <div class="row wrap" style="margin-top:10px">
+          <a class="btn" href="projects.html">See projects</a>
+          <a class="btn" href="blog.html">See studies</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MILESTONES -->
+  <section class="container section">
+    <div class="row"><h3 style="margin:0">Milestones</h3><div class="muted">Selected moments (demo)</div></div>
+    <div class="timeline" style="margin-top:8px">
+      <div class="mile"><div class="badge">2025</div><strong>Social AI v2</strong><p class="muted">Best-minute predictions across platforms; median +18% CTR in week one pilots.</p></div>
+      <div class="mile"><div class="badge">2025</div><strong>Ad Studio Planner</strong><p class="muted">Predictive mix selection; +2.1× ROAS in D2C pilot.</p></div>
+      <div class="mile"><div class="badge">2025</div><strong>Security Guardrails</strong><p class="muted">Zero critical incidents during finance launch (demo).</p></div>
+    </div>
+  </section>
+
+  <!-- DOWNLOADS -->
+  <section class="container section">
+    <div class="card">
+      <div class="row"><h3 style="margin:0">Downloads</h3><div class="muted">One-pager, bio, resume</div></div>
+      <div class="row wrap" style="margin-top:8px">
+        <button id="dlOnePager" class="btn neon">Company one-pager (.md)</button>
+        <button id="dlBio2" class="btn">Connor bio (.txt)</button>
+        <button id="dlCV2" class="btn">Connor resume (.pdf)</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sticky CTA -->
+  <div class="sticky-cta">
+    <div class="bar">
+      <span class="badge"><span class="ping"></span> Proof-driven delivery</span>
+      <div class="muted" style="flex:1">Ready to build your case study? We’ll ship a 3-week sprint and measure lift.</div>
+      <a class="btn neon" href="consulting.html">Book consult</a>
+    </div>
+  </div>
 
   <div data-include="partials/footer.html"></div>
+
   <script defer src="assets/app.js"></script>
-</body></html>
+  <script>
+    /* ===== Backdrop halo ===== */
+    (function haloFX(){
+      const c=document.getElementById('halo'), ctx=c.getContext('2d');
+      function resize(){ c.width=innerWidth; c.height=innerHeight; }
+      resize(); addEventListener('resize', resize);
+      const orbs = Array.from({length:7}, ()=>({x:Math.random()*c.width, y:Math.random()*c.height*0.6, r: 90+Math.random()*160, dx:(Math.random()-.5)*0.45, dy:(Math.random()-.5)*0.45, hue: 180+Math.random()*90}));
+      (function tick(){
+        ctx.clearRect(0,0,c.width,c.height);
+        orbs.forEach(o=>{
+          o.x+=o.dx; o.y+=o.dy; if(o.x<-120||o.x>c.width+120) o.dx*=-1; if(o.y<-120||o.y>c.height*0.8) o.dy*=-1;
+          const g=ctx.createRadialGradient(o.x,o.y, 0, o.x,o.y, o.r);
+          g.addColorStop(0, `hsla(${o.hue}, 100%, 60%, .12)`); g.addColorStop(1, 'transparent');
+          ctx.fillStyle=g; ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,6.283); ctx.fill();
+        });
+        requestAnimationFrame(tick);
+      })();
+    })();
+
+    /* ===== Founder headshot (placeholder) ===== */
+    (function makeHeadshot(){
+      const c=document.createElement('canvas'), ctx=c.getContext('2d'); c.width=256; c.height=256;
+      const g=ctx.createLinearGradient(0,0,256,256); g.addColorStop(0,'#0a0e14'); g.addColorStop(1,'#0f141c'); ctx.fillStyle=g; ctx.fillRect(0,0,256,256);
+      ctx.fillStyle='#6ee7ff'; ctx.font='bold 68px Space Grotesk, sans-serif'; ctx.textAlign='center'; ctx.fillText('CJ', 128, 155);
+      const url=c.toDataURL('image/png'); const box=document.getElementById('headshot'); box.style.backgroundImage=`url(${url})`; box.style.backgroundSize='cover';
+    })();
+
+    /* ===== Mission console typing ===== */
+    (function consoleFX(){
+      const el = document.getElementById('console');
+      const lines = [
+        'boot: evrt/mission console v1.2',
+        'check: guardrails • ok    telemetry • ok    anomalies • none',
+        'load: predictors (best-minute) • ready',
+        'init: bandit rotation (ε=0.15) • live',
+        'task: “make it obvious what to do next” • measuring…',
+        'result: CTR +18% median in week one (pilot) • scale ✅'
+      ];
+      let i=0, j=0; el.textContent='';
+      function type(){
+        if(i >= lines.length) { el.innerHTML += '\n<span class="blink">▌</span>'; return; }
+        const line = lines[i];
+        if(j <= line.length){
+          el.textContent = el.textContent.replace(/\n?▌?$/,'') + line.slice(0,j) + '\n▌';
+          j++; setTimeout(type, 10 + Math.random()*30);
+        } else {
+          i++; j=0; setTimeout(type, 400);
+        }
+      }
+      type();
+      document.getElementById('replay').onclick = ()=>{ i=0; j=0; el.textContent=''; type(); };
+    })();
+
+    /* ===== Counters (demo) ===== */
+    (function counters(){
+      const targets = { clients: 48, lift: 2.1, weeks: 3, incidents: 0 };
+      const dur = 900, steps = 36;
+      const ints = {};
+      function tick(k, fmt){
+        let i=0; clearInterval(ints[k]);
+        ints[k]=setInterval(()=>{
+          i++; const t = i/steps; const v = k==='lift' ? (1 + (targets.lift-1)*t) : Math.round(targets[k]*t);
+          document.querySelector(`.num[data-k="${k}"]`).textContent = fmt? fmt(v) : v;
+          if(i>=steps) clearInterval(ints[k]);
+        }, dur/steps);
+      }
+      tick('clients'); tick('lift', v=> v.toFixed(1)+'×'); tick('weeks'); tick('incidents');
+    })();
+
+    /* ===== Downloads ===== */
+    function kebab(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
+    function download(text, name, type){
+      const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    }
+    const bioText = `Connor Jenkins — Founder, EVRT
+Role: Consultant • Data Analysis • Marketing • Software Dev
+Email: connorje3kins@gmail.com
+
+Bio:
+Connor founded EVRT to replace guesswork with proof-driven systems. He blends data analysis, marketing strategy, and software engineering to ship predictors (best-minute scheduling), adaptive exploration (bandits), and dashboards with security guardrails—so leaders can move faster without breaking trust.
+`;
+    const resumePDF = `EVRT Resume — Connor Jenkins
+Summary: Consultant across data, marketing, and software development. Founder of EVRT. Builds predictive growth systems and secure analytics.
+Highlights:
+- Social AI: minute-level post prediction to lift CTR
+- Ad Studio: predictive mix planning to improve ROAS
+- Ad Lab: bandit-led creative exploration to find winners fast
+- Dashboards & Guardrails: measurable readouts with security-first practices
+Contact: connorje3kins@gmail.com
+`;
+
+    function onePager(){
+      const md = [
+        '# EVRT — One-Pager',
+        '',
+        '**What we do**',
+        '- Predictive Social AI: best-minute scheduling to lift CTR',
+        '- Ad Studio: simulate budget mixes before spend',
+        '- Ad Lab: bandit exploration to identify winning angles fast',
+        '- Dashboards + Security: PII-safe telemetry, anomaly alerts, guardrails',
+        '',
+        '**Why it works**',
+        '- Proof before scale: run pilots with measurable lift, then roll out',
+        '- Guardrails over gut feel: move fast without risking trust',
+        '',
+        '**Founder**',
+        'Connor Jenkins — Consultant | Data Analysis | Marketing | Software Dev',
+        'Email: connorje3kins@gmail.com',
+        '',
+        '**Selected Results (demo)**',
+        '- +18% CTR median in week-one pilots via best-minute scheduling',
+        '- +2.1× ROAS in D2C mix planning pilot',
+        '- 0 critical incidents during finance launch (guardrails)',
+        '',
+        '[Book a consult](consulting.html)'
+      ].join('\n');
+      download(md, 'evrt-one-pager.md', 'text/markdown');
+    }
+    document.getElementById('dlOnePager').onclick = onePager;
+    document.getElementById('dlBio').onclick = ()=> download(bioText, 'connor-jenkins-bio.txt', 'text/plain');
+    document.getElementById('dlBio2').onclick = ()=> download(bioText, 'connor-jenkins-bio.txt', 'text/plain');
+
+    // PDF placeholder (simple text blob with .pdf extension for now)
+    function dlPDF(){ download(resumePDF, 'connor-jenkins-resume.pdf', 'application/pdf'); }
+    document.getElementById('dlCV').onclick = dlPDF;
+    document.getElementById('dlCV2').onclick = dlPDF;
+
+    /* ===== JSON-LD ===== */
+    (function schema(){
+      const org = {
+        '@context':'https://schema.org', '@type':'Organization',
+        name:'EVRT', url: location.origin + '/evrt.ai/', logo: location.origin + '/evrt.ai/assets/evrt-og.png',
+        founder:{ '@type':'Person', name:'Connor Jenkins', email:'connorje3kins@gmail.com' }
+      };
+      const person = {
+        '@context':'https://schema.org', '@type':'Person',
+        name:'Connor Jenkins', email:'connorje3kins@gmail.com',
+        jobTitle:'Founder', worksFor:{'@type':'Organization','name':'EVRT'}
+      };
+      const s1=document.createElement('script'); s1.type='application/ld+json'; s1.textContent=JSON.stringify(org); document.head.appendChild(s1);
+      const s2=document.createElement('script'); s2.type='application/ld+json'; s2.textContent=JSON.stringify(person); document.head.appendChild(s2);
+    })();
+  </script>
+</body>
+</html>
