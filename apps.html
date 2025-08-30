@@ -3,392 +3,454 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Apps by EVRT — Social AI, Ads Optimizer, Monitor & More</title>
-  <meta name="description" content="The EVRT suite powers modern growth teams: Social AI for creation & timing, Ads Optimizer for creative lift, Monitor for privacy-first listening, and more."/>
+  <title>EVRT — Apps</title>
+  <meta name="description" content="EVRT App Launcher: Social AI, Ad Studio, Ad Lab, Dashboard, Cybersecurity, and more. Filters, live metrics, and a cinematic UX."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="assets/style.css"/>
 
-  <!-- Page-scoped styles (minimal, plays nice with global CSS) -->
   <style>
-    .subnav {
-      position: sticky; top: 64px; z-index: 40;
-      background: color-mix(in oklab, var(--bg) 90%, transparent);
-      backdrop-filter: blur(8px);
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
+    :root{
+      --apps-neon:#6ee7ff; --apps-accent:#63ffa5; --apps-amber:#ffd75a; --apps-danger:#ff4d6d;
+      --apps-bg:#0a0e14; --apps-card:#0f141c; --apps-grid:rgba(255,255,255,.06); --apps-mute:#8fa2b7;
     }
-    .subnav .rail { display:flex; gap:10px; flex-wrap:wrap; padding:10px 0; }
-    .pill { display:inline-flex; align-items:center; gap:.5rem; padding:.55rem .8rem; border-radius:999px; border:1px solid var(--line); background:#0e121b; font-weight:600; font-size:.95rem; }
-    .pill:hover { border-color: color-mix(in oklab,var(--line) 60%, hsl(var(--accent)) 40%); transform: translateY(-1px); transition:.2s; }
-    .muted{ color:var(--muted); }
+    body{ background: radial-gradient(1400px 900px at 80% -260px,#142034 0,#0a0e14 65%); }
 
-    .spot-card { display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; }
-    .spot-card .left { min-width:260px; flex: 1 1 280px; }
-    .spot-card .right { flex: 2 1 340px; }
+    /* Backdrop */
+    .layers{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+    #field{ position:absolute; inset:0; opacity:.25 }
+    .scan{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px) 0 0/100% 3px; opacity:.26; mix-blend-mode:overlay; }
 
-    /* tiny mock components to “feel” productized */
-    .ui-badge { display:inline-flex; align-items:center; gap:.4rem; padding:.35rem .6rem; border:1px solid var(--line); border-radius:999px; font-size:.8rem; background: #0e121b; }
+    .section{ position:relative; z-index:1; }
+    .eyebrow{ letter-spacing:.12em; text-transform:uppercase; color:var(--apps-mute); }
 
-    /* Ad preview mock */
-    .seg { display:inline-flex; gap:6px; border:1px solid var(--line); background:#0e121b; padding:4px; border-radius:999px; }
-    .seg button { border:0; background:transparent; color:var(--text); padding:.45rem .8rem; border-radius:999px; font-weight:700; cursor:pointer; }
-    .seg button.active { background:linear-gradient(90deg,hsl(var(--accent)/.35),hsl(var(--accent-2)/.35)); }
-    .ad-card {
-      --media-h: 220px;
-      --cta: linear-gradient(90deg,hsl(var(--accent)),hsl(var(--accent-2)));
-      background:#0c111a; border:1px solid var(--line); border-radius:14px; padding:14px;
-      max-width:520px; box-shadow: var(--shadow-lg); transition: .28s ease;
+    /* Controls */
+    .controls{ display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+    .control{ border:1px solid var(--apps-grid); border-radius:12px; background:#0f141c; padding:10px 12px; color:inherit }
+    .chips{ display:flex; flex-wrap:wrap; gap:8px }
+    .chip{ padding:6px 10px; border-radius:999px; border:1px solid var(--apps-grid); cursor:pointer; user-select:none }
+    .chip.active{ background:linear-gradient(90deg,var(--apps-neon),var(--apps-accent)); color:#061019; border:0; font-weight:800; }
+
+    /* Dock */
+    .dock{ display:flex; gap:10px; overflow:auto; padding-bottom:4px }
+    .dock-item{ min-width:160px; background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid var(--apps-grid); border-radius:12px; padding:10px; position:relative }
+    .dock-item .mini{ color:var(--apps-mute); font-size:12px }
+    .dock-item .glow{ position:absolute; inset:auto auto -8px -8px; width:80px; height:80px; background:radial-gradient(closest-side, rgba(110,231,255,.35), transparent 70%); filter:blur(10px) }
+
+    /* Grid */
+    .grid{ display:grid; gap:14px; grid-template-columns:1fr; }
+    @media(min-width:850px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+    @media(min-width:1200px){ .grid{ grid-template-columns:repeat(3,1fr); } }
+
+    /* Cards */
+    .card{ position:relative; border:1px solid var(--apps-grid); border-radius:16px; background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); padding:14px; overflow:hidden; transform-style:preserve-3d; transition:transform .15s ease, box-shadow .2s ease, border-color .2s; }
+    .card:hover{ border-color:rgba(110,231,255,.45); box-shadow:0 14px 50px rgba(110,231,255,.10), 0 0 0 1px rgba(110,231,255,.25) inset; }
+    .card .orb{ position:absolute; inset:auto auto -10% -10%; width:140px; height:140px; background:radial-gradient(closest-side, rgba(110,231,255,.28), transparent 70%); filter:blur(12px); pointer-events:none }
+    .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--apps-grid); border-radius:999px; font-size:12px; }
+    .muted{ color:var(--apps-mute); }
+    .row{ display:flex; justify-content:space-between; align-items:center; gap:10px }
+    .row.wrap{ flex-wrap:wrap }
+    .btn.neon{ background:linear-gradient(90deg,var(--apps-neon),var(--apps-accent)); color:#061019; border:0; font-weight:800; }
+    .btn.ghost{ border:1px solid var(--apps-grid); }
+    .tags{ display:flex; gap:6px; flex-wrap:wrap; }
+    .tag{ font-size:11px; padding:2px 8px; border:1px solid var(--apps-grid); border-radius:999px; color:var(--apps-mute) }
+
+    /* Live bits */
+    .ping{ width:8px; height:8px; border-radius:50%; background:#63ffa5; box-shadow:0 0 0 6px rgba(99,255,165,.15); }
+    .knum{ font-weight:900; font-size:20px }
+
+    /* App Race & Compare */
+    canvas.chart{ width:100%; height:240px; border:1px solid var(--apps-grid); border-radius:12px; background:#0f141c; }
+    .compare-drawer{ position:fixed; left:50%; transform:translateX(-50%); bottom:18px; width:min(1080px,92vw); background:#07121b; border:1px solid rgba(110,231,255,.35); border-radius:14px; z-index:40; display:none; }
+    .compare-drawer .inner{ padding:12px }
+    .compare-list{ display:flex; gap:8px; flex-wrap:wrap; }
+    .pill{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--apps-grid); border-radius:999px; background:#0f141c; }
+    #radar{ width:100%; height:240px; border:1px solid var(--apps-grid); border-radius:12px; background:#0f141c; }
+
+    /* Command Palette */
+    .palette{ position:fixed; inset:0; display:none; place-items:center; z-index:60; backdrop-filter:blur(6px); background:rgba(5,8,13,.55) }
+    .palette .box{ width:min(800px,92vw); background:#0f141c; border:1px solid var(--apps-grid); border-radius:12px; overflow:hidden }
+    .palette input{ width:100%; padding:12px; border:0; outline:0; background:#0b0e13; color:inherit; font-size:16px }
+    .palette .rows{ max-height:300px; overflow:auto }
+    .palette .row{ padding:10px 12px; border-top:1px solid rgba(255,255,255,.06); display:flex; justify-content:space-between; gap:8px; cursor:pointer }
+    .palette .row:hover{ background:rgba(110,231,255,.08) }
+
+    /* Grid overlay decoration */
+    .grid-overlay{ position:relative; }
+    .grid-overlay::before{
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px,
+        linear-gradient(0deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/ 40px 40px;
+      mask: linear-gradient(to bottom, transparent, rgba(0,0,0,.3) 20%, rgba(0,0,0,.3) 80%, transparent);
+      opacity:.22; border-radius:16px;
     }
-    .ad-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .ad-brand { display:flex; align-items:center; gap:10px; font-weight:800; }
-    .ad-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,hsl(var(--accent)),hsl(var(--accent-2))); }
-    .ad-media { height:var(--media-h); border-radius:12px; margin-top:10px;
-      background: radial-gradient(100% 120% at 10% 10%, hsl(var(--accent)/.45), transparent),
-                  radial-gradient(120% 120% at 90% 20%, hsl(var(--accent-2)/.35), transparent),
-                  radial-gradient(120% 120% at 40% 80%, hsl(320 90% 55%/.30), transparent);
-      transition:height .28s ease;
-    }
-    .ad-footer { display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
-    .ad-cta { padding:.5rem .8rem; border-radius:999px; border:1px solid var(--line); background:var(--cta); color:#fff; font-weight:800; }
 
-    /* platform variants via data-attr */
-    .ad-card[data-platform="facebook"] { --media-h: 220px; --cta: linear-gradient(90deg,#2d6bff,#00b7ff); }
-    .ad-card[data-platform="instagram"] { --media-h: 300px; --cta: linear-gradient(90deg,#ff4ecd,#ffb347); }
-    .ad-card[data-platform="tiktok"] { --media-h: 420px; --cta: linear-gradient(90deg,#00f2ea,#ff0050); }
-
-    .icons { display:grid; gap:14px; grid-template-columns:repeat(6,minmax(0,1fr)); }
-    @media (max-width: 980px){ .icons { grid-template-columns:repeat(3,minmax(0,1fr)); } }
-    .ico { display:grid; place-items:center; height:64px; border-radius:12px; border:1px solid var(--line); background:#0e121b; font-weight:700; }
-
-    .price-grid { display:grid; gap:22px; grid-template-columns: repeat(3,minmax(0,1fr)); }
-    @media (max-width: 980px) { .price-grid { grid-template-columns: 1fr; } }
-    .price .tag { font-size:.9rem; color:var(--muted); margin-bottom:.25rem; }
-    .price .value { font-size:2.1rem; font-weight:800; }
-    .price.pro { border-color:hsl(var(--accent)/.5); box-shadow:0 20px 50px hsl(var(--accent)/.18); }
+    @media(max-width:880px){ .row.wrap>.btn{ width:100% } }
   </style>
 </head>
-
 <body>
-  <div class="bg-orbs" aria-hidden="true"></div>
+  <!-- Backdrop -->
+  <div class="layers">
+    <canvas id="field" aria-hidden="true"></canvas>
+    <div class="scan" aria-hidden="true"></div>
+  </div>
+
   <div data-include="partials/header.html"></div>
 
-  <!-- Hero -->
-  <section class="container hero">
-    <span class="eyebrow">Suite</span>
-    <h1 class="gradient-text">Apps by EVRT</h1>
-    <p class="sub">A focused toolkit for creation, predictive timing, analytics, and privacy-first listening—built for teams that ship.</p>
-    <div class="hero-cta">
-      <a class="btn primary" href="#social-ai">Launch Social AI</a>
-      <a class="btn" href="pricing.html">Compare plans</a>
+  <!-- HERO -->
+  <section class="container hero section" style="margin-top:20px">
+    <span class="eyebrow">EVRT Apps</span>
+    <h1 class="gradient-text">Launchpad.<br/>Pick your weapon.</h1>
+    <p class="sub">Search, filter, pin favorites to the Dock, compare apps, and dive in. Everything’s simulated but feels alive.</p>
+
+    <!-- Controls -->
+    <div class="controls" style="margin-top:10px">
+      <input id="search" class="control" placeholder="Search apps (Press ⌘K / Ctrl+K)…" />
+      <div class="chips" id="chips">
+        <span class="chip active" data-cat="all">All</span>
+        <span class="chip" data-cat="marketing">Marketing</span>
+        <span class="chip" data-cat="analytics">Analytics</span>
+        <span class="chip" data-cat="security">Security</span>
+        <span class="chip" data-cat="ops">Ops</span>
+      </div>
+      <button id="shuffle" class="btn">Shuffle</button>
+      <button id="clearPins" class="btn ghost">Clear Dock</button>
     </div>
   </section>
 
-  <!-- Sticky sub-nav -->
-  <div class="subnav">
-    <div class="container rail">
-      <a class="pill" href="#suite">Overview</a>
-      <a class="pill" href="#social-ai">Social AI</a>
-      <a class="pill" href="#ads">Ads Optimizer</a>
-      <a class="pill" href="#monitor">Monitor</a>
-      <a class="pill" href="#kit">Attribution Kit</a>
-      <a class="pill" href="#integrations">Integrations</a>
-      <a class="pill" href="#security">Security</a>
-      <a class="pill" href="#faq">FAQ</a>
-      <a class="pill" href="#cta">Get started</a>
+  <!-- DOCK -->
+  <section class="container section">
+    <div class="row wrap">
+      <h3 style="margin:0">Dock (Favorites)</h3>
+      <div class="muted">Drag/Pin any app to keep it here. Stored locally.</div>
+    </div>
+    <div id="dock" class="dock" style="margin-top:8px"></div>
+  </section>
+
+  <!-- GRID -->
+  <section class="container section">
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- RACE + COMPARE -->
+  <section class="container section">
+    <div class="grid">
+      <div class="card grid-overlay">
+        <div class="row">
+          <h3 style="margin:0">App Race — ROI / Speed / Impact</h3>
+          <div class="muted">Simulated bar race. Toggle metric:</div>
+        </div>
+        <div class="chips" id="metrics" style="margin-top:8px">
+          <span class="chip active" data-m="roi">ROI</span>
+          <span class="chip" data-m="speed">Speed</span>
+          <span class="chip" data-m="impact">Impact</span>
+        </div>
+        <canvas id="race" class="chart" width="800" height="240"></canvas>
+      </div>
+      <div class="card grid-overlay">
+        <div class="row">
+          <h3 style="margin:0">Spotlight</h3>
+          <div class="muted">Rotates every few seconds.</div>
+        </div>
+        <div id="spot" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARE DRAWER -->
+  <div id="drawer" class="compare-drawer">
+    <div class="inner">
+      <div class="row wrap">
+        <strong>Compare</strong>
+        <div class="compare-list" id="compareList"></div>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button id="runCompare" class="btn neon">Run compare</button>
+          <button id="closeDrawer" class="btn">Close</button>
+        </div>
+      </div>
+      <canvas id="radar" width="900" height="240" style="margin-top:10px"></canvas>
     </div>
   </div>
 
-  <!-- Suite overview -->
-  <section id="suite" class="container section">
-    <div class="grid grid-3">
-      <a class="card" href="#social-ai" data-reveal>
-        <div class="icon">✨</div>
-        <h3>EVRT Social AI</h3>
-        <p class="muted">Compose on-brand content, predict best-minute timing per platform, schedule everywhere, measure lift.</p>
-        <span class="ui-badge">Live demo available</span>
-      </a>
-      <a class="card" href="#ads" data-reveal>
-        <div class="icon">🎯</div>
-        <h3>Ads Optimizer</h3>
-        <p class="muted">Score creative, generate variants, and get budget/split hints informed by historical performance.</p>
-        <span class="ui-badge">Creative scoring</span>
-      </a>
-      <a class="card" href="#monitor" data-reveal>
-        <div class="icon">🛰️</div>
-        <h3>Monitor</h3>
-        <p class="muted">Brand & competitor listening without creepiness. Clear signals, anomaly alerts, and idea pipelines.</p>
-        <span class="ui-badge">Privacy-first</span>
-      </a>
+  <!-- COMMAND PALETTE -->
+  <div id="palette" class="palette" aria-modal="true" role="dialog">
+    <div class="box">
+      <input id="palInput" placeholder="Type to jump to an app…"/>
+      <div id="palRows" class="rows"></div>
     </div>
-  </section>
-
-  <!-- Social AI Spotlight (with platform picker & live mock) -->
-  <section id="social-ai" class="container section">
-    <div class="spot-card spotlight" data-reveal>
-      <div class="left">
-        <h2 class="gradient-text" style="margin:0 0 6px;font-family:'Space Grotesk',Inter,sans-serif">EVRT Social AI</h2>
-        <p class="muted" style="margin:0">Draft once → tailor per platform → schedule at the best minute → measure creative-level lift.</p>
-        <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
-          <a class="btn primary" href="index.html#demo">Launch live demo</a>
-          <a class="btn" href="social-ai.html">Product page</a>
-          <a class="btn" href="pricing.html">Pricing</a>
-        </div>
-        <ul class="check" style="margin-top:12px">
-          <li><div></div><div><strong>AI Composer</strong> trained on your library with brand guardrails</div></li>
-          <li><div></div><div><strong>Predictive timing</strong> windows per FB/IG, TikTok, X, LinkedIn</div></li>
-          <li><div></div><div><strong>Closed-loop analytics</strong>—creative-level lift, not vanity metrics</div></li>
-        </ul>
-      </div>
-
-      <div class="right">
-        <!-- Platform segmented control -->
-        <div class="seg" role="tablist" aria-label="Choose preview platform" style="margin-bottom:10px">
-          <button class="active" data-p="facebook" role="tab" aria-selected="true">Facebook</button>
-          <button data-p="instagram" role="tab" aria-selected="false">Instagram</button>
-          <button data-p="tiktok" role="tab" aria-selected="false">TikTok</button>
-        </div>
-
-        <!-- Ad-style preview mock -->
-        <div class="ad-card" id="adMock" data-platform="facebook">
-          <div class="ad-head">
-            <div class="ad-brand">
-              <span class="ad-avatar" aria-hidden="true"></span>
-              <span class="ad-name" id="adName">EVRT</span>
-            </div>
-            <span class="ui-badge ad-tag" id="adTag">Sponsored · 1h</span>
-          </div>
-          <p class="muted ad-copy" id="adCopy" style="margin:.6rem 0 0">
-            Draft once → schedule everywhere with predictive timing.
-          </p>
-          <div class="ad-media" id="adMedia" aria-label="Ad media"></div>
-          <div class="ad-footer">
-            <span class="muted ad-url" id="adUrl">evrt.ai</span>
-            <span class="ad-cta" id="adCta">Start trial</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Ads Optimizer -->
-  <section id="ads" class="container section">
-    <div class="spot-card card" data-reveal>
-      <div class="left">
-        <div class="icon">🎯</div>
-        <h3 style="margin:.25rem 0">Ads Optimizer</h3>
-        <p class="muted">Quantify creative quality, generate variants, and route budget to what wins—fast.</p>
-        <ul class="check">
-          <li><div></div><div><strong>Creative scoring</strong> from text & assets → ranked shortlist</div></li>
-          <li><div></div><div><strong>Variant generator</strong> (hooks, bodies, CTAs) aligned to constraints</div></li>
-          <li><div></div><div><strong>Spend hints</strong> by predicted lift & uncertainty</div></li>
-          <li><div></div><div><strong>Experiment templates</strong> for A/B and multi-cell tests</div></li>
-        </ul>
-        <div style="margin-top:10px"><a class="btn" href="pricing.html">Included in Pro</a></div>
-      </div>
-      <div class="right">
-        <div class="grid grid-2">
-          <div class="card">
-            <strong>Top hooks (predicted)</strong>
-            <p class="muted" style="margin:.35rem 0 0">“Draft once, schedule everywhere” • “Find your best minute” • “Close the loop”.</p>
-          </div>
-          <div class="card">
-            <strong>Budget hints</strong>
-            <p class="muted" style="margin:.35rem 0 0">Shift +15% to Variant B; pause Variant D (low confidence, low lift).</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Monitor -->
-  <section id="monitor" class="container section">
-    <div class="spot-card card" data-reveal>
-      <div class="left">
-        <div class="icon">🛰️</div>
-        <h3 style="margin:.25rem 0">Monitor</h3>
-        <p class="muted">Stay ahead with brand/competitor signals—without surveillance creep. Transparent sources, smart summarization.</p>
-        <ul class="check">
-          <li><div></div><div><strong>Anomaly alerts</strong> (spikes, sentiment shifts, narrative change)</div></li>
-          <li><div></div><div><strong>Idea pipeline</strong> → convert signals into briefs & variants</div></li>
-          <li><div></div><div><strong>Privacy-first</strong> capture with retention policies</div></li>
-        </ul>
-      </div>
-      <div class="right">
-        <div class="grid grid-2">
-          <div class="card"><strong>Signals feed</strong><p class="muted" style="margin:.35rem 0 0">Daily summary → high-signal snippets you can trust.</p></div>
-          <div class="card"><strong>Briefs</strong><p class="muted" style="margin:.35rem 0 0">Auto-drafted creative briefs turn into drafts in Social AI.</p></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Attribution / UTM Kit -->
-  <section id="kit" class="container section">
-    <div class="spot-card spotlight" data-reveal>
-      <div class="left">
-        <h3 style="margin:.25rem 0">Attribution & UTM Kit</h3>
-        <p class="muted">Keep your data clean from day one. Links, naming, and governance your BI team will love.</p>
-        <ul class="check">
-          <li><div></div><div>UTM builder with presets & link shortener</div></li>
-          <li><div></div><div>Auto-tagging per platform; link validation</div></li>
-          <li><div></div><div>Warehouse-friendly exports; GA4 alignment</div></li>
-        </ul>
-      </div>
-      <div class="right">
-        <div class="card"><strong>Governance</strong><p class="muted" style="margin:.35rem 0 0">Naming standards, required fields, and review flows.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Integrations -->
-  <section id="integrations" class="container section">
-    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">Integrations</h2>
-    <p class="muted" style="margin:0 0 10px">Plug into the tools you already use.</p>
-    <div class="icons" data-reveal>
-      <div class="ico">Facebook</div><div class="ico">Instagram</div><div class="ico">TikTok</div>
-      <div class="ico">LinkedIn</div><div class="ico">X</div><div class="ico">Slack</div>
-      <div class="ico">GA4</div><div class="ico">Shopify</div><div class="ico">Segment</div>
-      <div class="ico">HubSpot</div><div class="ico">BigQuery</div><div class="ico">Looker</div>
-    </div>
-  </section>
-
-  <!-- Security -->
-  <section id="security" class="container section">
-    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">Security & Privacy</h2>
-    <div class="grid grid-2">
-      <div class="card" data-reveal>
-        <ul class="check">
-          <li><div></div><div>Tenant isolation; encryption in transit & at rest</div></li>
-          <li><div></div><div>SSO/MFA, roles, approvals, and audit trails</div></li>
-          <li><div></div><div>Data retention controls & export options</div></li>
-        </ul>
-      </div>
-      <div class="card" data-reveal>
-        <strong>Compliance posture</strong>
-        <p class="muted" style="margin:.35rem 0 0">Privacy-first patterns and SOC 2–friendly controls. See <a href="privacy.html">Privacy</a>.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Plans snapshot -->
-  <section class="container section">
-    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">Plans at a glance</h2>
-    <div class="price-grid">
-      <div class="card price" data-reveal>
-        <div class="tag">Starter</div>
-        <div class="value">$0</div>
-        <p class="muted">1 brand • 3 platforms • basic AI</p>
-        <a class="btn" href="pricing.html">Get started</a>
-      </div>
-      <div class="card price pro" data-reveal>
-        <div class="tag">Pro</div>
-        <div class="value">$49<span class="muted" style="font-size:1rem;font-weight:600">/mo</span></div>
-        <p class="muted">3 brands • 5 platforms • predictive • A/B • Ads Optimizer</p>
-        <a class="btn primary" href="pricing.html">Start trial</a>
-      </div>
-      <div class="card price" data-reveal>
-        <div class="tag">Enterprise</div>
-        <div class="value">Custom</div>
-        <p class="muted">SSO • roles • audit • SOC 2 workflows • support SLAs</p>
-        <a class="btn" href="contact.html">Talk to sales</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section id="faq" class="container section">
-    <h2 class="gradient-text" style="font-family:'Space Grotesk',Inter,sans-serif;margin:0 0 12px">FAQ</h2>
-    <div class="grid grid-2">
-      <details class="card" data-reveal>
-        <summary>Can we try Social AI without connecting accounts?</summary>
-        <p class="muted">Yes—use the live demo with simulated data, then connect when you’re ready.</p>
-      </details>
-      <details class="card" data-reveal>
-        <summary>Is Ads Optimizer included in Pro?</summary>
-        <p class="muted">Yes. Scoring, variants, and spend hints are part of the Pro plan.</p>
-      </details>
-      <details class="card" data-reveal>
-        <summary>How does Monitor handle privacy?</summary>
-        <p class="muted">Transparent sources, configurable retention, and tenant isolation. See <a href="privacy.html">Privacy</a> for details.</p>
-      </details>
-      <details class="card" data-reveal>
-        <summary>Do you have an API?</summary>
-        <p class="muted">We expose endpoints for catalog sync and analytics export on Pro/Enterprise. Contact us for access.</p>
-      </details>
-    </div>
-  </section>
-
-  <!-- CTA -->
-  <section id="cta" class="container section">
-    <div class="card" style="display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap" data-reveal>
-      <div>
-        <h3 style="margin:.25rem 0">Ready to build your compounding loop?</h3>
-        <p class="muted" style="margin:.25rem 0 0">Start a trial or talk to us about a pilot. You’ll see lift fast.</p>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <a class="btn primary" href="pricing.html">Start trial</a>
-        <a class="btn" href="contact.html">Talk to sales</a>
-      </div>
-    </div>
-  </section>
+  </div>
 
   <div data-include="partials/footer.html"></div>
 
-  <!-- Page script: platform picker for the ad mock -->
-  <script>
-    (function(){
-      const ad = document.getElementById('adMock');
-      const name = document.getElementById('adName');
-      const tag  = document.getElementById('adTag');
-      const copy = document.getElementById('adCopy');
-      const url  = document.getElementById('adUrl');
-      const cta  = document.getElementById('adCta');
-
-      const data = {
-        facebook: {
-          tag: 'Sponsored · 1h',
-          copy: 'Draft once → schedule everywhere with predictive timing.',
-          url:  'evrt.ai',
-          cta:  'Start trial'
-        },
-        instagram: {
-          tag: 'Sponsored',
-          copy: 'Create on-brand posts, publish at the best minute, measure lift.',
-          url:  'evrt.ai',
-          cta:  'Shop now'
-        },
-        tiktok: {
-          tag: 'Promoted',
-          copy: 'On-brand content + best-minute timing. Close the loop on lift.',
-          url:  '@evrt.ai',
-          cta:  'Learn more'
-        }
-      };
-
-      function render(p){
-        const d = data[p];
-        ad.dataset.platform = p;
-        name.textContent = p === 'tiktok' ? 'EVRT · Official' : 'EVRT';
-        tag.textContent  = d.tag;
-        copy.textContent = d.copy;
-        url.textContent  = d.url;
-        cta.textContent  = d.cta;
-      }
-
-      document.querySelectorAll('.seg [data-p]').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          document.querySelectorAll('.seg [data-p]').forEach(b=>b.classList.remove('active'));
-          btn.classList.add('active');
-          render(btn.dataset.p);
-        });
-      });
-
-      render('facebook'); // initial
-    })();
-  </script>
-
   <script defer src="assets/app.js"></script>
+  <script>
+    /* ===== Star field background ===== */
+    (function starfield(){
+      const c = document.getElementById('field'); const ctx = c.getContext('2d');
+      function resize(){ c.width = innerWidth; c.height = innerHeight; }
+      resize(); addEventListener('resize', resize);
+      const N = 240, pts = [];
+      for(let i=0;i<N;i++){ pts.push({x:Math.random()*c.width, y:Math.random()*c.height, z:Math.random()*1, v: 0.4 + Math.random()*1}); }
+      (function tick(){
+        ctx.fillStyle = 'rgba(10,14,20,0.10)'; ctx.fillRect(0,0,c.width,c.height);
+        pts.forEach(p=>{
+          p.y += p.v; if(p.y>c.height){ p.y = -4; p.x = Math.random()*c.width; }
+          const r = Math.max(.5, (1-p.z)*2.2);
+          ctx.beginPath(); ctx.fillStyle = '#6ee7ff'; ctx.globalAlpha = 0.2 + (1-p.z)*0.8;
+          ctx.arc(p.x, p.y, r, 0, 6.283); ctx.fill(); ctx.globalAlpha = 1;
+        });
+        requestAnimationFrame(tick);
+      })();
+    })();
+
+    /* ===== App data ===== */
+    const APPS = [
+      { id:'social', name:'EVRT Social AI', path:'social-ai.html', cat:['marketing','analytics'], desc:'Draft on-brand content, predict best minute, schedule, and preview.', tags:['Scheduler','Predictive','Cross-platform'], roi:93, speed:88, impact:92, color:'#6ee7ff' },
+      { id:'adstudio', name:'Ad Studio', path:'ad-studio.html', cat:['marketing','analytics'], desc:'Audience builder → creative → plan. Predict before you spend.', tags:['Audience','Creative','ROAS'], roi:91, speed:84, impact:95, color:'#63ffa5' },
+      { id:'adlab', name:'Ad Demo Lab', path:'adlab.html', cat:['marketing','analytics'], desc:'Collider + Predictor + Bandit Arena + Radar. Alien-grade sandbox.', tags:['Bandits','Anomalies','Export'], roi:88, speed:90, impact:90, color:'#ffd75a' },
+      { id:'dash', name:'Command Dashboard', path:'dashboard.html', cat:['analytics'], desc:'KPIs, performance, audience, funnel, cohorts, and alerts.', tags:['KPIs','Cohorts','ROAS'], roi:86, speed:92, impact:88, color:'#8ab6ff' },
+      { id:'cyber', name:'Cybersecurity Ops', path:'cybersecurity.html', cat:['security','ops'], desc:'Terminal-grade visuals, scan animations, and guardrails vibe.', tags:['Scan','Guardrails','Visibility'], roi:82, speed:86, impact:87, color:'#ff4d6d' },
+      { id:'portal', name:'Client Portal', path:'portal.html', cat:['ops'], desc:'Magic link login → projects, docs, messages. (Auth wiring optional.)', tags:['Auth','Docs','Messages'], roi:80, speed:85, impact:84, color:'#bde8ff' },
+      { id:'projects', name:'Projects', path:'projects.html', cat:['ops','analytics'], desc:'Case studies & showcases with cinematic cards.', tags:['Showcase','Cards'], roi:78, speed:88, impact:80, color:'#caffbf' },
+      { id:'app', name:'Client App (MVP)', path:'app.html', cat:['ops'], desc:'Signed URLs, realtime messages, private docs. (Supabase demo.)', tags:['Realtime','Storage'], roi:79, speed:82, impact:83, color:'#ffe29a' },
+      { id:'consult', name:'Consulting', path:'consulting.html', cat:['ops'], desc:'Engagements, packages, and hands-on data + marketing builds.', tags:['Engage','Delivery'], roi:76, speed:84, impact:82, color:'#fbcfe8' },
+      { id:'about', name:'About EVRT', path:'about.html', cat:['ops'], desc:'Who we are and how we work—fast, skeptical, ROI-led.', tags:['Team','Ethos'], roi:72, speed:90, impact:75, color:'#e9d5ff' },
+    ];
+
+    /* ===== State ===== */
+    const state = {
+      cat:'all', q:'', pins: new Set(JSON.parse(localStorage.getItem('evrt.pins')||'[]')),
+      compare: new Set(), metric:'roi'
+    };
+
+    /* ===== Helpers ===== */
+    const el = sel => document.querySelector(sel);
+    const els = sel => Array.from(document.querySelectorAll(sel));
+    function savePins(){ localStorage.setItem('evrt.pins', JSON.stringify([...state.pins])); }
+    function fmt(n){ return n.toLocaleString(); }
+
+    /* ===== Build Dock ===== */
+    function renderDock(){
+      const dock = el('#dock'); dock.innerHTML='';
+      const items = APPS.filter(a=> state.pins.has(a.id));
+      if(items.length===0){
+        dock.innerHTML = '<div class="muted">No favorites yet. Click “Pin” on any app.</div>';
+        return;
+      }
+      items.forEach(a=>{
+        const d = document.createElement('div'); d.className='dock-item';
+        d.innerHTML = `
+          <div class="row">
+            <strong>${a.name}</strong>
+            <span class="badge"><span class="ping"></span> live</span>
+          </div>
+          <div class="mini" style="margin-top:4px">${a.desc}</div>
+          <div class="row wrap" style="margin-top:8px">
+            <a class="btn neon" href="${a.path}">Open</a>
+            <button class="btn" data-unpin="${a.id}">Unpin</button>
+          </div>
+          <div class="glow"></div>
+        `;
+        dock.appendChild(d);
+      });
+      dock.querySelectorAll('[data-unpin]').forEach(b=>{
+        b.onclick = ()=>{ state.pins.delete(b.dataset.unpin); savePins(); renderDock(); renderGrid(); };
+      });
+    }
+
+    /* ===== Build Grid ===== */
+    function match(app){
+      const inCat = state.cat==='all' || app.cat.includes(state.cat);
+      if(!inCat) return false;
+      if(!state.q) return true;
+      const q = state.q.toLowerCase();
+      return [app.name, app.desc, ...(app.tags||[])].join(' ').toLowerCase().includes(q);
+    }
+
+    function cardHTML(a){
+      const pinned = state.pins.has(a.id);
+      const picked = state.compare.has(a.id);
+      return `
+        <div class="card" data-id="${a.id}" style="--tiltX:0;--tiltY:0">
+          <div class="orb"></div>
+          <div class="row">
+            <div class="badge" style="border-color:${a.color}80">${a.cat.map(c=>c[0].toUpperCase()+c.slice(1)).join(' • ')}</div>
+            <div class="row" style="gap:8px">
+              <span class="badge" title="ROI score"><svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="${a.color}"/></svg> ${a.roi}</span>
+              <span class="badge" title="Speed score"><svg width="12" height="12"><rect x="2" y="2" width="8" height="8" fill="${a.color}"/></svg> ${a.speed}</span>
+              <span class="badge" title="Impact score"><svg width="12" height="12"><polygon points="6,1 11,11 1,11" fill="${a.color}"/></svg> ${a.impact}</span>
+            </div>
+          </div>
+          <h3 style="margin:8px 0 4px">${a.name}</h3>
+          <div class="muted">${a.desc}</div>
+          <div class="tags" style="margin-top:8px">${(a.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+          <div class="row wrap" style="margin-top:10px">
+            <a class="btn neon" href="${a.path}">Launch</a>
+            <button class="btn" data-compare="${a.id}">${picked?'Remove from Compare':'Add to Compare'}</button>
+            <button class="btn ${pinned?'ghost':''}" data-pin="${a.id}">${pinned?'Unpin':'Pin'}</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderGrid(){
+      const grid = el('#grid'); grid.innerHTML='';
+      const list = APPS.filter(match);
+      if(list.length===0){ grid.innerHTML = '<div class="muted">No matches. Try a different filter.</div>'; return; }
+      list.forEach(a=>{
+        const wrap = document.createElement('div'); wrap.innerHTML = cardHTML(a);
+        grid.appendChild(wrap.firstElementChild);
+      });
+      // hooks
+      els('[data-pin]').forEach(b=>{
+        b.onclick = ()=>{
+          const id = b.dataset.pin;
+          if(state.pins.has(id)) state.pins.delete(id); else state.pins.add(id);
+          savePins(); renderDock(); renderGrid();
+        };
+      });
+      els('[data-compare]').forEach(b=>{
+        b.onclick = ()=>{
+          const id = b.dataset.compare;
+          if(state.compare.has(id)) state.compare.delete(id); else state.compare.add(id);
+          renderGrid(); renderDrawer();
+        };
+      });
+      // tilt
+      els('.card').forEach(card=>{
+        card.addEventListener('mousemove', (e)=>{
+          const r = card.getBoundingClientRect(); const x = (e.clientX - r.left)/r.width, y = (e.clientY - r.top)/r.height;
+          const rx = (y-0.5)*8, ry = (x-0.5)*-8;
+          card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+        });
+        card.addEventListener('mouseleave', ()=> card.style.transform='');
+      });
+    }
+
+    /* ===== Filters/Search ===== */
+    els('#chips .chip').forEach(ch=>{
+      ch.onclick = ()=>{ els('#chips .chip').forEach(x=>x.classList.remove('active')); ch.classList.add('active'); state.cat = ch.dataset.cat; renderGrid(); };
+    });
+    el('#search').addEventListener('input', (e)=>{ state.q = e.target.value; renderGrid(); });
+    el('#shuffle').onclick = ()=>{
+      // quick shuffle for vibes
+      APPS.sort(()=> Math.random() - 0.5); renderGrid();
+    };
+    el('#clearPins').onclick = ()=>{ state.pins.clear(); savePins(); renderDock(); renderGrid(); };
+
+    /* ===== Spotlight ===== */
+    function spotlight(){
+      const spot = el('#spot');
+      let i=0;
+      function draw(){
+        const a = APPS[i % APPS.length];
+        spot.innerHTML = `
+          <div class="card grid-overlay">
+            <div class="row"><strong>${a.name}</strong><span class="badge"><span class="ping"></span> ready</span></div>
+            <p class="muted" style="margin-top:6px">${a.desc}</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+              <div class="card" style="padding:10px"><div class="muted">ROI</div><div class="knum">${a.roi}</div></div>
+              <div class="card" style="padding:10px"><div class="muted">Speed</div><div class="knum">${a.speed}</div></div>
+              <div class="card" style="padding:10px"><div class="muted">Impact</div><div class="knum">${a.impact}</div></div>
+            </div>
+            <div class="row wrap" style="margin-top:10px">
+              <a class="btn neon" href="${a.path}">Open ${a.name.split(' ')[0]}</a>
+              <button class="btn" onclick="navigator.clipboard.writeText(location.origin+location.pathname.replace('apps.html','${a.path}'))">Copy Link</button>
+            </div>
+          </div>
+        `;
+        i++; setTimeout(draw, 4200);
+      }
+      draw();
+    }
+
+    /* ===== Race Chart ===== */
+    const race = el('#race'); const rctx = race.getContext('2d');
+    function drawRace(){
+      const W=race.width=race.clientWidth, H=race.height=race.clientHeight;
+      rctx.clearRect(0,0,W,H); rctx.fillStyle='#0f141c'; rctx.fillRect(0,0,W,H);
+      rctx.strokeStyle='rgba(255,255,255,.08)'; for(let i=0;i<5;i++){ rctx.beginPath(); rctx.moveTo(36,20+i*(H-60)/4); rctx.lineTo(W-20,20+i*(H-60)/4); rctx.stroke(); }
+      const m = state.metric;
+      const sorted = [...APPS].sort((a,b)=> b[m]-a[m]).slice(0,6);
+      const bw = (H-60)/sorted.length;
+      sorted.forEach((a,idx)=>{
+        const val = a[m]; const w = (W-180) * (val/100);
+        const y = 30 + idx*bw;
+        rctx.fillStyle = a.color; rctx.shadowBlur = 10; rctx.shadowColor = a.color + '66';
+        rctx.fillRect(140, y, w, bw-14); rctx.shadowBlur=0;
+        rctx.fillStyle = '#9fb3c8'; rctx.font='12px Inter,system-ui';
+        rctx.fillText(a.name, 20, y + (bw-14)/2 + 4);
+        rctx.fillText(val.toFixed(0), 140 + w + 8, y + (bw-14)/2 + 4);
+      });
+    }
+    els('#metrics .chip').forEach(ch=>{
+      ch.onclick = ()=>{ els('#metrics .chip').forEach(x=>x.classList.remove('active')); ch.classList.add('active'); state.metric = ch.dataset.m; drawRace(); };
+    });
+    setInterval(()=>{
+      // tiny jitter to feel alive
+      APPS.forEach(a=>{ a.roi = Math.max(60, Math.min(99, a.roi + (Math.random()-0.5)*1.2)); a.speed = Math.max(60, Math.min(99, a.speed + (Math.random()-0.5)*1.2)); a.impact = Math.max(60, Math.min(99, a.impact + (Math.random()-0.5)*1.2)); });
+      drawRace();
+    }, 1400);
+
+    /* ===== Compare Drawer + Radar ===== */
+    function renderDrawer(){
+      const drawer = el('#drawer'); const list = el('#compareList');
+      list.innerHTML = '';
+      if(state.compare.size===0){ drawer.style.display='none'; return; }
+      drawer.style.display='block';
+      APPS.filter(a=> state.compare.has(a.id)).forEach(a=>{
+        const p=document.createElement('span'); p.className='pill'; p.style.borderColor=a.color+'80'; p.innerHTML=`<span style="width:10px;height:10px;border-radius:3px;background:${a.color};display:inline-block"></span>${a.name} <button data-rm="${a.id}" style="background:transparent;border:0;color:#9fb3c8;cursor:pointer">×</button>`;
+        list.appendChild(p);
+      });
+      list.querySelectorAll('[data-rm]').forEach(b=> b.onclick=()=>{ state.compare.delete(b.dataset.rm); renderGrid(); renderDrawer(); });
+    }
+    el('#closeDrawer').onclick = ()=>{ el('#drawer').style.display='none'; };
+    el('#runCompare').onclick = drawRadar;
+
+    const radar = el('#radar'); const xrx = radar.getContext('2d');
+    function drawRadar(){
+      const items = APPS.filter(a=> state.compare.has(a.id));
+      const W = radar.width=radar.clientWidth, H=radar.height=radar.clientHeight;
+      xrx.clearRect(0,0,W,H); xrx.fillStyle='#0f141c'; xrx.fillRect(0,0,W,H);
+      const cx=W/2, cy=H/2, R=Math.min(W,H)*0.38, axes=['ROI','Speed','Impact'];
+      // grid
+      xrx.strokeStyle='rgba(255,255,255,.08)'; for(let g=1; g<=4; g++){ xrx.beginPath(); for(let i=0;i<axes.length;i++){ const a=(i/axes.length)*Math.PI*2 - Math.PI/2; const x=cx+Math.cos(a)*R*g/4, y=cy+Math.sin(a)*R*g/4; if(i===0) xrx.moveTo(x,y); else xrx.lineTo(x,y);} xrx.closePath(); xrx.stroke(); }
+      // axes
+      xrx.fillStyle='#9fb3c8'; xrx.font='12px Inter,system-ui'; xrx.textAlign='center';
+      for(let i=0;i<axes.length;i++){ const a=(i/axes.length)*Math.PI*2 - Math.PI/2; xrx.beginPath(); xrx.moveTo(cx,cy); xrx.lineTo(cx+Math.cos(a)*R, cy+Math.sin(a)*R); xrx.stroke(); xrx.fillText(axes[i], cx+Math.cos(a)*(R+14), cy+Math.sin(a)*(R+14)); }
+      if(items.length===0) return;
+      items.forEach((app,idx)=>{
+        const vals=[app.roi,app.speed,app.impact].map(v=> v/100);
+        xrx.beginPath(); vals.forEach((v,i)=>{ const a=(i/axes.length)*Math.PI*2 - Math.PI/2; const x=cx+Math.cos(a)*R*v, y=cy+Math.sin(a)*R*v; if(i===0) xrx.moveTo(x,y); else xrx.lineTo(x,y); });
+        xrx.closePath(); xrx.fillStyle = app.color+'33'; xrx.strokeStyle=app.color; xrx.lineWidth=2; xrx.fill(); xrx.stroke();
+      });
+    }
+
+    /* ===== Command Palette (Cmd/Ctrl + K) ===== */
+    const palette = el('#palette'), palInput = el('#palInput'), palRows = el('#palRows');
+    function openPalette(){ palette.style.display='grid'; palInput.value=''; buildRows(''); palInput.focus(); }
+    function closePalette(){ palette.style.display='none'; }
+    function buildRows(q){
+      palRows.innerHTML='';
+      APPS.filter(a=> !q || (a.name+' '+a.desc+' '+(a.tags||[]).join(' ')).toLowerCase().includes(q.toLowerCase()))
+          .slice(0,20).forEach(a=>{
+        const row=document.createElement('div'); row.className='row'; row.innerHTML=`<div>${a.name}<div class="muted">${a.desc}</div></div><a class="btn neon" href="${a.path}">Open</a>`;
+        row.onclick = ()=> location.href = a.path;
+        palRows.appendChild(row);
+      });
+    }
+    addEventListener('keydown', (e)=>{
+      if((e.metaKey || e.ctrlKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); openPalette(); }
+      if(e.key==='Escape'){ closePalette(); }
+    });
+    palInput.addEventListener('input', (e)=> buildRows(e.target.value));
+    palette.addEventListener('click', (e)=>{ if(e.target===palette) closePalette(); });
+
+    /* ===== Init ===== */
+    renderDock(); renderGrid(); drawRace(); spotlight();
+    addEventListener('resize', ()=>{ drawRace(); drawRadar(); });
+  </script>
 </body>
 </html>
