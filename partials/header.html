@@ -1,32 +1,7 @@
-<!-- partials/header.html -->
-<header class="site-header" role="banner">
-  <a href="#main" class="skip">Skip to content</a>
-
-  <style>
-    /* Scoped to header */
-    .site-header{
-      --hdr-bg: rgba(7,18,27,.85);
-      --hdr-line: rgba(255,255,255,.12);
-      --hdr-line-strong: rgba(255,255,255,.92);
-      --neon: var(--evrt-neon, #6ee7ff);
-      --accent: var(--evrt-accent, #63ffa5);
-      position:sticky;top:0;z-index:1000;background:var(--hdr-bg);
-      backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08)
-    }
-    .site-header .skip{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
-    .site-header .skip:focus{
-      position:fixed;left:12px;top:12px;padding:8px 12px;border-radius:8px;background:#0f141c;color:#fff;
-      border:1px solid var(--hdr-line-strong);z-index:1200
-    }
-
-    .site-header .wrap{display:flex;align-items:center;gap:12px;padding:10px 14px}
-    .site-header .brand{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:auto}
-    .site-header .brand .logo{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--neon),var(--accent))}
-    .site-header .brand span{font-weight:800;letter-spacing:.4px;color:#fff}
-
-    <header class="site-header">
+<header class="site-header">
   <div class="container nav">
-    <a class="brand" href="index.html">EVRT</a>
+    <a class="brand" href="index.html">EVRT Social AI</a>
+
     <nav class="links">
       <a href="consulting.html">Consulting</a>
       <a href="cybersecurity.html">Cyber Ops</a>
@@ -34,10 +9,22 @@
       <a href="insights.html">Insights</a>
       <a href="about.html">About</a>
     </nav>
-    <a class="btn primary" href="APPLY_URL">Apply to work with EVRT</a>
+
+    <div class="row">
+      <a class="btn primary" href="APPLY_URL">Apply to work with EVRT</a>
+      <button class="btn menu-btn" id="menuBtn">Menu</button>
+    </div>
   </div>
 
-  <!-- Acceptance bar -->
+  <div class="mobile-drawer" id="mDrawer">
+    <a href="consulting.html">Consulting</a>
+    <a href="cybersecurity.html">Cyber Ops</a>
+    <a href="ad-studio.html">Ad Studio</a>
+    <a href="insights.html">Insights</a>
+    <a href="about.html">About</a>
+    <a class="btn primary" href="APPLY_URL">Apply</a>
+  </div>
+
   <div class="acceptance">
     <div class="container">
       <span>We accept ~<strong>1.3%</strong> of applicants.</span>
@@ -47,171 +34,8 @@
   </div>
 </header>
 
-
-    /* Desktop nav */
-    .site-header .nav{display:flex;gap:6px;align-items:center}
-    .site-header .nav > details{position:relative}
-    .site-header .nav > details > summary{
-      list-style:none;cursor:pointer;user-select:none;color:#fff;
-      padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:10px
-    }
-    .site-header .nav > details > summary::-webkit-details-marker{display:none}
-    .site-header .nav > details[open] > summary{border-color:rgba(110,231,255,.45)}
-    .site-header .menu{
-      position:absolute;left:0;top:44px;min-width:260px;display:grid;gap:8px;
-      background:#0f141c;border:1px solid var(--hdr-line-strong);border-radius:12px;
-      padding:10px;box-shadow:0 16px 50px rgba(0,0,0,.45);z-index:1001
-    }
-    .site-header .menu a{
-      display:block;color:#fff;text-decoration:none;padding:10px;border:1px solid var(--hdr-line);border-radius:10px
-    }
-    .site-header .menu a:hover{border-color:rgba(110,231,255,.45)}
-
-    .site-header .cta{
-      background:linear-gradient(90deg,var(--neon),var(--accent));color:#061019;border:0;
-      font-weight:800;border-radius:10px;padding:8px 12px;margin-left:6px;text-decoration:none
-    }
-
-    /* Mobile controls */
-    .site-header #navToggle{position:absolute;left:-9999px;top:-9999px}
-    .site-header .menu-btn{
-      display:none;align-items:center;gap:8px;background:#0f141c;color:#fff;
-      padding:8px 12px;border-radius:10px;border:1px solid var(--hdr-line-strong);
-      font-weight:600;cursor:pointer;user-select:none;margin-left:auto;
-    }
-    .site-header .menu-btn:focus{outline:2px solid var(--neon);outline-offset:2px}
-
-    /* Mobile panel (top-right) */
-    .site-header .mnav{
-      display:none;position:absolute;right:10px;top:58px;width:90vw;max-width:420px;
-      background:#0f141c;border:1px solid var(--hdr-line-strong);border-radius:14px;
-      box-shadow:0 16px 50px rgba(0,0,0,.55);padding:12px;z-index:1002;color:#fff
-    }
-    .site-header #navToggle:checked ~ .mnav{display:block}
-    .site-header .backdrop{display:none;position:fixed;inset:0;background:rgba(6,10,15,.6);backdrop-filter:blur(2px);z-index:1001}
-    .site-header #navToggle:checked ~ .backdrop{display:block}
-
-    /* Mobile accordions */
-    .site-header .mcat{border:1px solid var(--hdr-line);border-radius:12px;margin-bottom:10px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01))}
-    .site-header .mcat > summary{
-      list-style:none;cursor:pointer;user-select:none;display:flex;align-items:center;
-      justify-content:space-between;gap:8px;padding:12px 12px
-    }
-    .site-header .mcat > summary::-webkit-details-marker{display:none}
-    .site-header .chev{transition:transform .2s ease}
-    .site-header .mcat[open] .chev{transform:rotate(90deg)}
-    .site-header .mlinks{display:grid;gap:8px;padding:10px}
-    .site-header .mlinks a{display:block;color:#fff;text-decoration:none;padding:10px;border:1px solid var(--hdr-line);border-radius:10px}
-    .site-header .mlinks a:hover{border-color:rgba(110,231,255,.45)}
-
-    /* Account block */
-    .site-header .acc{border:1px solid var(--hdr-line);border-radius:12px;padding:12px;margin-top:2px}
-    .site-header .acc h4{margin:0 0 8px 0;font-size:14px;font-weight:800;color:#cfe7ff}
-    .site-header .acc .row{display:flex;gap:8px;flex-wrap:wrap}
-    .site-header .acc .btn{
-      border:1px solid var(--hdr-line-strong);border-radius:10px;padding:10px 12px;background:#0f141c;color:#fff;text-decoration:none
-    }
-    .site-header .acc .neon{
-      background:linear-gradient(90deg,var(--neon),var(--accent));color:#061019;border:0;font-weight:800
-    }
-
-    /* Breakpoints */
-    @media (max-width:980px){
-      .site-header .nav{display:none}
-      .site-header .menu-btn{display:inline-flex}
-      .site-header .wrap{position:relative}
-    }
-    @media (min-width:981px){
-      .site-header .menu-btn{display:none}
-    }
-  </style>
-
-  <div class="wrap container">
-    <a class="brand" href="index.html" aria-label="EVRT Home">
-      <i class="logo" aria-hidden="true"></i><span>EVRT</span>
-    </a>
-
-    <!-- Desktop nav -->
-    <nav class="nav" aria-label="Primary">
-      <details>
-        <summary>Products</summary>
-        <div class="menu" role="menu">
-          <a href="apps.html">Apps overview</a>
-          <a href="social-ai.html">Social AI</a>
-          <a href="ad-studio.html">Ad Studio</a>
-          <a href="adlab.html">Ad Lab</a>
-          <a href="dashboard.html">Dashboards</a>
-        </div>
-      </details>
-      <details>
-        <summary>Solutions</summary>
-        <div class="menu" role="menu">
-          <a href="consulting.html">Consulting</a>
-          <a href="industries.html">Industries</a>
-          <a href="projects.html">Projects & Case Studies</a>
-        </div>
-      </details>
-      <details>
-        <summary>Resources</summary>
-        <div class="menu" role="menu">
-          <a href="blog.html">Insights</a>
-          <a href="pricing.html">Pricing</a>
-        </div>
-      </details>
-      <details>
-        <summary>Trust</summary>
-        <div class="menu" role="menu">
-          <a href="cybersecurity.html">Cybersecurity</a>
-          <a href="privacy.html">Privacy</a>
-        </div>
-      </details>
-      <details>
-        <summary>Company</summary>
-        <div class="menu" role="menu">
-          <a href="about.html">About</a>
-          <a href="press.html">Press</a>
-          <a href="careers.html">Careers</a>
-          <a href="contact.html">Contact</a>
-        </div>
-      </details>
-      <a class="cta" href="portal.html?plan=pro-trial">Start trial</a>
-    </nav>
-
-    <!-- Mobile controls -->
-    <input type="checkbox" id="navToggle" aria-hidden="true"/>
-    <label for="navToggle" class="menu-btn" aria-controls="mobileCatalog" aria-expanded="false">Menu</label>
-
-    <nav id="mobileCatalog" class="mnav" aria-label="Mobile catalog">
-      <details class="mcat"><summary><span>Products</span><span class="chev">›</span></summary>
-        <div class="mlinks">
-          <a href="apps.html">Apps overview</a><a href="social-ai.html">Social AI</a>
-          <a href="ad-studio.html">Ad Studio</a><a href="adlab.html">Ad Lab</a><a href="dashboard.html">Dashboards</a>
-        </div></details>
-      <details class="mcat"><summary><span>Solutions</span><span class="chev">›</span></summary>
-        <div class="mlinks">
-          <a href="consulting.html">Consulting</a><a href="industries.html">Industries</a><a href="projects.html">Projects & Case Studies</a>
-        </div></details>
-      <details class="mcat"><summary><span>Resources</span><span class="chev">›</span></summary>
-        <div class="mlinks"><a href="blog.html">Insights</a><a href="pricing.html">Pricing</a></div></details>
-      <details class="mcat"><summary><span>Trust</span><span class="chev">›</span></summary>
-        <div class="mlinks"><a href="cybersecurity.html">Cybersecurity</a><a href="privacy.html">Privacy</a></div></details>
-      <details class="mcat"><summary><span>Company</span><span class="chev">›</span></summary>
-        <div class="mlinks"><a href="about.html">About</a><a href="press.html">Press</a><a href="careers.html">Careers</a><a href="contact.html">Contact</a></div></details>
-
-      <div class="acc" role="group" aria-label="Account">
-        <h4>Account</h4>
-        <div class="row">
-          <a class="btn neon" href="portal.html?plan=pro-trial">Start trial</a>
-          <a class="btn" href="portal.html">Client portal</a>
-        </div>
-      </div>
-    </nav>
-
-    <label for="navToggle" class="backdrop" aria-hidden="true" title="Close menu"></label>
-  </div>
-
-  <!-- Add the kill switch (hides “slots left” etc. everywhere) -->
-  <!-- Add the updated popup kill script for mobile -->
-<script src="assets/urgency-popup.js" defer></script>
-  <script src="assets/urgency-kill.js" defer></script>
-</header>
+<script>
+  // tiny mobile drawer
+  const mb=document.getElementById('menuBtn'), md=document.getElementById('mDrawer');
+  mb?.addEventListener('click', ()=> md.classList.toggle('open'));
+</script>
