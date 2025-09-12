@@ -1,8 +1,11 @@
 <header class="site-header">
   <div class="container nav">
-    <a class="brand" href="index.html">EVRT Social AI</a>
+    <a class="brand" href="index.html" aria-label="EVRT Home">
+      <img src="assets/evrt-logo.svg" alt="" />
+      <span class="word">EVRT Consulting</span>
+    </a>
 
-    <nav class="links">
+    <nav class="links" aria-label="Primary">
       <a href="consulting.html">Consulting</a>
       <a href="cybersecurity.html">Cyber Ops</a>
       <a href="ad-studio.html">Ad Studio</a>
@@ -11,12 +14,12 @@
     </nav>
 
     <div class="row">
-      <a class="btn primary" href="APPLY_URL">Apply to work with EVRT</a>
-      <button class="btn menu-btn" id="menuBtn">Menu</button>
+      <a class="btn primary" href="APPLY_URL">Apply</a>
+      <button class="btn menu-btn" id="menuBtn" aria-haspopup="true" aria-expanded="false">Menu</button>
     </div>
   </div>
 
-  <div class="mobile-drawer" id="mDrawer">
+  <div class="mobile-drawer" id="mDrawer" role="dialog" aria-label="Mobile menu">
     <a href="consulting.html">Consulting</a>
     <a href="cybersecurity.html">Cyber Ops</a>
     <a href="ad-studio.html">Ad Studio</a>
@@ -35,7 +38,10 @@
 </header>
 
 <script>
-  // tiny mobile drawer
   const mb=document.getElementById('menuBtn'), md=document.getElementById('mDrawer');
-  mb?.addEventListener('click', ()=> md.classList.toggle('open'));
+  mb?.addEventListener('click', ()=>{
+    md.classList.toggle('open');
+    const open = md.classList.contains('open');
+    mb.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
 </script>
